@@ -1291,4 +1291,3 @@ const AdminPage = ({ onNavigate }) => {
 }
 
 export default AdminPage;
-  
