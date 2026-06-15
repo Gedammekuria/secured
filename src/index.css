@@ -1,0 +1,196 @@
+:root {
+  --primary: #e25822;
+  --primary-hover: #ff7500;
+  --secondary: #0a2540;
+  --accent: #00d4ff;
+  --text-main: #425466;
+  --text-dark: #0a2540;
+  --bg-light: #f6f9fc;
+  --white: #ffffff;
+
+  --font-sans: 'Inter', 'Segoe UI', Roboto, sans-serif;
+  --font-display: Arial, sans-serif;
+
+  --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+
+  --nav-height: 60px;
+  --nav-height-scrolled: 60px;
+
+
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--white);
+  color: var(--text-main);
+  line-height: 1.6;
+  overflow-x: hidden;
+  /* Hide scrollbar for Chrome, Safari and Opera */
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
+
+body.body-lock {
+  overflow: hidden;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  color: var(--text-dark);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: var(--transition);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: var(--transition);
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 30px;
+}
+
+/* Background Stripe Effect */
+.stripe-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: -1;
+  background: linear-gradient(150deg, #53f 15%, #05d5ff 70%, #a6ffcb 94%);
+  transform: skewY(-6deg);
+  transform-origin: 0;
+}
+
+.stripe-mesh {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-color: #f6f9fc;
+  overflow: hidden;
+}
+
+.stripe-mesh::before,
+.stripe-mesh::after {
+  content: '';
+  position: absolute;
+  width: 140%;
+  height: 140%;
+  top: -20%;
+  left: -20%;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(99, 91, 255, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(0, 212, 255, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(166, 255, 203, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 10% 90%, rgba(99, 91, 255, 0.1) 0%, transparent 30%);
+  filter: blur(80px);
+  animation: meshRotate 20s linear infinite;
+}
+
+.stripe-mesh::after {
+  background:
+    radial-gradient(circle at 70% 60%, rgba(0, 212, 255, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 30% 80%, rgba(166, 255, 203, 0.1) 0%, transparent 40%);
+  animation: meshRotate 25s linear infinite reverse;
+  opacity: 0.8;
+}
+
+@keyframes meshRotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.hero-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  opacity: 0.4;
+  background-image:
+    linear-gradient(#e5e7eb 1px, transparent 1px),
+    linear-gradient(90deg, #e5e7eb 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(circle at center, black, transparent 80%);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fadeInUp 0.8s ease forwards;
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+/* === PERFORMANCE HINTS === */
+
+/* GPU-composited layers for animated elements */
+.marquee-content,
+.services-gallery-track {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Skip rendering off-screen sections until they scroll into view */
+.process-grid,
+.benefits-grid,
+.cta-section,
+.partners-section,
+.footer {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 400px;
+}
