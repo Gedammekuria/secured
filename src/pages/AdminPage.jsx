@@ -1281,13 +1281,13 @@ const AdminPage = ({ onNavigate }) => {
             </div>
           </div>
 
-        )};
+        )}
 
       </div>
 
     </div >
 
-  )
-}
+  );
+};
 
 export default AdminPage;
