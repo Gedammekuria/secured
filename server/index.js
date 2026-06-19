@@ -32,6 +32,8 @@ let mockInquiries = [
     alarm_property_type: 'Commercial',
     num_sensors: 12,
     alarm_system_type: 'Wireless (Ajax)',
+    alarm_timeframe: 'Based on your schedule',
+    alarm_installed_system: 'Paradox',
     message: 'Please provide a detailed site assessment and proposal.',
     created_at: new Date(Date.now() - 3600000 * 2).toISOString()
   },
@@ -52,6 +54,8 @@ let mockInquiries = [
     alarm_property_type: 'Residential',
     num_sensors: 4,
     alarm_system_type: 'GSM Burglar Alarm',
+    alarm_timeframe: null,
+    alarm_installed_system: null,
     message: 'Looking for a simple burglar alarm system for my villa.',
     created_at: new Date(Date.now() - 3600000 * 24).toISOString()
   }
@@ -87,6 +91,8 @@ async function initDb() {
         alarm_property_type VARCHAR(100),
         num_sensors INTEGER,
         alarm_system_type VARCHAR(100),
+        alarm_timeframe VARCHAR(100),
+        alarm_installed_system VARCHAR(255),
         message TEXT,
         status VARCHAR(50) DEFAULT 'pending',
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -97,6 +103,12 @@ async function initDb() {
     // Migration to add status column if it doesn't exist (for existing tables)
     await pool.query(`
       ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'pending';
+    `);
+    await pool.query(`
+      ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS alarm_timeframe VARCHAR(100);
+    `);
+    await pool.query(`
+      ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS alarm_installed_system VARCHAR(255);
     `);
 
     console.log('🟢 Database initialized successfully. Table "inquiries" is ready.');
@@ -124,6 +136,8 @@ app.post('/api/inquiries', async (req, res) => {
     alarmPropertyType,
     numSensors,
     alarmSystemType,
+    alarmTimeframe,
+    alarmInstalledSystem,
     message
   } = req.body;
 
@@ -176,6 +190,8 @@ app.post('/api/inquiries', async (req, res) => {
           alarm_property_type: getValue(alarmPropertyType, existingRecord.alarm_property_type),
           num_sensors: (parsedNumSensors !== undefined && parsedNumSensors !== null) ? parsedNumSensors : existingRecord.num_sensors,
           alarm_system_type: getValue(alarmSystemType, existingRecord.alarm_system_type),
+          alarm_timeframe: getValue(alarmTimeframe, existingRecord.alarm_timeframe),
+          alarm_installed_system: getValue(alarmInstalledSystem, existingRecord.alarm_installed_system),
           message: getValue(message, existingRecord.message)
         };
         
@@ -206,6 +222,8 @@ app.post('/api/inquiries', async (req, res) => {
       alarm_property_type: alarmPropertyType || null,
       num_sensors: parsedNumSensors !== undefined && parsedNumSensors !== null && !isNaN(parsedNumSensors) ? parsedNumSensors : null,
       alarm_system_type: alarmSystemType || null,
+      alarm_timeframe: alarmTimeframe || null,
+      alarm_installed_system: alarmInstalledSystem || null,
       message: message || null,
       status: 'pending',
       created_at: new Date().toISOString()
@@ -251,6 +269,8 @@ app.post('/api/inquiries', async (req, res) => {
         const finalAlarmPropertyType = getValue(alarmPropertyType, existingRecord.alarm_property_type);
         const finalNumSensors = (parsedNumSensors !== undefined && parsedNumSensors !== null) ? parsedNumSensors : existingRecord.num_sensors;
         const finalAlarmSystemType = getValue(alarmSystemType, existingRecord.alarm_system_type);
+        const finalAlarmTimeframe = getValue(alarmTimeframe, existingRecord.alarm_timeframe);
+        const finalAlarmInstalledSystem = getValue(alarmInstalledSystem, existingRecord.alarm_installed_system);
         const finalMessage = getValue(message, existingRecord.message);
 
         const updateQuery = `
@@ -270,8 +290,10 @@ app.post('/api/inquiries', async (req, res) => {
             alarm_property_type = $13,
             num_sensors = $14,
             alarm_system_type = $15,
-            message = $16
-          WHERE id = $17
+            alarm_timeframe = $16,
+            alarm_installed_system = $17,
+            message = $18
+          WHERE id = $19
           RETURNING id, created_at;
         `;
 
@@ -291,6 +313,8 @@ app.post('/api/inquiries', async (req, res) => {
           finalAlarmPropertyType || null,
           finalNumSensors,
           finalAlarmSystemType || null,
+          finalAlarmTimeframe || null,
+          finalAlarmInstalledSystem || null,
           finalMessage || null,
           numericId
         ];
@@ -335,9 +359,11 @@ app.post('/api/inquiries', async (req, res) => {
         alarm_property_type,
         num_sensors,
         alarm_system_type,
+        alarm_timeframe,
+        alarm_installed_system,
         message,
         status
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
       RETURNING id, created_at;
     `;
 
@@ -357,6 +383,8 @@ app.post('/api/inquiries', async (req, res) => {
       alarmPropertyType || null,
       parsedNumSensors !== undefined && parsedNumSensors !== null && !isNaN(parsedNumSensors) ? parsedNumSensors : null,
       alarmSystemType || null,
+      alarmTimeframe || null,
+      alarmInstalledSystem || null,
       message || null,
       'pending'
     ];

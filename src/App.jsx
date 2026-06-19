@@ -377,16 +377,15 @@ const Footer = ({ onNavigate }) => {
             <a href="#landing" onClick={(e) => handleNav(e, 'landing')}>Home</a>
 
             <a href="#about" onClick={(e) => handleNav(e, 'about')}>About</a>
-            <a href="#quote" onClick={(e) => handleNav(e, 'quote')}>Get a Quote</a>
             <a href="#contact" onClick={(e) => handleNav(e, 'contact')}>Contact</a>
-            <a href="#admin" onClick={(e) => handleNav(e, 'admin')}>Admin Panel</a>
+            <a href="#quote" onClick={(e) => handleNav(e, 'quote')}>Get a Quote</a>
           </div>
           <div className="footer-links">
             <h4>Contact Info</h4>
             <a href="tel:+251 923 55 55 54" className="footer-contact-item">
               <Phone size={14} className="text-primary" /> +251 923 55 55 54
             </a>
-            <a href="mailto:info@safehive.com" className="footer-contact-item">
+            <a href="mailto:info@safehive.com" className="footer-contact-item" >
               <Mail size={14} className="text-primary" /> info@safehive.com
             </a>
 

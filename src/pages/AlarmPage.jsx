@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Bell, Shield, ShieldCheck, AlertTriangle, Smartphone, Wifi, ArrowRight, CheckCircle, Zap, Radio, Lock, Activity } from 'lucide-react';
+import { Bell, Shield, ShieldCheck, AlertTriangle, Smartphone, Wifi, ArrowRight, CheckCircle, Zap, Radio, Lock, Activity, PhoneIcon, Siren, BellOff } from 'lucide-react';
 
 const AlarmPage = ({ onNavigate }) => {
   useEffect(() => {
@@ -9,7 +9,11 @@ const AlarmPage = ({ onNavigate }) => {
   const ajaxFeatures = [
     { title: "Jewish Technology", desc: "Patented radio technology for secure, long-range communication.", icon: <Radio /> },
     { title: "Anti-Jamming", desc: "Automatically detects interference and switches to clean frequencies.", icon: <Zap /> },
-    { title: "Instant Alerts", desc: "Receive notifications in 0.15 seconds on your mobile devices.", icon: <Smartphone /> },
+    { title: "Instant Alerts", desc: "Receive notifications in 0.15 seconds on your mobile devices.", icon: <Bell /> },
+    { title: "No Alarm with Pets", desc: "Ajax motion detectors (like MotionProtect or MotionCam) use a smart software algorithm called SmartDetect to ignore animals.", icon: <BellOff /> },
+    { title: "Remote Access Sharing", desc: "You can absolutely share  with others remotely. You never have to share your personal login details; instead, you invite people directly.", icon: <Smartphone /> },
+
+
     { title: "5-Year Battery", desc: "Devices designed to last years without needing maintenance.", icon: <Activity /> }
   ];
 
@@ -52,7 +56,7 @@ const AlarmPage = ({ onNavigate }) => {
               <h2>Ajax Alarm Security System</h2>
               <p>Ajax systems are designed for both residential and commercial use, offering unmatched reliability and professional-grade security that looks great in any environment.</p>
 
-              <div className="ajax-features-list mt-10">
+              <div className="ajax-features-list mt-6">
                 {ajaxFeatures.map((f, i) => (
                   <div key={i} className="ajax-feature-item">
                     <div className="icon-box">{f.icon}</div>

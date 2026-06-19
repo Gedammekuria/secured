@@ -40,6 +40,8 @@ let mockInquiries = [
         alarm_property_type: 'Commercial',
         num_sensors: 12,
         alarm_system_type: 'Wireless (Ajax)',
+        alarm_timeframe: 'Based on your schedule',
+        alarm_installed_system: 'Paradox',
         message: 'Please provide a detailed site assessment and proposal.',
         status: 'pending',
         created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
@@ -61,6 +63,8 @@ let mockInquiries = [
         alarm_property_type: 'Residential',
         num_sensors: 4,
         alarm_system_type: 'GSM Burglar Alarm',
+        alarm_timeframe: null,
+        alarm_installed_system: null,
         message: 'Looking for a simple burglar alarm system for my villa.',
         status: 'pending',
         created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
@@ -90,6 +94,8 @@ async function ensureDb() {
         alarm_property_type VARCHAR(100),
         num_sensors INTEGER,
         alarm_system_type VARCHAR(100),
+        alarm_timeframe VARCHAR(100),
+        alarm_installed_system VARCHAR(255),
         message TEXT,
         status VARCHAR(50) DEFAULT 'pending',
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -97,6 +103,12 @@ async function ensureDb() {
     `);
         await pool.query(`
       ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'pending';
+    `);
+        await pool.query(`
+      ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS alarm_timeframe VARCHAR(100);
+    `);
+        await pool.query(`
+      ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS alarm_installed_system VARCHAR(255);
     `);
         dbInitialised = true;
     } catch (err) {
@@ -144,7 +156,7 @@ app.post('/api/inquiries', async (req, res) => {
         id, source, fullName, initialContact, alternativeContact,
         companyName, location, budget, inquiryType, customInquiry,
         numCameras, footageDuration, cctvOther, alarmPropertyType,
-        numSensors, alarmSystemType, message,
+        numSensors, alarmSystemType, alarmTimeframe, alarmInstalledSystem, message,
     } = req.body;
 
     if (!source || !fullName || !initialContact) {
@@ -182,6 +194,8 @@ app.post('/api/inquiries', async (req, res) => {
                     alarm_property_type: gv(alarmPropertyType, e.alarm_property_type),
                     num_sensors: parsedNumSensors ?? e.num_sensors,
                     alarm_system_type: gv(alarmSystemType, e.alarm_system_type),
+                    alarm_timeframe: gv(alarmTimeframe, e.alarm_timeframe),
+                    alarm_installed_system: gv(alarmInstalledSystem, e.alarm_installed_system),
                     message: gv(message, e.message),
                 };
                 return res.status(200).json({ success: true, id, createdAt: e.created_at });
@@ -195,6 +209,7 @@ app.post('/api/inquiries', async (req, res) => {
             num_cameras: parsedNumCameras, footage_duration: footageDuration || null,
             cctv_other: cctvOther || null, alarm_property_type: alarmPropertyType || null,
             num_sensors: parsedNumSensors, alarm_system_type: alarmSystemType || null,
+            alarm_timeframe: alarmTimeframe || null, alarm_installed_system: alarmInstalledSystem || null,
             message: message || null, status: 'pending', created_at: new Date().toISOString(),
         };
         mockInquiries.unshift(mock);
@@ -213,7 +228,7 @@ app.post('/api/inquiries', async (req, res) => {
                     `UPDATE inquiries SET source=$1,full_name=$2,initial_contact=$3,alternative_contact=$4,
            company_name=$5,location=$6,budget=$7,inquiry_type=$8,custom_inquiry=$9,
            num_cameras=$10,footage_duration=$11,cctv_other=$12,alarm_property_type=$13,
-           num_sensors=$14,alarm_system_type=$15,message=$16 WHERE id=$17 RETURNING id,created_at;`,
+           num_sensors=$14,alarm_system_type=$15,alarm_timeframe=$16,alarm_installed_system=$17,message=$18 WHERE id=$19 RETURNING id,created_at;`,
                     [
                         gv(source, e.source), gv(fullName, e.full_name), gv(initialContact, e.initial_contact),
                         gv(alternativeContact, e.alternative_contact), gv(companyName, e.company_name),
@@ -222,7 +237,8 @@ app.post('/api/inquiries', async (req, res) => {
                         gv(customInquiry, e.custom_inquiry), parsedNumCameras ?? e.num_cameras,
                         gv(footageDuration, e.footage_duration), gv(cctvOther, e.cctv_other),
                         gv(alarmPropertyType, e.alarm_property_type), parsedNumSensors ?? e.num_sensors,
-                        gv(alarmSystemType, e.alarm_system_type), gv(message, e.message), numericId,
+                        gv(alarmSystemType, e.alarm_system_type), gv(alarmTimeframe, e.alarm_timeframe),
+                        gv(alarmInstalledSystem, e.alarm_installed_system), gv(message, e.message), numericId,
                     ]
                 );
                 return res.status(200).json({ success: true, id: r.rows[0].id, createdAt: r.rows[0].created_at });
@@ -237,13 +253,14 @@ app.post('/api/inquiries', async (req, res) => {
         const r = await pool.query(
             `INSERT INTO inquiries (source,full_name,initial_contact,alternative_contact,company_name,
        location,budget,inquiry_type,custom_inquiry,num_cameras,footage_duration,cctv_other,
-       alarm_property_type,num_sensors,alarm_system_type,message,status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) RETURNING id,created_at;`,
+       alarm_property_type,num_sensors,alarm_system_type,alarm_timeframe,alarm_installed_system,message,status)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19) RETURNING id,created_at;`,
             [
                 source, fullName, initialContact, alternativeContact || null, companyName || null,
                 location || null, budget || null, formattedInquiryType, customInquiry || null,
                 parsedNumCameras, footageDuration || null, cctvOther || null,
-                alarmPropertyType || null, parsedNumSensors, alarmSystemType || null, message || null, 'pending',
+                alarmPropertyType || null, parsedNumSensors, alarmSystemType || null,
+                alarmTimeframe || null, alarmInstalledSystem || null, message || null, 'pending',
             ]
         );
         return res.status(201).json({ success: true, id: r.rows[0].id, createdAt: r.rows[0].created_at });

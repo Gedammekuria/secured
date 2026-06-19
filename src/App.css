@@ -969,10 +969,10 @@
   margin-top: var(--nav-height);
   /* Offset for the fixed navbar */
   overflow: hidden;
-  background: linear-gradient(rgba(24, 24, 24, 0.5), rgba(139, 218, 224, 0.1)), url('/hero page.webp');
+  background: linear-gradient(rgba(24, 24, 24, 0.5), rgba(139, 218, 224, 0.1)), url('/hero image.jpg');
   background-size: cover;
-
   background-position: right center;
+
 }
 
 /* Hero Background Elements Removed per User Request */
@@ -999,6 +999,7 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  filter: blur(4px);
 }
 
 .hero-text h1 {
@@ -3553,7 +3554,7 @@
 
 .ajax-feature-item {
   display: flex;
-  gap: 24px;
+  gap: 15px;
   margin-bottom: 20px;
 }
 
@@ -4178,7 +4179,7 @@
 
 .footer-grid {
   display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr 1fr 2fr;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr 2fr;
   gap: 60px;
   margin-bottom: 80px;
 }

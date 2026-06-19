@@ -217,7 +217,7 @@ const AdminPage = ({ onNavigate }) => {
     'Inquiry ID', 'Full Name', 'Company', 'Primary Contact', 'Secondary Contact',
     'Location', 'Budget', 'Source', 'Service Types', 'Custom Inquiry', 'Status',
     'Num Cameras', 'Footage Duration', 'CCTV Notes', 'Alarm Property Type',
-    'Num Sensors', 'Alarm System Type', 'Message', 'Request Date'
+    'Num Sensors', 'Alarm System Type', 'Alarm Timeframe', 'Alarm Previous System', 'Message', 'Request Date'
   ];
 
   const inquiryToRow = (item) => [
@@ -233,11 +233,13 @@ const AdminPage = ({ onNavigate }) => {
     item.custom_inquiry || '',
     STATUS_CONFIG[item.status || 'pending']?.label || 'Pending',
     item.num_cameras || '',
-    item.footage_duration || '',
+    item.timeframe || '',
     item.cctv_other || '',
     item.alarm_property_type || '',
     item.num_sensors || '',
     item.alarm_system_type || '',
+    item.alarm_timeframe || '',
+    item.alarm_installed_system || '',
     item.message || '',
     formatDate(item.created_at),
   ];
@@ -248,7 +250,7 @@ const AdminPage = ({ onNavigate }) => {
     const wsData = [EXPORT_HEADERS, ...rows.map(inquiryToRow)];
     const ws = XLSX.utils.aoa_to_sheet(wsData);
     // Column widths
-    ws['!cols'] = [10, 18, 18, 22, 22, 16, 12, 10, 20, 20, 12, 12, 16, 18, 20, 12, 20, 30, 20].map(w => ({ wch: w }));
+    ws['!cols'] = [10, 18, 18, 22, 22, 16, 12, 10, 20, 20, 12, 12, 16, 18, 20, 12, 20, 16, 20, 30, 20].map(w => ({ wch: w }));
     // Bold header row
     EXPORT_HEADERS.forEach((_, ci) => {
       const cellRef = XLSX.utils.encode_cell({ r: 0, c: ci });
@@ -375,8 +377,8 @@ const AdminPage = ({ onNavigate }) => {
     y = doc.lastAutoTable.finalY + 8;
 
     // ── SERVICE SPECIFICATIONS ──
-    const hasCctv = item.num_cameras || item.footage_duration || item.cctv_other;
-    const hasAlarm = item.alarm_property_type || item.num_sensors || item.alarm_system_type;
+    const hasCctv = item.num_cameras || item.timeframe || item.cctv_other;
+    const hasAlarm = item.alarm_property_type || item.num_sensors || item.alarm_system_type || item.alarm_timeframe || item.alarm_installed_system;
     const hasCustom = item.custom_inquiry;
 
     if (hasCctv || hasAlarm || hasCustom) {
@@ -386,7 +388,7 @@ const AdminPage = ({ onNavigate }) => {
       if (hasCctv) {
         specRows.push([{ content: 'CCTV Surveillance System', colSpan: 2, styles: { fontStyle: 'bold', textColor: [226, 88, 34], fillColor: [255, 248, 245], fontSize: 8.5, cellPadding: { top: 4, bottom: 4, left: 6, right: 4 } } }]);
         if (item.num_cameras) specRows.push(['Number of Cameras', item.num_cameras]);
-        if (item.footage_duration) specRows.push(['Footage Retention Duration', item.footage_duration]);
+        if (item.timeframe) specRows.push(['Your estimate timeframe to complete the project?', item.timeframe]);
         if (item.cctv_other) specRows.push(['Special Surveillance Needs', item.cctv_other]);
       }
       if (hasAlarm) {
@@ -394,6 +396,8 @@ const AdminPage = ({ onNavigate }) => {
         if (item.alarm_property_type) specRows.push(['Property Profile', item.alarm_property_type]);
         if (item.num_sensors) specRows.push(['Number of Protection Sensors', item.num_sensors]);
         if (item.alarm_system_type) specRows.push(['Preferred System Brand/Type', item.alarm_system_type]);
+        if (item.alarm_timeframe) specRows.push(['Estimated Timeframe', item.alarm_timeframe]);
+        if (item.alarm_installed_system) specRows.push(['Previously Installed System', item.alarm_installed_system]);
       }
       if (hasCustom) {
         specRows.push([{ content: 'Custom Service Request', colSpan: 2, styles: { fontStyle: 'bold', textColor: [15, 118, 110], fillColor: [240, 253, 250], fontSize: 8.5, cellPadding: { top: 4, bottom: 4, left: 6, right: 4 } } }]);
@@ -763,7 +767,7 @@ const AdminPage = ({ onNavigate }) => {
                   <div className="modal-section-title">Technical Specifications</div>
                   <div className="modal-specs-list">
                     {/* CCTV cameras specifications */}
-                    {(selectedInquiry.num_cameras || selectedInquiry.footage_duration || selectedInquiry.cctv_other) ? (
+                    {(selectedInquiry.num_cameras || selectedInquiry.timeframe || selectedInquiry.cctv_other) ? (
                       <div style={{ marginBottom: '15px' }}>
                         <div style={{ fontWeight: '800', fontSize: '13px', color: 'var(--primary)', marginBottom: '8px' }}>🎥 CCTV Surveillance System</div>
                         <div className="modal-spec-row">
@@ -771,18 +775,18 @@ const AdminPage = ({ onNavigate }) => {
                           <span className="modal-spec-value">{selectedInquiry.num_cameras || 'Not specified'}</span>
                         </div>
                         <div className="modal-spec-row">
-                          <span className="modal-spec-label">Footage Retention Duration</span>
-                          <span className="modal-spec-value">{selectedInquiry.footage_duration || 'Not specified'}</span>
+                          <span className="modal-spec-label">Your estimate timeframe to complete the project?</span>
+                          <span className="modal-spec-value">{selectedInquiry.timeframe || 'Not specified'}</span>
                         </div>
                         <div className="modal-spec-row">
-                          <span className="modal-spec-label">Special surveillance needs</span>
-                          <span className="modal-spec-value">{selectedInquiry.cctv_other || 'None'}</span>
+                          <span className="modal-spec-label">Previously installed system</span>
+                          <span className="modal-spec-value">{selectedInquiry.installedsystem || 'None'}</span>
                         </div>
                       </div>
                     ) : null}
 
                     {/* Alarm system specifications */}
-                    {(selectedInquiry.alarm_property_type || selectedInquiry.num_sensors || selectedInquiry.alarm_system_type) ? (
+                    {(selectedInquiry.alarm_property_type || selectedInquiry.num_sensors || selectedInquiry.alarm_system_type || selectedInquiry.alarm_timeframe || selectedInquiry.alarm_installed_system) ? (
                       <div>
                         <div style={{ fontWeight: '800', fontSize: '13px', color: 'var(--primary)', marginBottom: '8px', marginTop: (selectedInquiry.num_cameras) ? '15px' : '0' }}>🔔 Alarm Intrusion System</div>
                         <div className="modal-spec-row">
@@ -797,6 +801,14 @@ const AdminPage = ({ onNavigate }) => {
                           <span className="modal-spec-label">Preferred System Brand/Type</span>
                           <span className="modal-spec-value">{selectedInquiry.alarm_system_type || 'Not specified'}</span>
                         </div>
+                        <div className="modal-spec-row">
+                          <span className="modal-spec-label">Estimated Timeframe</span>
+                          <span className="modal-spec-value">{selectedInquiry.alarm_timeframe || 'Not specified'}</span>
+                        </div>
+                        <div className="modal-spec-row">
+                          <span className="modal-spec-label">Previously Installed System</span>
+                          <span className="modal-spec-value">{selectedInquiry.alarm_installed_system || 'None'}</span>
+                        </div>
                       </div>
                     ) : null}
 
@@ -809,7 +821,7 @@ const AdminPage = ({ onNavigate }) => {
                     )}
 
                     {/* General consult note */}
-                    {!(selectedInquiry.num_cameras || selectedInquiry.footage_duration || selectedInquiry.cctv_other || selectedInquiry.alarm_property_type || selectedInquiry.num_sensors || selectedInquiry.alarm_system_type || selectedInquiry.custom_inquiry) && (
+                    {!(selectedInquiry.num_cameras || selectedInquiry.timeframe || selectedInquiry.cctv_other || selectedInquiry.alarm_property_type || selectedInquiry.num_sensors || selectedInquiry.alarm_system_type || selectedInquiry.custom_inquiry) && (
                       <div className="text-muted text-center" style={{ fontSize: '13px' }}>
                         No technical specs provided. Client requested a general security consultation.
                       </div>

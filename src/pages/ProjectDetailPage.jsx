@@ -150,7 +150,7 @@ const ProjectDetailPage = ({ project, onBack, onNavigate }) => {
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: '30px',
+            gap: '5px',
             alignItems: 'stretch'
           }}>
             {[

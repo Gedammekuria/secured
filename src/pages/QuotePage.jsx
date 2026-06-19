@@ -38,11 +38,13 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
     message: '',
     budget: '',
     numCameras: '',
-    footageDuration: '',
-    cctvOther: '',
+    timeframe: '',
+    installedsystem: '',
     alarmPropertyType: '',
     numSensors: '',
-    alarmSystemType: ''
+    alarmSystemType: '',
+    alarmTimeframe: '',
+    alarmInstalledSystem: ''
   });
   const [isEmailInitial, setIsEmailInitial] = useState(true);
   const [submitted, setSubmitted] = useState(false);
@@ -722,40 +724,40 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                             </div>
                             <div className="row">
                               <div className="col-md-6 mb-4">
-                                <label className="mb-2 d-block font-weight-bold">Number of Cameras</label>
+                                <label className="mb-2 d-block font-weight-bold">Estimated Number of Cameras needed?</label>
                                 <input
                                   type="number"
                                   name="numCameras"
                                   value={formData.numCameras}
                                   onChange={handleChange}
-                                  placeholder="e.g. 4"
+                                  placeholder=" "
                                   style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}
                                 />
                               </div>
                               <div className="col-md-6 mb-4">
-                                <label className="mb-2 d-block font-weight-bold">Footage Duration</label>
+                                <label className="mb-2 d-block font-weight-bold">Your estimate timeframe to complete the project?</label>
                                 <select
-                                  name="footageDuration"
-                                  value={formData.footageDuration}
+                                  name="timeframe"
+                                  value={formData.timeframe}
                                   onChange={handleChange}
                                   style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}
                                 >
-                                  <option value="">Select duration</option>
-                                  <option value="1 Week">1 Week</option>
-                                  <option value="2 Weeks">2 Weeks</option>
-                                  <option value="1 Month">1 Month</option>
-                                  <option value="3 Months+">3 Months+</option>
+                                  <option value=""></option>
+                                  <option value="Urgent">Urgent</option>
+                                  <option value="Based on your schedule">Based on your schedule</option>
+                                  <option value="With in a Week">With in a Week</option>
+                                  <option value="With in a month">With in a Month</option>
                                 </select>
                               </div>
                             </div>
                             <div className="mb-4">
-                              <label className="mb-2 d-block font-weight-bold">Special CCTV Needs</label>
+                              <label className="mb-2 d-block font-weight-bold">If there was previously installed system type the brand here?</label>
                               <input
                                 type="text"
-                                name="cctvOther"
-                                value={formData.cctvOther}
+                                name="installedsystem"
+                                value={formData.installedsystem}
                                 onChange={handleChange}
-                                placeholder="e.g. Night vision, remote access"
+                                placeholder=""
                                 style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}
                               />
                             </div>
@@ -766,7 +768,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                           <div className="animate-slide-down mb-5">
                             <div className="d-flex align-items-center gap-2 mb-4">
                               <Bell size={20} className="text-primary" />
-                              <h4 style={{ fontSize: '18px', fontWeight: '700', marginBottom: 0 }}>Alarm System Specifics</h4>
+                              <h4 style={{ fontSize: '18px', fontWeight: '700', marginBottom: 0 }}>Alarm System Specifications</h4>
                             </div>
                             <div className="row">
                               <div className="col-md-6 mb-4">
@@ -806,8 +808,35 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                                 <option value="">Select preference</option>
                                 <option value="Wireless (Ajax)">Wireless (Ajax)</option>
                                 <option value="GSM Burglar Alarm">GSM Burglar Alarm</option>
-                                <option value="Wired System">Wired System</option>
                               </select>
+                            </div>
+                            <div className="row">
+                              <div className="col-md-6 mb-4">
+                                <label className="mb-2 d-block font-weight-bold">Your estimate timeframe to complete the project?</label>
+                                <select
+                                  name="alarmTimeframe"
+                                  value={formData.alarmTimeframe}
+                                  onChange={handleChange}
+                                  style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}
+                                >
+                                  <option value="">select</option>
+                                  <option value="Urgent">Urgent</option>
+                                  <option value="Based on your schedule">Based on your schedule</option>
+                                  <option value="With in a Week">With in a Week</option>
+                                  <option value="With in a month">With in a Month</option>
+                                </select>
+                              </div>
+                              <div className="col-md-6 mb-4">
+                                <label className="mb-2 d-block font-weight-bold">If there was previously installed system type the brand here?</label>
+                                <input
+                                  type="text"
+                                  name="alarmInstalledSystem"
+                                  value={formData.alarmInstalledSystem}
+                                  onChange={handleChange}
+                                  placeholder=""
+                                  style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}
+                                />
+                              </div>
                             </div>
                           </div>
                         )}
@@ -836,9 +865,15 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                           >
                             <option value="">Select Budget Range</option>
                             <option value="Under 50,000 ETB">Under 50,000 ETB</option>
-                            <option value="50,000 - 150,000 ETB">50,000 - 150,000 ETB</option>
-                            <option value="150,000 - 500,000 ETB">150,000 - 500,000 ETB</option>
-                            <option value="500,000+ ETB">500,000+ ETB</option>
+                            <option value="50,000 - 150,000 ETB">50,001 - 100,000 ETB</option>
+                            <option value="50,000 - 150,000 ETB">100,001 - 250,000 ETB</option>
+                            <option value="150,000 - 500,000 ETB">250,001 - 450,000 ETB</option>
+                            <option value="150,000 - 500,000 ETB">450,001 - 700,000 ETB</option>
+                            <option value="150,000 - 500,000 ETB">700,001 - 1,000,000 ETB</option>
+                            <option value="150,000 - 500,000 ETB">1,000,001- 2,000,000 ETB</option>
+                            <option value="500,000+ ETB">Above 2,000,000+ ETB</option>
+                            <option value="Not sure">Not sure</option>
+
                           </select>
                           {touched.budget && errors.budget && (
                             <div style={{ color: '#ef4444', fontSize: '13px', fontWeight: '600', marginTop: '6px', marginLeft: '4px' }}>

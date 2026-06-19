@@ -245,9 +245,9 @@ const Process = () => {
       icon: <Wrench size={22} />
     },
     {
-      title: "Training & Support",
+      title: "Training and Support",
       description: "We walk you through every feature and provide ongoing support to keep your hive running smoothly 24/7.",
-      image: "/assets/service/cctv training.jpg",
+      image: "/assets/service/training.jpg",
       icon: <Users size={22} />
     }
   ];

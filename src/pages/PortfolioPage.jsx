@@ -20,8 +20,7 @@ const PortfolioPage = ({ onSelectProject, onNavigate }) => {
       fullDetail: "A massive security deployment for a large commercial properties group. We engineered a high resolution IP camera network designed for 360-degree blind-spot coverage. The system features advanced motion analytics to monitor high-traffic areas and thermal detection for sensitive zones.",
       benefit: ["24/7 continuous recording", "Elimination of blind spots", "Remote global access", "Motion detection", "Minimized risks of employee's and property loses", "Take immediate action for the problem"],
       category: "CCTV Camera",
-      image: "/assets/service/amibara cctv.jpg",
-      heroImage: "/assets/service/amibara project.JPG"
+      image: "/assets/service/amibara project.JPG",
     },
     {
       id: 2,
@@ -51,18 +50,19 @@ const PortfolioPage = ({ onSelectProject, onNavigate }) => {
       title: "Sunrise Real Estate CCTV Installation",
       clientName: "Sunrise Real Estate",
       location: "Addis Ababa, Ethiopia",
-      description: "Advanced perimeter protection and gate monitoring for a premium residential development.",
-      fullDetail: "Sunrise Real Estate required a CCTV security solution for their residential complex. We are  installed the Cameras with out any blined spot.",
+      description: "We installed high-definition CCTV surveillance system for Sunrise Real Estate to safeguard property assets and ensure tenant security .",
+      fullDetail: "Sunrise Real Estate required a CCTV security solution for their residential complex. We installed the Cameras with out blined spot.",
       benefit: ["24/7 continuous recording", "Elimination of blind spots", "Remote global access", "Motion-triggered alerts", "Night vision excellence"],
       category: "CCTV Camera",
       image: "/assets/service/sunrise_real_estate.png"
+
     },
     {
       id: 5,
       title: "Maryod Bakery CCTV Installation ",
       clientName: "Maryod Bakery",
       location: "Addis Ababa, Ethiopia",
-      description: "Professional CCTV camera installation designed to provide continuous, high-quality monitoring.",
+      description: "Professional CCTV camera installation designed to provide continuous, high quality monitoring.",
       fullDetail: "We designed a powerful CCTV system for Maryod Bakery. Key focus areas include the point of sale for transaction security and the production area to monitor quality control. The high-resolution cameras provide clear footage even in low-light conditions during night shifts.",
       benefit: ["24/7 continuous recording", "Elimination of blind spots", "Quality control oversight", "Remote operational checks", "POS transaction monitoring", "Time managment"],
       category: "CCTV Camera",
