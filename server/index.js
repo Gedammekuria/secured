@@ -35,6 +35,8 @@ let mockInquiries = [
     alarm_timeframe: 'Based on your schedule',
     alarm_installed_system: 'Paradox',
     message: 'Please provide a detailed site assessment and proposal.',
+    status: 'pending',
+    notifications: [],
     created_at: new Date(Date.now() - 3600000 * 2).toISOString()
   },
   {
@@ -57,11 +59,129 @@ let mockInquiries = [
     alarm_timeframe: null,
     alarm_installed_system: null,
     message: 'Looking for a simple burglar alarm system for my villa.',
+    status: 'pending',
+    notifications: [],
     created_at: new Date(Date.now() - 3600000 * 24).toISOString()
   }
 ];
 
-// Initialize database table if not exists
+// Default Mock Data for Services and Projects
+const defaultServices = [
+  {
+    id: 1,
+    category: "CCTV Installation",
+    icon: "Camera",
+    tagline: "See everything, miss nothing.",
+    cards: [
+      {
+        title: "Outdoor Cameras",
+        description: "Weatherproof Outdoor cameras with night vision and motion detection. Covers driveways, gardens, and perimeters 24/7.",
+        image: "/assets/service/outdoor camera 1.webp"
+      },
+      {
+        title: "Indoor Cameras",
+        description: "A wide-angle lenses and two-way audio. Monitor your home's interior from your smartphone.",
+        image: "/assets/service/indoor camera 1.webp"
+      },
+      {
+        title: "Remote Access",
+        description: "You can view any incidence from your property by using  smartphone everywhere remotely.",
+        image: "/assets/service/mobile view.jpg"
+      }
+    ]
+  },
+  {
+    id: 2,
+    category: "Alarm Systems",
+    icon: "Bell",
+    tagline: "Alert before intrusion happens.",
+    cards: [
+      {
+        title: "Ajax Alarm System",
+        description: "It is a wireless security technology that protects against intrusion, fire, and flooding. It's the most awarded and reliable smart home/commercial security solutions.",
+        image: "/assets/service/ajax detector.webp"
+      },
+      {
+        title: "GSM Burglare alarm System",
+        description: "A wireless security alarm that uses GSM (Global System for Mobile Communications) cellular technology essentially a SIM card to send alerts, notifications, and alarm signals over mobile phone networks.",
+        image: "/assets/service/burglar.webp"
+      },
+      {
+        title: "Ajax Remote Control",
+        description: "Our systems are simple to access remotely with cellphone ",
+        image: "/assets/service/ajax control.jpg"
+      }
+    ]
+  }
+];
+
+const defaultProjects = [
+  {
+    id: 1,
+    title: "Amibara Properties CCTV Installation",
+    client_name: "Amibara Properties",
+    location: "Addis Ababa, Ethiopia",
+    description: "The client needed a cost-effective, high-definition security system with zero blind spots, local video backup redundancy, and secure remote access.",
+    full_detail: "A massive security deployment for a large commercial properties group. We engineered a high resolution IP camera network designed for 360-degree blind-spot coverage. The system features advanced motion analytics to monitor high-traffic areas and thermal detection for sensitive zones.",
+    benefit: ["24/7 continuous recording", "Elimination of blind spots", "Remote global access", "Motion detection", "Minimized risks of employee's and property loses", "Take immediate action for the problem"],
+    category: "CCTV Camera",
+    image: "/assets/service/amibara project.JPG",
+    show_on_home: true
+  },
+  {
+    id: 2,
+    title: "Jotun CCTV Installation",
+    client_name: "Jotun Paint manufacturing",
+    location: "Addis Ababa, Ethiopia",
+    description: "the client needed cctv camera to control his employe's and their properties any where to reduce wastage and increase the productivity of the manufacturing plant.",
+    full_detail: "Surveillance in industry is vital to control the employees and their properties any where to reduce wastage and increase the productivity of the manufacturing plant. We deployed explosion-proof CCTV housings and long-range thermal cameras to monitor process equipment and ensure site safety.",
+    benefit: ["24/7 continuous recording", "Elimination of blind spots", "Remote access from any where", "Increase productivity", "Use their time properly", "Highly minimized the wastage"],
+    category: "CCTV Camera",
+    image: "/assets/service/jotun cctv.jpg",
+    show_on_home: true
+  },
+  {
+    id: 3,
+    title: "Oasis Hotel Apartment CCTV Installation",
+    client_name: "Oasis Hotel Apartment",
+    location: "Addis Ababa, Ethiopia",
+    description: "Comprehensive surveillance system for guest safety and high-traffic area monitoring across multiple floors.",
+    full_detail: "For Oasis Hotel Apartment, we installaed  a CCTV camera security system. The installation includes high-definition dome and bullet cameras in hallways and common areass. The system provides real-time monitoring and advanced playback capabilities for management.",
+    benefit: ["Multi-floor coverage", "Guest privacy optimization", "24/7 hotel monitoring", "Mobile access for management"],
+    category: "CCTV Camera",
+    image: "/assets/service/oasis_hotel.png",
+    show_on_home: false
+  },
+  {
+    id: 4,
+    title: "Sunrise Real Estate CCTV Installation",
+    client_name: "Sunrise Real Estate",
+    location: "Addis Ababa, Ethiopia",
+    description: "We installed high-definition CCTV surveillance system for Sunrise Real Estate to safeguard property assets and ensure tenant security .",
+    full_detail: "Sunrise Real Estate required a CCTV security solution for their residential complex. We installed the Cameras with out blined spot.",
+    benefit: ["24/7 continuous recording", "Elimination of blind spots", "Remote global access", "Motion-triggered alerts", "Night vision excellence"],
+    category: "CCTV Camera",
+    image: "/assets/service/sunrise_real_estate.png",
+    show_on_home: false
+  },
+  {
+    id: 5,
+    title: "Maryod Bakery CCTV Installation ",
+    client_name: "Maryod Bakery",
+    location: "Addis Ababa, Ethiopia",
+    description: "Professional CCTV camera installation designed to provide continuous, high quality monitoring.",
+    full_detail: "We designed a powerful CCTV system for Maryod Bakery. Key focus areas include the point of sale for transaction security and the production area to monitor quality control. The high-resolution cameras provide clear footage even in low-light conditions during night shifts.",
+    benefit: ["24/7 continuous recording", "Elimination of blind spots", "Quality control oversight", "Remote operational checks", "POS transaction monitoring", "Time managment"],
+    category: "CCTV Camera",
+    image: "/assets/service/maryod_bakery.jpg",
+    show_on_home: false
+  }
+];
+
+let mockServices = JSON.parse(JSON.stringify(defaultServices));
+let mockProjects = JSON.parse(JSON.stringify(defaultProjects));
+
+// Initialize database tables if not exists
 async function initDb() {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
@@ -95,10 +215,41 @@ async function initDb() {
         alarm_installed_system VARCHAR(255),
         message TEXT,
         status VARCHAR(50) DEFAULT 'pending',
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        timeframe VARCHAR(100),
+        installedsystem VARCHAR(255)
       );
     `;
     await pool.query(createTableQuery);
+
+    // Create services table if it doesn't exist
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS services (
+        id SERIAL PRIMARY KEY,
+        category VARCHAR(255) NOT NULL,
+        icon VARCHAR(100),
+        tagline VARCHAR(255),
+        cards JSONB DEFAULT '[]',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // Create projects table if it doesn't exist
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS projects (
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        client_name VARCHAR(255),
+        location VARCHAR(255),
+        description TEXT,
+        full_detail TEXT,
+        benefit TEXT[] DEFAULT '{}',
+        category VARCHAR(100),
+        image VARCHAR(255),
+        show_on_home BOOLEAN DEFAULT false,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
 
     // Migration to add status column if it doesn't exist (for existing tables)
     await pool.query(`
@@ -110,8 +261,48 @@ async function initDb() {
     await pool.query(`
       ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS alarm_installed_system VARCHAR(255);
     `);
+    await pool.query(`
+      ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS notifications JSONB DEFAULT '[]';
+    `);
+    await pool.query(`
+      ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS timeframe VARCHAR(100);
+    `);
+    await pool.query(`
+      ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS installedsystem VARCHAR(255);
+    `);
 
-    console.log('🟢 Database initialized successfully. Table "inquiries" is ready.');
+    // Create database indexes for high performance retrievals
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_inquiries_created_at ON inquiries(created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_inquiries_status ON inquiries(status);
+      CREATE INDEX IF NOT EXISTS idx_projects_show_on_home ON projects(show_on_home) WHERE show_on_home = true;
+    `);
+
+    // Seed services if table is empty
+    const servicesCount = await pool.query('SELECT COUNT(*) FROM services;');
+    if (parseInt(servicesCount.rows[0].count, 10) === 0) {
+      console.log('🌱 Seeding initial services table...');
+      for (const s of defaultServices) {
+        await pool.query(
+          'INSERT INTO services (category, icon, tagline, cards) VALUES ($1, $2, $3, $4);',
+          [s.category, s.icon, s.tagline, JSON.stringify(s.cards)]
+        );
+      }
+    }
+
+    // Seed projects if table is empty
+    const projectsCount = await pool.query('SELECT COUNT(*) FROM projects;');
+    if (parseInt(projectsCount.rows[0].count, 10) === 0) {
+      console.log('🌱 Seeding initial projects table...');
+      for (const p of defaultProjects) {
+        await pool.query(
+          'INSERT INTO projects (title, client_name, location, description, full_detail, benefit, category, image, show_on_home) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);',
+          [p.title, p.client_name, p.location, p.description, p.full_detail, p.benefit, p.category, p.image, p.show_on_home]
+        );
+      }
+    }
+
+    console.log('🟢 Database initialized successfully. Tables are ready.');
   } catch (err) {
     console.error('🔴 Database initialization failed:', err.message);
   }
@@ -138,7 +329,10 @@ app.post('/api/inquiries', async (req, res) => {
     alarmSystemType,
     alarmTimeframe,
     alarmInstalledSystem,
-    message
+    message,
+    timeframe,
+    installedsystem,
+    previousinstalled
   } = req.body;
 
   // Validation
@@ -158,6 +352,8 @@ app.post('/api/inquiries', async (req, res) => {
   const formattedInquiryType = Array.isArray(inquiryType) ? inquiryType : [];
   const parsedNumCameras = numCameras !== undefined ? (numCameras !== null && numCameras !== '' ? parseInt(numCameras, 10) : null) : undefined;
   const parsedNumSensors = numSensors !== undefined ? (numSensors !== null && numSensors !== '' ? parseInt(numSensors, 10) : null) : undefined;
+  const cctvTimeframe = timeframe || null;
+  const cctvInstalledSystem = installedsystem || previousinstalled || null;
 
   // Simulation fallback if database is not configured
   if (!process.env.DATABASE_URL) {
@@ -192,7 +388,9 @@ app.post('/api/inquiries', async (req, res) => {
           alarm_system_type: getValue(alarmSystemType, existingRecord.alarm_system_type),
           alarm_timeframe: getValue(alarmTimeframe, existingRecord.alarm_timeframe),
           alarm_installed_system: getValue(alarmInstalledSystem, existingRecord.alarm_installed_system),
-          message: getValue(message, existingRecord.message)
+          message: getValue(message, existingRecord.message),
+          timeframe: getValue(cctvTimeframe, existingRecord.timeframe),
+          installedsystem: getValue(cctvInstalledSystem, existingRecord.installedsystem)
         };
         
         console.log(`📝 [SIMULATED INQUIRY UPDATE] Updated mock inquiry. ID: ${id}`);
@@ -226,7 +424,9 @@ app.post('/api/inquiries', async (req, res) => {
       alarm_installed_system: alarmInstalledSystem || null,
       message: message || null,
       status: 'pending',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      timeframe: cctvTimeframe || null,
+      installedsystem: cctvInstalledSystem || null
     };
     
     // Add to simulated memory
@@ -272,6 +472,8 @@ app.post('/api/inquiries', async (req, res) => {
         const finalAlarmTimeframe = getValue(alarmTimeframe, existingRecord.alarm_timeframe);
         const finalAlarmInstalledSystem = getValue(alarmInstalledSystem, existingRecord.alarm_installed_system);
         const finalMessage = getValue(message, existingRecord.message);
+        const finalCctvTimeframe = getValue(cctvTimeframe, existingRecord.timeframe);
+        const finalCctvInstalledSystem = getValue(cctvInstalledSystem, existingRecord.installedsystem);
 
         const updateQuery = `
           UPDATE inquiries SET
@@ -292,8 +494,10 @@ app.post('/api/inquiries', async (req, res) => {
             alarm_system_type = $15,
             alarm_timeframe = $16,
             alarm_installed_system = $17,
-            message = $18
-          WHERE id = $19
+            message = $18,
+            timeframe = $19,
+            installedsystem = $20
+          WHERE id = $21
           RETURNING id, created_at;
         `;
 
@@ -316,6 +520,8 @@ app.post('/api/inquiries', async (req, res) => {
           finalAlarmTimeframe || null,
           finalAlarmInstalledSystem || null,
           finalMessage || null,
+          finalCctvTimeframe || null,
+          finalCctvInstalledSystem || null,
           numericId
         ];
 
@@ -362,8 +568,10 @@ app.post('/api/inquiries', async (req, res) => {
         alarm_timeframe,
         alarm_installed_system,
         message,
-        status
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
+        status,
+        timeframe,
+        installedsystem
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
       RETURNING id, created_at;
     `;
 
@@ -386,7 +594,9 @@ app.post('/api/inquiries', async (req, res) => {
       alarmTimeframe || null,
       alarmInstalledSystem || null,
       message || null,
-      'pending'
+      'pending',
+      cctvTimeframe || null,
+      cctvInstalledSystem || null
     ];
 
     const result = await pool.query(insertQuery, values);
@@ -516,6 +726,89 @@ app.delete('/api/admin/inquiries/:id', authenticateAdmin, async (req, res) => {
   }
 });
 
+
+// Helper to send email notification to the client regarding inquiry status change
+async function sendNotificationEmail(inquiry, status) {
+  const name = inquiry.full_name || 'Valued Customer';
+  const recipient = inquiry.initial_contact;
+  const isEmail = recipient && recipient.includes('@');
+  
+  const serviceText = Array.isArray(inquiry.inquiry_type) && inquiry.inquiry_type.length > 0 
+    ? inquiry.inquiry_type.join(', ') 
+    : (inquiry.source === 'quote' ? 'Security Quote Request' : 'Contact Inquiry');
+
+  let subject = '';
+  let body = '';
+
+  switch (status) {
+    case 'accepted':
+      subject = `SafeHive Security — Request Accepted (Ref: ${inquiry.id})`;
+      body = `Dear ${name},\n\nThank you for choosing SafeHive Security.\n\nWe are pleased to inform you that your request for "${serviceText}" has been accepted by our team.\n\nOur security experts are currently reviewing your requirements and will reach out to you shortly to schedule an onsite assessment or discuss next steps.\n\nBest regards,\nThe SafeHive Security Team\nwww.safehive.com`;
+      break;
+    case 'progress':
+      subject = `SafeHive Security — Project In Progress (Ref: ${inquiry.id})`;
+      body = `Dear ${name},\n\nWe are pleased to update you that your security installation project for "${serviceText}" is now officially IN PROGRESS.\n\nOur engineering and installation crews are coordinating the equipment and setups. We will keep you posted on the daily milestones.\n\nBest regards,\nThe SafeHive Security Team\nwww.safehive.com`;
+      break;
+    case 'finished':
+      subject = `SafeHive Security — Project Completed! (Ref: ${inquiry.id})`;
+      body = `Dear ${name},\n\nGreat news! Your SafeHive Security system installation for "${serviceText}" has been marked as FINISHED.\n\nWe trust that our setup meets your security requirements. A customer service representative will follow up to ensure your complete satisfaction and guide you through system operations.\n\nThank you for trusting SafeHive to secure what matters most.\n\nBest regards,\nThe SafeHive Security Team\nwww.safehive.com`;
+      break;
+    default:
+      subject = `SafeHive Security — Inquiry Update (Ref: ${inquiry.id})`;
+      body = `Dear ${name},\n\nThis is an automated update regarding your security inquiry. Your inquiry status has been updated to: ${status.toUpperCase()}.\n\nBest regards,\nThe SafeHive Security Team\nwww.safehive.com`;
+  }
+
+  // 1. Log to notifications_log.txt in root
+  const logEntry = `
+========================================
+[EMAIL SENT VIA SAFEHIVE SYSTEM]
+Timestamp: ${new Date().toISOString()}
+Recipient: ${recipient} (${isEmail ? 'Email' : 'SMS/Phone Candidate'})
+Subject:   ${subject}
+Body:
+${body}
+========================================
+`;
+  try {
+    fs.appendFileSync('notifications_log.txt', logEntry, 'utf8');
+    console.log(`✉️ [NOTIFICATION LOGGED] Simulated email written to notifications_log.txt for ${recipient}`);
+  } catch (err) {
+    console.error('Failed to write simulated email to log file:', err.message);
+  }
+
+  // 2. Attempt real SMTP if configured
+  if (isEmail && process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    try {
+      const nodemailer = (await import('nodemailer')).default;
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT || '587', 10),
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+
+      const mailOptions = {
+        from: process.env.SMTP_FROM || `"SafeHive Security" <${process.env.SMTP_USER}>`,
+        to: recipient,
+        subject: subject,
+        text: body,
+      };
+
+      const info = await transporter.sendMail(mailOptions);
+      console.log('⚡ Real email notification sent successfully:', info.messageId);
+      return { success: true, method: 'email', messageId: info.messageId, subject, preview: body };
+    } catch (err) {
+      console.error('🔴 Failed to send real SMTP email, falling back to simulator:', err.message);
+      return { success: true, method: 'simulation_fallback', error: err.message, subject, preview: body };
+    }
+  }
+
+  return { success: true, method: 'simulation', subject, preview: body };
+}
+
 // Admin Update Inquiry Status
 app.put('/api/admin/inquiries/:id/status', authenticateAdmin, async (req, res) => {
   const { id } = req.params;
@@ -534,7 +827,27 @@ app.put('/api/admin/inquiries/:id/status', authenticateAdmin, async (req, res) =
     }
     mockInquiries[index].status = status;
     console.log(`📝 [SIMULATED STATUS UPDATE] Updated inquiry ${id} status to ${status}`);
-    return res.json({ success: true, message: 'Status updated successfully (Simulated).' });
+    
+    // Trigger notification
+    const notifyRes = await sendNotificationEmail(mockInquiries[index], status);
+    
+    // Save to simulated notifications list
+    const newNotify = {
+      status,
+      timestamp: new Date().toISOString(),
+      recipient: mockInquiries[index].initial_contact,
+      subject: notifyRes.subject,
+      preview: notifyRes.preview,
+      method: notifyRes.method
+    };
+    mockInquiries[index].notifications = mockInquiries[index].notifications || [];
+    mockInquiries[index].notifications.push(newNotify);
+    
+    return res.json({ 
+      success: true, 
+      message: 'Status updated successfully (Simulated).',
+      notification: newNotify
+    });
   }
 
   try {
@@ -544,7 +857,7 @@ app.put('/api/admin/inquiries/:id/status', authenticateAdmin, async (req, res) =
     }
 
     const result = await pool.query(
-      'UPDATE inquiries SET status = $1 WHERE id = $2 RETURNING id;',
+      'UPDATE inquiries SET status = $1 WHERE id = $2 RETURNING *;',
       [status, numericId]
     );
 
@@ -553,10 +866,329 @@ app.put('/api/admin/inquiries/:id/status', authenticateAdmin, async (req, res) =
     }
 
     console.log(`📥 Updated inquiry ID ${id} status to ${status} in database.`);
-    return res.json({ success: true, message: 'Status updated successfully.' });
+    
+    // Trigger notification
+    const notifyRes = await sendNotificationEmail(result.rows[0], status);
+
+    // Save to notifications JSONB array in database
+    const currentNotifications = result.rows[0].notifications || [];
+    const newNotify = {
+      status,
+      timestamp: new Date().toISOString(),
+      recipient: result.rows[0].initial_contact,
+      subject: notifyRes.subject,
+      preview: notifyRes.preview,
+      method: notifyRes.method
+    };
+    currentNotifications.push(newNotify);
+
+    await pool.query(
+      'UPDATE inquiries SET notifications = $1 WHERE id = $2;',
+      [JSON.stringify(currentNotifications), numericId]
+    );
+
+    return res.json({ 
+      success: true, 
+      message: 'Status updated successfully.',
+      notification: newNotify
+    });
   } catch (err) {
     console.error('🔴 Failed to update status in DB:', err.message);
     return res.status(500).json({ error: 'Failed to update status in database.' });
+  }
+});
+
+// ── Public Services & Projects Endpoints ─────────────────────────────────────
+
+// Get all services
+app.get('/api/services', async (req, res) => {
+  if (!process.env.DATABASE_URL) {
+    return res.json(mockServices);
+  }
+  try {
+    const result = await pool.query('SELECT * FROM services ORDER BY id ASC;');
+    return res.json(result.rows);
+  } catch (err) {
+    console.error('Failed to get services:', err.message);
+    return res.status(500).json({ error: 'Failed to retrieve services.' });
+  }
+});
+
+// Get projects (with optional showOnHome filtering)
+app.get('/api/projects', async (req, res) => {
+  const showOnHome = req.query.showOnHome === 'true';
+  if (!process.env.DATABASE_URL) {
+    let list = mockProjects;
+    if (req.query.showOnHome !== undefined) {
+      list = list.filter(p => p.show_on_home === showOnHome);
+    }
+    // Return formatted objects for frontend camelCase compatibility
+    const formatted = list.map(p => ({
+      id: p.id,
+      title: p.title,
+      clientName: p.client_name || p.clientName,
+      location: p.location,
+      description: p.description,
+      fullDetail: p.full_detail || p.fullDetail,
+      benefit: p.benefit || p.benefits || [],
+      category: p.category,
+      image: p.image,
+      showOnHome: p.show_on_home
+    }));
+    return res.json(formatted);
+  }
+  try {
+    let query = 'SELECT * FROM projects';
+    let values = [];
+    if (req.query.showOnHome !== undefined) {
+      query += ' WHERE show_on_home = $1';
+      values.push(showOnHome);
+    }
+    query += ' ORDER BY id ASC;';
+    const result = await pool.query(query, values);
+    const formatted = result.rows.map(r => ({
+      id: r.id,
+      title: r.title,
+      clientName: r.client_name,
+      location: r.location,
+      description: r.description,
+      fullDetail: r.full_detail,
+      benefit: r.benefit || [],
+      category: r.category,
+      image: r.image,
+      showOnHome: r.show_on_home
+    }));
+    return res.json(formatted);
+  } catch (err) {
+    console.error('Failed to get projects:', err.message);
+    return res.status(500).json({ error: 'Failed to retrieve projects.' });
+  }
+});
+
+// ── Admin Services CRUD Endpoints ────────────────────────────────────────────
+
+// Get all services for Admin
+app.get('/api/admin/services', authenticateAdmin, async (req, res) => {
+  if (!process.env.DATABASE_URL) {
+    return res.json(mockServices);
+  }
+  try {
+    const result = await pool.query('SELECT * FROM services ORDER BY id ASC;');
+    return res.json(result.rows);
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to retrieve services.' });
+  }
+});
+
+// Create new service
+app.post('/api/admin/services', authenticateAdmin, async (req, res) => {
+  const { category, icon, tagline, cards } = req.body;
+  if (!category) {
+    return res.status(400).json({ error: 'Category name is required.' });
+  }
+  const formattedCards = Array.isArray(cards) ? cards : [];
+  if (!process.env.DATABASE_URL) {
+    const newService = {
+      id: `simulated-s-${Date.now()}`,
+      category,
+      icon: icon || 'Camera',
+      tagline: tagline || '',
+      cards: formattedCards,
+      created_at: new Date().toISOString()
+    };
+    mockServices.push(newService);
+    return res.status(201).json(newService);
+  }
+  try {
+    const result = await pool.query(
+      'INSERT INTO services (category, icon, tagline, cards) VALUES ($1, $2, $3, $4) RETURNING *;',
+      [category, icon || 'Camera', tagline || '', JSON.stringify(formattedCards)]
+    );
+    return res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error('Failed to create service:', err.message);
+    return res.status(500).json({ error: 'Failed to create service.' });
+  }
+});
+
+// Update service
+app.put('/api/admin/services/:id', authenticateAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { category, icon, tagline, cards } = req.body;
+  if (!category) {
+    return res.status(400).json({ error: 'Category name is required.' });
+  }
+  const formattedCards = Array.isArray(cards) ? cards : [];
+  if (!process.env.DATABASE_URL) {
+    const idx = mockServices.findIndex(s => String(s.id) === String(id));
+    if (idx === -1) {
+      return res.status(404).json({ error: 'Service not found.' });
+    }
+    mockServices[idx] = {
+      ...mockServices[idx],
+      category,
+      icon: icon || 'Camera',
+      tagline: tagline || '',
+      cards: formattedCards
+    };
+    return res.json(mockServices[idx]);
+  }
+  try {
+    const result = await pool.query(
+      'UPDATE services SET category=$1, icon=$2, tagline=$3, cards=$4 WHERE id=$5 RETURNING *;',
+      [category, icon || 'Camera', tagline || '', JSON.stringify(formattedCards), id]
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Service not found.' });
+    }
+    return res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Failed to update service:', err.message);
+    return res.status(500).json({ error: 'Failed to update service.' });
+  }
+});
+
+// Delete service
+app.delete('/api/admin/services/:id', authenticateAdmin, async (req, res) => {
+  const { id } = req.params;
+  if (!process.env.DATABASE_URL) {
+    const idx = mockServices.findIndex(s => String(s.id) === String(id));
+    if (idx === -1) {
+      return res.status(404).json({ error: 'Service not found.' });
+    }
+    mockServices.splice(idx, 1);
+    return res.json({ success: true, message: 'Service deleted.' });
+  }
+  try {
+    const result = await pool.query('DELETE FROM services WHERE id=$1 RETURNING id;', [id]);
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Service not found.' });
+    }
+    return res.json({ success: true, message: 'Service deleted.' });
+  } catch (err) {
+    console.error('Failed to delete service:', err.message);
+    return res.status(500).json({ error: 'Failed to delete service.' });
+  }
+});
+
+
+// ── Admin Projects CRUD Endpoints ────────────────────────────────────────────
+
+// Get all projects for Admin
+app.get('/api/admin/projects', authenticateAdmin, async (req, res) => {
+  if (!process.env.DATABASE_URL) {
+    return res.json(mockProjects);
+  }
+  try {
+    const result = await pool.query('SELECT * FROM projects ORDER BY id ASC;');
+    return res.json(result.rows);
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to retrieve projects.' });
+  }
+});
+
+// Create new project
+app.post('/api/admin/projects', authenticateAdmin, async (req, res) => {
+  const { title, clientName, location, description, fullDetail, benefit, category, image, showOnHome } = req.body;
+  if (!title) {
+    return res.status(400).json({ error: 'Project title is required.' });
+  }
+  const benefitArray = Array.isArray(benefit) ? benefit : [];
+  const isShowOnHome = showOnHome === true || showOnHome === 'true';
+
+  if (!process.env.DATABASE_URL) {
+    const newProject = {
+      id: `simulated-p-${Date.now()}`,
+      title,
+      client_name: clientName || '',
+      location: location || '',
+      description: description || '',
+      full_detail: fullDetail || '',
+      benefit: benefitArray,
+      category: category || '',
+      image: image || '',
+      show_on_home: isShowOnHome,
+      created_at: new Date().toISOString()
+    };
+    mockProjects.push(newProject);
+    return res.status(201).json(newProject);
+  }
+  try {
+    const result = await pool.query(
+      'INSERT INTO projects (title, client_name, location, description, full_detail, benefit, category, image, show_on_home) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *;',
+      [title, clientName || '', location || '', description || '', fullDetail || '', benefitArray, category || '', image || '', isShowOnHome]
+    );
+    return res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error('Failed to create project:', err.message);
+    return res.status(500).json({ error: 'Failed to create project.' });
+  }
+});
+
+// Update project
+app.put('/api/admin/projects/:id', authenticateAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { title, clientName, location, description, fullDetail, benefit, category, image, showOnHome } = req.body;
+  if (!title) {
+    return res.status(400).json({ error: 'Project title is required.' });
+  }
+  const benefitArray = Array.isArray(benefit) ? benefit : [];
+  const isShowOnHome = showOnHome === true || showOnHome === 'true';
+
+  if (!process.env.DATABASE_URL) {
+    const idx = mockProjects.findIndex(p => String(p.id) === String(id));
+    if (idx === -1) {
+      return res.status(404).json({ error: 'Project not found.' });
+    }
+    mockProjects[idx] = {
+      ...mockProjects[idx],
+      title,
+      client_name: clientName || '',
+      location: location || '',
+      description: description || '',
+      full_detail: fullDetail || '',
+      benefit: benefitArray,
+      category: category || '',
+      image: image || '',
+      show_on_home: isShowOnHome
+    };
+    return res.json(mockProjects[idx]);
+  }
+  try {
+    const result = await pool.query(
+      'UPDATE projects SET title=$1, client_name=$2, location=$3, description=$4, full_detail=$5, benefit=$6, category=$7, image=$8, show_on_home=$9 WHERE id=$10 RETURNING *;',
+      [title, clientName || '', location || '', description || '', fullDetail || '', benefitArray, category || '', image || '', isShowOnHome, id]
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Project not found.' });
+    }
+    return res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Failed to update project:', err.message);
+    return res.status(500).json({ error: 'Failed to update project.' });
+  }
+});
+
+// Delete project
+app.delete('/api/admin/projects/:id', authenticateAdmin, async (req, res) => {
+  const { id } = req.params;
+  if (!process.env.DATABASE_URL) {
+    const idx = mockProjects.findIndex(p => String(p.id) === String(id));
+    if (idx === -1) {
+      return res.status(404).json({ error: 'Project not found.' });
+    }
+    mockProjects.splice(idx, 1);
+    return res.json({ success: true, message: 'Project deleted.' });
+  }
+  try {
+    const result = await pool.query('DELETE FROM projects WHERE id=$1 RETURNING id;', [id]);
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Project not found.' });
+    }
+    return res.json({ success: true, message: 'Project deleted.' });
+  } catch (err) {
+    console.error('Failed to delete project:', err.message);
+    return res.status(500).json({ error: 'Failed to delete project.' });
   }
 });
 

@@ -43,7 +43,7 @@ const ProjectDetailPage = ({ project, onBack, onNavigate }) => {
             <div style={{ flex: '1 0 450px', backgroundColor: '#f8fafc' }}>
               <img src={project.image} alt={project.title} style={{ width: '100%', height: '500px', objectFit: 'cover' }} loading="lazy" decoding="async" />
               <div style={{ padding: '40px' }}>
-                <h4 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '24px', color: '#0a2540' }}>Project Technicals</h4>
+                <h4 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '24px', color: '#0a2540' }}>Project information</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid #e2e8f0' }}>
                     <span style={{ color: '#64748b', fontWeight: '600' }}>Client Name</span>

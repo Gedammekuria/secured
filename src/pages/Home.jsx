@@ -2,8 +2,20 @@ import React, { useState, useEffect } from 'react';
 import {
   Camera, Bell, Radio, Home as HomeIcon, Eye, Shield, DoorOpen, AlertTriangle,
   ChevronDown, ChevronUp, ClipboardList, PenTool, Wrench, Users,
-  ArrowRight, Award, CheckCircle, HeartHandshake, ShieldCheck, DollarSign
+  ArrowRight, Award, CheckCircle, HeartHandshake, ShieldCheck, DollarSign, MapPin
 } from 'lucide-react';
+
+const iconMap = {
+  Camera: <Camera size={20} />,
+  Bell: <Bell size={20} />,
+  Shield: <Shield size={20} />,
+  Radio: <Radio size={20} />,
+  Home: <HomeIcon size={20} />,
+  Eye: <Eye size={20} />,
+  DoorOpen: <DoorOpen size={20} />,
+  AlertTriangle: <AlertTriangle size={20} />
+};
+
 const SERVICES_DATA = [
   {
     category: "CCTV Installation",
@@ -42,7 +54,6 @@ const SERVICES_DATA = [
         description: "A wireless security alarm that uses GSM (Global System for Mobile Communications) cellular technology essentially a SIM card to send alerts, notifications, and alarm signals over mobile phone networks.",
         image: "/assets/service/burglar.webp"
       },
-
       {
         title: "Ajax Remote Control",
         description: "Our systems are simple to access remotely with cellphone ",
@@ -100,6 +111,7 @@ const Partners = () => {
 };
 
 const Services = ({ onNavigate, onQuoteOpen }) => {
+  const [servicesList, setServicesList] = useState(SERVICES_DATA);
   const [activeTab, setActiveTab] = useState(0);
   const [prevTab, setPrevTab] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -110,15 +122,49 @@ const Services = ({ onNavigate, onQuoteOpen }) => {
   }, [activeTab]);
 
   useEffect(() => {
-    if (isPaused) return;
+    const cachedServices = sessionStorage.getItem('safehive_services_cache');
+    if (cachedServices) {
+      try {
+        const parsed = JSON.parse(cachedServices);
+        const mapped = parsed.map(s => ({
+          ...s,
+          icon: iconMap[s.icon] || iconMap['Camera']
+        }));
+        setServicesList(mapped);
+        return;
+      } catch (e) {
+        // Fallback to fetch
+      }
+    }
+
+    fetch('/api/services')
+      .then(res => {
+        if (!res.ok) throw new Error('API failed');
+        return res.json();
+      })
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          sessionStorage.setItem('safehive_services_cache', JSON.stringify(data));
+          const mapped = data.map(s => ({
+            ...s,
+            icon: iconMap[s.icon] || iconMap['Camera']
+          }));
+          setServicesList(mapped);
+        }
+      })
+      .catch(err => console.error('Failed to fetch services, using static fallback:', err));
+  }, []);
+
+  useEffect(() => {
+    if (isPaused || servicesList.length === 0) return;
 
     const interval = setInterval(() => {
-      handleTabChange((activeTab + 1) % SERVICES_DATA.length);
+      handleTabChange((activeTab + 1) % servicesList.length);
     }, 4000);
     return () => clearInterval(interval);
-  }, [activeTab, isPaused, handleTabChange]);
+  }, [activeTab, isPaused, handleTabChange, servicesList.length]);
 
-  const current = SERVICES_DATA[activeTab];
+  const current = servicesList[activeTab] || servicesList[0];
   const direction = activeTab >= prevTab ? 'right' : 'left';
 
   const [isMobile, setIsMobile] = useState(false);
@@ -155,6 +201,8 @@ const Services = ({ onNavigate, onQuoteOpen }) => {
     );
   };
 
+  if (servicesList.length === 0) return null;
+
   return (
     <section id="Services" className="services-section"
       onMouseEnter={() => setIsPaused(true)}
@@ -170,7 +218,7 @@ const Services = ({ onNavigate, onQuoteOpen }) => {
           <div className="services-layout-top">
             <div className="services-nav-top">
               <div className="service-tabs-row">
-                {SERVICES_DATA.map((s, i) => (
+                {servicesList.map((s, i) => (
                   <button
                     key={i}
                     className={`service-tab-v ${activeTab === i ? 'active' : ''}`}
@@ -181,12 +229,12 @@ const Services = ({ onNavigate, onQuoteOpen }) => {
                   </button>
                 ))}
               </div>
-              <div className="gallery-tagline-centered">{current.tagline}</div>
+              <div className="gallery-tagline-centered">{current?.tagline}</div>
             </div>
 
             <div className="services-gallery-viewport">
               <div className="services-gallery-track" style={{ transform: `translateX(-${activeTab * 100}%)` }}>
-                {SERVICES_DATA.map((category, idx) => (
+                {servicesList.map((category, idx) => (
                   <div key={idx} className="services-gallery-slide">
                     <div className="services-gallery">
                       {category.cards.map((card, i) => renderCard(card, i, category.category))}
@@ -197,7 +245,7 @@ const Services = ({ onNavigate, onQuoteOpen }) => {
             </div>
 
             <div className="tab-dots-centered">
-              {SERVICES_DATA.map((_, i) => (
+              {servicesList.map((_, i) => (
                 <button key={i} className={`tab-dot ${activeTab === i ? 'active' : ''}`} onClick={() => handleTabChange(i)} />
               ))}
             </div>
@@ -206,7 +254,7 @@ const Services = ({ onNavigate, onQuoteOpen }) => {
 
         {isMobile && (
           <div className="services-mobile-list">
-            {SERVICES_DATA.map((s, i) => (
+            {servicesList.map((s, i) => (
               <div key={i} className="service-mobile-section">
                 <div className="service-mobile-header">
                   <span className="service-mobile-icon">{s.icon}</span>
@@ -310,7 +358,7 @@ const WhyChooseUs = () => {
     },
     {
       title: "Premium Brands",
-      description: "We use only top-tier brands like Hikvision, Dahua, Reolink, ring and Ajax for reliability and durability.",
+      description: "We use only top-tier brands like Hikvision, Dahua and Ajax for reliability and durability.",
       icon: <ShieldCheck size={30} />
     },
     {
@@ -325,7 +373,7 @@ const WhyChooseUs = () => {
     },
     {
       title: "Service Warranty",
-      description: "We will give you a 6 months  warranty on both products and our installation work.",
+      description: "We will give you a 1 year  warranty on both products and our installation work.",
       icon: <Shield size={30} />
     },
     {
@@ -358,7 +406,95 @@ const WhyChooseUs = () => {
     </section>
   );
 };
-const Home = ({ onNavigate, onQuoteOpen, onViewServicesClick }) => {
+const FeaturedProjects = ({ onNavigate, onSelectProject }) => {
+  const [featured, setFeatured] = useState([]);
+
+  useEffect(() => {
+    const cachedFeatured = sessionStorage.getItem('safehive_featured_projects_cache');
+    if (cachedFeatured) {
+      try {
+        const parsed = JSON.parse(cachedFeatured);
+        setFeatured(parsed);
+        return;
+      } catch (e) {
+        // Fallback to fetch
+      }
+    }
+
+    fetch('/api/projects?showOnHome=true')
+      .then(res => {
+        if (!res.ok) throw new Error('API failed');
+        return res.json();
+      })
+      .then(data => {
+        if (Array.isArray(data)) {
+          sessionStorage.setItem('safehive_featured_projects_cache', JSON.stringify(data));
+          setFeatured(data);
+        }
+      })
+      .catch(err => console.error('Failed to fetch featured projects:', err));
+  }, []);
+
+  if (featured.length === 0) return null;
+
+  return (
+    <section className="featured-projects-home why-choose-us" style={{ background: '#f8fafc', paddingTop: '80px', paddingBottom: '80px', borderTop: '1px solid #e2e8f0' }}>
+      <div className="container animate-fade-up">
+        <div className="section-header">
+          <span className="pill" style={{ backgroundColor: '#eef2ff', color: '#635bff' }}>Projects</span>
+          <h2>Featured Completed Projects</h2>
+          <p>Explore some of our premium security setups deployed successfully.</p>
+        </div>
+
+        <div className="content-grid" style={{ marginTop: '40px' }}>
+          {featured.map((project) => (
+            <div key={project.id} className="portfolio-card bg-white rounded-32 shadow-lg overflow-hidden border-0 d-flex flex-column">
+              <div
+                className="portfolio-image-wrapper"
+                style={{ height: '240px', overflow: 'hidden', position: 'relative', cursor: 'pointer' }}
+                onClick={() => onSelectProject && onSelectProject(project)}
+              >
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  loading="lazy"
+                />
+                <div style={{ position: 'absolute', top: '20px', left: '20px' }}>
+                  <span className="badge-light" style={{ backgroundColor: 'rgba(10, 37, 64, 0.8)', color: 'white', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.1)' }}>{project.category}</span>
+                </div>
+              </div>
+              <div className="portfolio-content p-5 flex-1 d-flex flex-column" style={{ padding: '24px' }}>
+                <div className="d-flex align-items-center gap-2 text-primary mb-2" style={{ fontSize: '13px', fontWeight: '700', color: '#635bff' }}>
+                  <MapPin size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} /> {project.location}
+                </div>
+                <h3 className="font-weight-bold mb-3" style={{ fontSize: '18px', color: '#0a2540', lineHeight: '1.4', margin: '8px 0' }}>{project.title}</h3>
+                <p className="text-muted mb-4" style={{ lineHeight: '1.6', fontSize: '14px', flexGrow: 1 }}>{project.description}</p>
+                <div className="mt-auto pt-4" style={{ borderTop: '1px solid #f1f5f9' }}>
+                  <button
+                    onClick={() => {
+                      if (onSelectProject) {
+                        onSelectProject(project);
+                      } else {
+                        onNavigate('portfolio');
+                      }
+                    }}
+                    className="btn-primary w-100"
+                    style={{ justifyContent: 'center', fontWeight: '700', padding: '12px', borderRadius: '12px' }}
+                  >
+                    View Details
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const Home = ({ onNavigate, onQuoteOpen, onViewServicesClick, onSelectProject }) => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -370,6 +506,7 @@ const Home = ({ onNavigate, onQuoteOpen, onViewServicesClick }) => {
       <Services onNavigate={onNavigate} onQuoteOpen={onQuoteOpen} />
       <Process />
       <WhyChooseUs />
+      <FeaturedProjects onNavigate={onNavigate} onSelectProject={onSelectProject} />
       <CTA onQuoteOpen={onQuoteOpen} />
     </div>
   );

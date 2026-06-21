@@ -183,6 +183,8 @@ const FAQPage = () => {
           </div>
 
           {/* Contact CTA */}
+
+          {/*
           <div className="mt-5 text-center p-5 bg-gray-50 rounded-24" style={{ padding: '40px', marginTop: '40px', backgroundColor: '#f9f9f9', border: '1px solid #eee', borderRadius: '24px', textAlign: 'center' }}>
             <HelpCircle className="text-primary mb-3" size={40} style={{ color: '#635bff', marginBottom: '20px' }} />
             <h3>Still have questions?</h3>
@@ -203,6 +205,7 @@ const FAQPage = () => {
               </button>
             </div>
           </div>
+          */}
         </div>
       </section>
     </div>

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { CheckCircle, FileEdit, ArrowRight, Send, X, ClipboardList, Bell, Shield } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { CheckCircle, FileEdit, ArrowRight, Send, X, ClipboardList, Bell, Shield, Save } from 'lucide-react';
 import PhoneInput from '../components/PhoneInput';
 const QuotePage = ({ onNavigate, initialCategory = null }) => {
   useEffect(() => {
@@ -14,6 +14,22 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [submitError, setSubmitError] = useState('');
+  const [categoryBudgets, setCategoryBudgets] = useState({});
+  const [autoSaving, setAutoSaving] = useState(false);
+  const [autoSaved, setAutoSaved] = useState(false);
+  const autoSaveTimer = useRef(null);
+  const formDataRef = useRef(null);
+
+  // Sync budget when activeCategory changes
+  useEffect(() => {
+    if (activeCategory) {
+      setFormData(prev => ({
+        ...prev,
+        budget: categoryBudgets[activeCategory] || ''
+      }));
+      setTouched(prev => ({ ...prev, budget: false }));
+    }
+  }, [activeCategory]);
 
   // Handle case where user might navigate between quote routes
   useEffect(() => {
@@ -49,6 +65,54 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
   const [isEmailInitial, setIsEmailInitial] = useState(true);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // Keep a ref in sync with formData for use in async autosave
+  useEffect(() => {
+    formDataRef.current = formData;
+  }, [formData]);
+
+  // Background pre-save — fires as user types so the button click is instant
+  const triggerAutoSave = useCallback(async (currentFormData, currentDbRecordId, currentCategoryBudgets, currentActiveCategory) => {
+    // Need at least name + contact to save anything meaningful
+    if (!currentFormData.fullName || !currentFormData.initialContact) return;
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    autoSaveTimer.current = setTimeout(async () => {
+      try {
+        setAutoSaving(true);
+        const updatedBudgets = { ...(currentCategoryBudgets || {}) };
+        if (currentFormData.budget && currentActiveCategory) {
+          updatedBudgets[currentActiveCategory] = currentFormData.budget;
+        }
+        const combinedBudget = Object.entries(updatedBudgets).length > 0
+          ? Object.entries(updatedBudgets).map(([cat, b]) => `${cat}: ${b}`).join(' | ')
+          : (currentFormData.budget || null);
+
+        const response = await fetch('/api/inquiries', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: currentDbRecordId,
+            source: 'quote',
+            ...currentFormData,
+            budget: combinedBudget,
+            inquiryType: currentFormData.inquiryType.includes(currentActiveCategory)
+              ? currentFormData.inquiryType
+              : [...(currentFormData.inquiryType || []), currentActiveCategory]
+          })
+        });
+        const data = await response.json();
+        if (response.ok && data.id) {
+          setDbRecordId(data.id);
+          setAutoSaved(true);
+          setTimeout(() => setAutoSaved(false), 2500);
+        }
+      } catch (err) {
+        console.warn('Background pre-save failed silently:', err.message);
+      } finally {
+        setAutoSaving(false);
+      }
+    }, 800); // 0.8s debounce — fast enough to save before user clicks button
+  }, []);
 
   const validateField = (name, value) => {
     let error = '';
@@ -112,11 +176,42 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const updatedBudgets = name === 'budget'
+      ? { ...categoryBudgets, [activeCategory]: value }
+      : categoryBudgets;
+
+    let latestFormData;
+    setFormData(prev => {
+      const updated = { ...prev, [name]: value };
+      formDataRef.current = updated;
+      latestFormData = updated;
+      return updated;
+    });
+    if (name === 'budget') {
+      setCategoryBudgets(updatedBudgets);
+    }
 
     if (touched[name]) {
       const error = validateField(name, value);
       setErrors(prev => ({ ...prev, [name]: error }));
+    }
+
+    // Pre-save DURING step 1 typing so the button click is instant
+    const step1Fields = ['fullName', 'initialContact', 'customInquiry'];
+    if (step1Fields.includes(name) && !contactSubmitted) {
+      // Use a short timeout to get the latest state after setState
+      const fd = formDataRef.current || {};
+      const updatedFd = { ...fd, [name]: value };
+      if (updatedFd.fullName && updatedFd.initialContact) {
+        triggerAutoSave(updatedFd, dbRecordId, categoryBudgets, activeCategory);
+      }
+      return;
+    }
+
+    // Auto-save for select/dropdown changes in step 2
+    const selectFields = ['budget', 'timeframe', 'installedsystem', 'alarmPropertyType', 'alarmSystemType', 'alarmTimeframe'];
+    if (selectFields.includes(name) && contactSubmitted && formDataRef.current) {
+      triggerAutoSave(formDataRef.current, dbRecordId, updatedBudgets, activeCategory);
     }
   };
 
@@ -125,6 +220,11 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
     setTouched(prev => ({ ...prev, [name]: true }));
     const error = validateField(name, value);
     setErrors(prev => ({ ...prev, [name]: error }));
+    // Pre-save on blur too — catches copy-paste and tab-navigation
+    const fd = formDataRef.current || {};
+    if (fd.fullName && fd.initialContact) {
+      triggerAutoSave(fd, dbRecordId, categoryBudgets, activeCategory);
+    }
   };
 
   const handleCategorySelect = (category) => {
@@ -142,6 +242,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
     if (e) e.preventDefault();
     setSubmitError('');
 
+    // Validate fields
     const step1Fields = ['fullName', 'initialContact'];
     if (activeCategory === 'Other') {
       step1Fields.push('customInquiry');
@@ -161,40 +262,42 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
     setTouched(prev => ({ ...prev, ...newTouched }));
     setErrors(prev => ({ ...prev, ...newErrors }));
 
-    if (hasError) {
-      return;
-    }
+    if (hasError) return;
 
     const hasAt = formData.initialContact.includes('@');
     setIsEmailInitial(hasAt);
 
+    // If already pre-saved in background, transition instantly with no DB wait
+    if (dbRecordId) {
+      setContactSubmitted(true);
+      window.scrollTo(0, 0);
+      return;
+    }
+
+    // Fallback: save now (only if background pre-save hadn't fired yet)
     setSubmitting(true);
     try {
       const response = await fetch('/api/inquiries', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: dbRecordId,
           source: 'quote',
           fullName: formData.fullName,
           initialContact: formData.initialContact,
-          inquiryType: formData.inquiryType.includes(activeCategory) ? formData.inquiryType : [...formData.inquiryType, activeCategory],
+          inquiryType: formData.inquiryType.includes(activeCategory)
+            ? formData.inquiryType
+            : [...formData.inquiryType, activeCategory],
           customInquiry: formData.customInquiry || null
         })
       });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to save form progress.');
-      }
+      if (!response.ok) throw new Error(data.error || 'Failed to save form progress.');
       setDbRecordId(data.id);
       setContactSubmitted(true);
       window.scrollTo(0, 0);
     } catch (err) {
-      console.error('Autosave error:', err);
+      console.error('Save error:', err);
       setSubmitError(err.message);
     } finally {
       setSubmitting(false);
@@ -222,6 +325,11 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
       return;
     }
 
+    const updatedBudgets = { ...categoryBudgets, [activeCategory]: formData.budget };
+    const combinedBudget = Object.entries(updatedBudgets)
+      .map(([cat, b]) => `${cat}: ${b}`)
+      .join(' | ');
+
     setSubmitting(true);
     try {
       const response = await fetch('/api/inquiries', {
@@ -233,6 +341,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
           id: dbRecordId,
           source: 'quote',
           ...formData,
+          budget: combinedBudget,
           inquiryType: formData.inquiryType.includes(activeCategory) ? formData.inquiryType : [...formData.inquiryType, activeCategory]
         })
       });
@@ -252,12 +361,15 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
         return prev;
       });
 
+      setCategoryBudgets(updatedBudgets);
+
       setActiveCategory(targetCategory);
       setView('form');
       setContactSubmitted(true);
 
       setFormData(prev => ({
         ...prev,
+        budget: '',
         inquiryType: prev.inquiryType.includes(targetCategory) ? prev.inquiryType : [...prev.inquiryType, targetCategory]
       }));
 
@@ -301,6 +413,11 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
       return;
     }
 
+    const updatedBudgets = { ...categoryBudgets, [activeCategory]: formData.budget };
+    const combinedBudget = Object.entries(updatedBudgets)
+      .map(([cat, b]) => `${cat}: ${b}`)
+      .join(' | ');
+
     setSubmitting(true);
 
     try {
@@ -312,7 +429,8 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
         body: JSON.stringify({
           id: dbRecordId,
           source: 'quote',
-          ...formData
+          ...formData,
+          budget: combinedBudget
         })
       });
 
@@ -324,6 +442,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
 
       setSubmitted(true);
       setDbRecordId(null);
+      setCategoryBudgets({});
       window.scrollTo(0, 0);
     } catch (err) {
       console.error('Submission error:', err);
@@ -343,10 +462,9 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
               <div className="quote-success-icon mx-auto mb-4" style={{ width: '80px', height: '80px', background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <CheckCircle size={48} />
               </div>
-              <h1 className="display-4 font-weight-bold mb-3" style={{ color: '#0a2540' }}>Request Received!</h1>
-              <p className="lead text-muted mb-5">
-                Thank you, {formData.fullName}. Your security inquiry has been prioritized.
-                Our experts will review your requirements and contact you within 24 hours.
+              <h1 className="display-2 font-weight-bold mb-3" style={{ color: '#0a2540' }}>Request Received!</h1>
+              <p style={{ textAlign: 'center', justifyContent: 'center', fontSize: '13px', color: '#64748b', maxWidth: '360px', margin: '0 auto', lineHeight: 1.6 }}>
+                Thank you, <strong style={{ color: '#0a2540' }}>{formData.fullName}</strong>! Our security experts will review your inquiry and get back to you within 24 hours.
               </p>
               <button
                 className="btn-primary rounded-pill px-5 py-3"
@@ -713,8 +831,6 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                           )}
                           <p className="mt-2 text-muted" style={{ fontSize: '12px' }}>We need this to finalize your official quote document.</p>
                         </div>
-
-
                         {/* --- CATEGORY SPECIFIC FIELDS --- */}
                         {activeCategory === 'CCTV Systems' && (
                           <div className="animate-slide-down mb-5">
@@ -723,7 +839,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                               <h4 style={{ fontSize: '18px', fontWeight: '700', marginBottom: 0 }}>CCTV Requirements</h4>
                             </div>
                             <div className="row">
-                              <div className="col-md-6 mb-4">
+                              <div className="qf-group mb-4">
                                 <label className="mb-2 d-block font-weight-bold">Estimated Number of Cameras needed?</label>
                                 <input
                                   type="number"
@@ -734,7 +850,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                                   style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}
                                 />
                               </div>
-                              <div className="col-md-6 mb-4">
+                              <div className="qf-group mb-4">
                                 <label className="mb-2 d-block font-weight-bold">Your estimate timeframe to complete the project?</label>
                                 <select
                                   name="timeframe"
@@ -750,7 +866,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                                 </select>
                               </div>
                             </div>
-                            <div className="mb-4">
+                            <div className=" qf-group mb-4">
                               <label className="mb-2 d-block font-weight-bold">If there was previously installed system type the brand here?</label>
                               <input
                                 type="text"
@@ -771,7 +887,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                               <h4 style={{ fontSize: '18px', fontWeight: '700', marginBottom: 0 }}>Alarm System Specifications</h4>
                             </div>
                             <div className="row">
-                              <div className="col-md-6 mb-4">
+                              <div className="qf-group mb-4">
                                 <label className="mb-2 d-block font-weight-bold">Property Type</label>
                                 <select
                                   name="alarmPropertyType"
@@ -785,8 +901,8 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                                   <option value="Industrial">Industrial</option>
                                 </select>
                               </div>
-                              <div className="col-md-6 mb-4">
-                                <label className="mb-2 d-block font-weight-bold">Number of Sensors</label>
+                              <div className="qf-group mb-4">
+                                <label className="mb-2 d-block font-weight-bold">Number of required Sensors</label>
                                 <input
                                   type="number"
                                   name="numSensors"
@@ -797,8 +913,8 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                                 />
                               </div>
                             </div>
-                            <div className="mb-4">
-                              <label className="mb-2 d-block font-weight-bold">System Preference</label>
+                            <div className="qf-group mb-4">
+                              <label className="mb-2 d-block font-weight-bold">System preference</label>
                               <select
                                 name="alarmSystemType"
                                 value={formData.alarmSystemType}
@@ -811,7 +927,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                               </select>
                             </div>
                             <div className="row">
-                              <div className="col-md-6 mb-4">
+                              <div className="qf-group mb-4">
                                 <label className="mb-2 d-block font-weight-bold">Your estimate timeframe to complete the project?</label>
                                 <select
                                   name="alarmTimeframe"
@@ -826,7 +942,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                                   <option value="With in a month">With in a Month</option>
                                 </select>
                               </div>
-                              <div className="col-md-6 mb-4">
+                              <div className="qf-group mb-4">
                                 <label className="mb-2 d-block font-weight-bold">If there was previously installed system type the brand here?</label>
                                 <input
                                   type="text"
@@ -865,15 +981,14 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                           >
                             <option value="">Select Budget Range</option>
                             <option value="Under 50,000 ETB">Under 50,000 ETB</option>
-                            <option value="50,000 - 150,000 ETB">50,001 - 100,000 ETB</option>
-                            <option value="50,000 - 150,000 ETB">100,001 - 250,000 ETB</option>
-                            <option value="150,000 - 500,000 ETB">250,001 - 450,000 ETB</option>
-                            <option value="150,000 - 500,000 ETB">450,001 - 700,000 ETB</option>
-                            <option value="150,000 - 500,000 ETB">700,001 - 1,000,000 ETB</option>
-                            <option value="150,000 - 500,000 ETB">1,000,001- 2,000,000 ETB</option>
-                            <option value="500,000+ ETB">Above 2,000,000+ ETB</option>
+                            <option value="50,001 - 100,000 ETB">50,001 - 100,000 ETB</option>
+                            <option value="100,001 - 250,000 ETB">100,001 - 250,000 ETB</option>
+                            <option value="250,001 - 450,000 ETB">250,001 - 450,000 ETB</option>
+                            <option value="450,001 - 700,000 ETB">450,001 - 700,000 ETB</option>
+                            <option value="700,001 - 1,000,000 ETB">700,001 - 1,000,000 ETB</option>
+                            <option value="1,000,001 - 2,000,000 ETB">1,000,001 - 2,000,000 ETB</option>
+                            <option value="Above 2,000,000 ETB">Above 2,000,000 ETB</option>
                             <option value="Not sure">Not sure</option>
-
                           </select>
                           {touched.budget && errors.budget && (
                             <div style={{ color: '#ef4444', fontSize: '13px', fontWeight: '600', marginTop: '6px', marginLeft: '4px' }}>
@@ -881,6 +996,14 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                             </div>
                           )}
                         </div>
+
+                        {/* Autosave indicator */}
+                        {(autoSaving || autoSaved) && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: autoSaving ? '#94a3b8' : '#22c55e', fontWeight: '600', marginBottom: '12px', transition: 'all 0.3s ease' }}>
+                            <Save size={13} />
+                            {autoSaving ? 'Saving...' : '✓ Progress saved automatically'}
+                          </div>
+                        )}
 
                         <div className="qf-group mb-5">
                           <label className="mb-2 d-block font-weight-bold">Additional Details</label>
@@ -919,7 +1042,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                               }}
                               className="hover-lift"
                             >
-                              Add Alarm System +
+                              Add Alarm System
                             </button>
                           )}
                           {activeCategory !== 'CCTV Systems' && !completedCategories.includes('CCTV Systems') && (
@@ -940,7 +1063,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                               }}
                               className="hover-lift"
                             >
-                              Add CCTV Setup +
+                              Add CCTV Setup
                             </button>
                           )}
 

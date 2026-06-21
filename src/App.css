@@ -969,11 +969,26 @@
   margin-top: var(--nav-height);
   /* Offset for the fixed navbar */
   overflow: hidden;
-  background: linear-gradient(rgba(24, 24, 24, 0.5), rgba(139, 218, 224, 0.1)), url('/hero image.jpg');
+  background: linear-gradient(rgba(24, 24, 24, 0.5), rgba(139, 218, 224, 0.2)), url('/hero page.jpg');
   background-size: cover;
   background-position: right center;
-
 }
+
+/* Gradient blur: strong blur on the left fading to zero on the right */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  /* Mask: fully opaque (blur active) on left, fades to transparent (no blur) on the right */
+  -webkit-mask-image: linear-gradient(to right, black 0%, black 30%, transparent 75%, transparent 100%);
+  mask-image: linear-gradient(to right, black 0%, black 5%, black 10%, transparent 50%, transparent 60%, transparent 70%, transparent 100%);
+  pointer-events: none;
+  pointer-events: none;
+}
+
 
 /* Hero Background Elements Removed per User Request */
 
@@ -1767,7 +1782,8 @@
 
 .footer-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 3fr 1.4fr 1fr;
+
   gap: 64px;
   margin-bottom: 60px;
   align-items: start;

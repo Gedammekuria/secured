@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Mail, Phone, MapPin, Send, MessageSquare, Clock, Shield, ArrowRight, CheckCircle, Bell, XCircle } from 'lucide-react';
 import PhoneInput from '../components/PhoneInput';
 
@@ -38,7 +38,7 @@ const SuccessScreen = ({ name, onReset }) => (
     <h2 style={{ fontSize: '26px', fontWeight: '800', color: '#0a2540', margin: 0 }}>
       Request Received!
     </h2>
-    <p style={{ fontSize: '16px', color: '#64748b', maxWidth: '360px', margin: 0, lineHeight: 1.6 }}>
+    <p style={{ fontSize: '13px', color: '#64748b', maxWidth: '360px', margin: 0, lineHeight: 1.6 }}>
       Thank you, <strong style={{ color: '#0a2540' }}>{name}</strong>! Our security experts will review your inquiry and get back to you within 24 hours.
     </p>
     <div style={{
@@ -111,6 +111,10 @@ const ContactPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [dbRecordId, setDbRecordId] = useState(null);
   const [submitted, setSubmitted] = useState(false);
+  const [autoSaving, setAutoSaving] = useState(false);
+  const [autoSaved, setAutoSaved] = useState(false);
+  const autoSaveTimer = useRef(null);
+  const formDataRef = useRef(emptyForm);
 
   /* ── Validation state ── */
   const [errors, setErrors] = useState({});
@@ -156,25 +160,73 @@ const ContactPage = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => {
+      const updated = { ...prev, [name]: value };
+      formDataRef.current = updated;
+      return updated;
+    });
     if (touched[name]) setErrors(prev => ({ ...prev, [name]: validateField(name, value) }));
+
+    // Autosave on select field change in step 2
+    const selectFields = ['budget', 'timeframe', 'previousinstalled', 'alarmPropertyType', 'alarmSystemType'];
+    if (selectFields.includes(name) && formStep === 2 && formDataRef.current) {
+      triggerAutoSave(formDataRef.current, dbRecordId);
+    }
   };
 
   const handleBlur = (e) => {
     const { name, value } = e.target;
     markTouched(name, value);
+    // Trigger background autosave when in step 2
+    if (formStep === 2 && formDataRef.current) {
+      triggerAutoSave(formDataRef.current, dbRecordId);
+    }
   };
 
   const handleCheckboxChange = (service) => {
     setFormData(prev => {
       const current = Array.isArray(prev.inquiryType) ? prev.inquiryType : [];
+      let updated;
       if (current.includes(service))
-        return { ...prev, inquiryType: current.filter(s => s !== service) };
-      return { ...prev, inquiryType: [...current, service] };
+        updated = { ...prev, inquiryType: current.filter(s => s !== service) };
+      else
+        updated = { ...prev, inquiryType: [...current, service] };
+      formDataRef.current = updated;
+      return updated;
     });
     setTouched(prev => ({ ...prev, inquiryType: true }));
     setErrors(prev => ({ ...prev, inquiryType: '' }));
   };
+
+  // Background autosave — triggered silently after user leaves a field
+  const triggerAutoSave = useCallback(async (currentFormData, currentDbRecordId) => {
+    if (!currentFormData.fullName || !currentFormData.initialContact) return;
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    autoSaveTimer.current = setTimeout(async () => {
+      try {
+        setAutoSaving(true);
+        const response = await fetch('/api/inquiries', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: currentDbRecordId,
+            source: 'contact',
+            ...currentFormData
+          })
+        });
+        const data = await response.json();
+        if (response.ok && data.id) {
+          setDbRecordId(data.id);
+          setAutoSaved(true);
+          setTimeout(() => setAutoSaved(false), 3000);
+        }
+      } catch (err) {
+        console.warn('Background autosave failed silently:', err.message);
+      } finally {
+        setAutoSaving(false);
+      }
+    }, 1200);
+  }, []);
 
   /* ─── Step 1 submit / autosave ─── */
   const handleInitialSubmit = async (e) => {
@@ -288,10 +340,12 @@ const ContactPage = () => {
     setFormStep(1);
     setDbRecordId(null);
     setFormData(emptyForm);
+    formDataRef.current = emptyForm;
     setErrors({});
     setTouched({});
     setSubmitError('');
     setSubmitted(false);
+    setAutoSaved(false);
     window.scrollTo(0, 0);
   };
 
@@ -725,13 +779,20 @@ const ContactPage = () => {
                       >
                         Back
                       </button>
-                      <button
-                        disabled={submitting}
-                        className="btn-primary"
-                        style={{ padding: '18px', borderRadius: '14px', flex: '2', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', minWidth: '200px', opacity: submitting ? 0.7 : 1, cursor: submitting ? 'not-allowed' : 'pointer' }}
-                      >
-                        {submitting ? 'Finalizing...' : 'Finalize Request'} {!submitting && <Send size={18} />}
-                      </button>
+                      <div style={{ flex: '2', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        {(autoSaving || autoSaved) && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: autoSaving ? '#94a3b8' : '#22c55e', fontWeight: '600', transition: 'all 0.3s ease' }}>
+                            <span>{autoSaving ? '⏳ Saving...' : '✓ Progress saved automatically'}</span>
+                          </div>
+                        )}
+                        <button
+                          disabled={submitting}
+                          className="btn-primary"
+                          style={{ padding: '18px', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', minWidth: '200px', opacity: submitting ? 0.7 : 1, cursor: submitting ? 'not-allowed' : 'pointer' }}
+                        >
+                          {submitting ? 'Finalizing...' : 'Finalize Request'} {!submitting && <Send size={18} />}
+                        </button>
+                      </div>
                     </div>
                   </form>
                 )}
@@ -797,7 +858,7 @@ const ContactPage = () => {
           </div>
           <iframe
             title="SafeHive Location"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3940.4973695805377!2d38.796!3d9.0192!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x164b85cef5ab402d%3A0x8467b6b037a24d49!2sMegenagna%2C%20Addis%20Ababa%2C%20Ethiopia!5e0!3m2!1sen!2set!4v1717000000000"
+            src="https://www.google.com/maps/place/Hexagon+Computer+Systems/@9.0171303,38.7907261,532m/data=!3m1!1e3!4m14!1m7!3m6!1s0x164b9b9f24f13f99:0xcbdcf9523ac82bd4!2sHexagon+Computer+Systems!8m2!3d9.0148912!4d38.7878398!16s%2Fg%2F11h75wgxbh!3m5!1s0x164b85d80cabe897:0x3579e089b0c95ef!8m2!3d9.0164128!4d38.7913093!16s%2Fg%2F11l38nvtmw?entry=ttu&g_ep=EgoyMDI2MDYxNi4wIKXMDSoASAFQAw%3D%3D"
             width="100%"
             height="420"
             style={{ border: 0, display: 'block' }}

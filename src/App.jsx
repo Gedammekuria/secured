@@ -473,8 +473,8 @@ function App() {
 
   const renderView = () => {
     switch (view) {
-      case 'landing': return <Home onNavigate={setView} onQuoteOpen={(target = 'quote') => setView(target)} onViewServicesClick={handleViewServicesClick} />;
-      case 'services': return <Home onNavigate={setView} onQuoteOpen={(target = 'quote') => setView(target)} onViewServicesClick={handleViewServicesClick} />;
+      case 'landing': return <Home onNavigate={setView} onQuoteOpen={(target = 'quote') => setView(target)} onViewServicesClick={handleViewServicesClick} onSelectProject={navigateToProject} />;
+      case 'services': return <Home onNavigate={setView} onQuoteOpen={(target = 'quote') => setView(target)} onViewServicesClick={handleViewServicesClick} onSelectProject={navigateToProject} />;
       case 'cctv': return <CCTVPage onNavigate={setView} />;
       case 'alarm': return <AlarmPage onNavigate={setView} />;
       case 'portfolio': return <PortfolioPage onSelectProject={navigateToProject} onNavigate={setView} />;
