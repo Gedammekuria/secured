@@ -858,7 +858,7 @@ const ContactPage = () => {
           </div>
           <iframe
             title="SafeHive Location"
-            src="https://www.google.com/maps/place/Hexagon+Computer+Systems/@9.0171303,38.7907261,532m/data=!3m1!1e3!4m14!1m7!3m6!1s0x164b9b9f24f13f99:0xcbdcf9523ac82bd4!2sHexagon+Computer+Systems!8m2!3d9.0148912!4d38.7878398!16s%2Fg%2F11h75wgxbh!3m5!1s0x164b85d80cabe897:0x3579e089b0c95ef!8m2!3d9.0164128!4d38.7913093!16s%2Fg%2F11l38nvtmw?entry=ttu&g_ep=EgoyMDI2MDYxNi4wIKXMDSoASAFQAw%3D%3D"
+            src="https://maps.google.com/maps?q=9.0164128,38.7913093&z=16&output=embed"
             width="100%"
             height="420"
             style={{ border: 0, display: 'block' }}
