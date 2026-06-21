@@ -231,3 +231,41 @@ Best regards,
 The SafeHive Security Team
 www.safehive.com
 ========================================
+
+========================================
+[EMAIL SENT VIA SAFEHIVE SYSTEM]
+Timestamp: 2026-06-21T19:36:19.994Z
+Recipient: gedu094@gmail.com (Admin Reset Code)
+Subject:   SafeHive Security — Admin Password Reset Code
+Body:
+Dear SafeHive Admin,
+
+You requested a password reset code for the admin console.
+
+Your 6-digit verification code is: 926191
+
+This code will expire in 10 minutes.
+
+If you did not request this, please secure your admin credentials immediately.
+
+Best regards,
+The SafeHive Security Team
+www.safehive.com
+========================================
+
+========================================
+[EMAIL SENT VIA SAFEHIVE SYSTEM]
+Timestamp: 2026-06-21T19:36:49.000Z
+Recipient: gedu094@gmail.com (Admin Reset Confirmation)
+Subject:   SafeHive Security — Admin Password Reset Successful
+Body:
+Dear SafeHive Admin,
+
+Your SafeHive Admin account password has been successfully reset.
+
+You can now log in using your new password.
+
+Best regards,
+The SafeHive Security Team
+www.safehive.com
+========================================

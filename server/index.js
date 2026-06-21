@@ -3,6 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import pool from './db.js';
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Load environment variables
 dotenv.config();
@@ -646,6 +648,9 @@ app.get('/api/health', async (req, res) => {
 
 // Admin Authentication Middleware
 function authenticateAdmin(req, res, next) {
+  // Reload environment variables dynamically
+  dotenv.config({ override: true });
+
   const authHeader = req.headers.authorization;
   const expectedToken = process.env.ADMIN_TOKEN || 'safehive_secret_token_2026';
   
@@ -663,6 +668,9 @@ function authenticateAdmin(req, res, next) {
 
 // Admin Login
 app.post('/api/admin/login', (req, res) => {
+  // Reload environment variables dynamically to pick up any changes to .env
+  dotenv.config({ override: true });
+
   const { email, password } = req.body;
   const expectedEmail = process.env.ADMIN_EMAIL || 'admin@safehive.com';
   const expectedPassword = process.env.ADMIN_PASSWORD || 'safehiveadmin';
@@ -680,6 +688,216 @@ app.post('/api/admin/login', (req, res) => {
   } else {
     return res.status(401).json({ error: 'Invalid email or password.' });
   }
+});
+
+// Temporary store for reset codes: email -> { code, expiresAt }
+const resetCodes = new Map();
+
+// Helper to update password in .env file
+function updateEnvPassword(newPassword) {
+  try {
+    const envPath = fileURLToPath(new URL('../.env', import.meta.url));
+    if (fs.existsSync(envPath)) {
+      let content = fs.readFileSync(envPath, 'utf8');
+      if (content.includes('ADMIN_PASSWORD=')) {
+        content = content.replace(/ADMIN_PASSWORD=.*/, `ADMIN_PASSWORD=${newPassword}`);
+      } else {
+        content += `\nADMIN_PASSWORD=${newPassword}`;
+      }
+      fs.writeFileSync(envPath, content, 'utf8');
+      // Also update process.env
+      process.env.ADMIN_PASSWORD = newPassword;
+      console.log('✅ Updated ADMIN_PASSWORD in .env');
+      return true;
+    }
+  } catch (err) {
+    console.error('Failed to update .env file:', err.message);
+  }
+  return false;
+}
+
+// Helper to send reset code email
+async function sendResetCodeEmail(recipient, code) {
+  const subject = `SafeHive Security — Admin Password Reset Code`;
+  const body = `Dear SafeHive Admin,\n\nYou requested a password reset code for the admin console.\n\nYour 6-digit verification code is: ${code}\n\nThis code will expire in 10 minutes.\n\nIf you did not request this, please secure your admin credentials immediately.\n\nBest regards,\nThe SafeHive Security Team\nwww.safehive.com`;
+
+  const logEntry = `
+========================================
+[EMAIL SENT VIA SAFEHIVE SYSTEM]
+Timestamp: ${new Date().toISOString()}
+Recipient: ${recipient} (Admin Reset Code)
+Subject:   ${subject}
+Body:
+${body}
+========================================
+`;
+  try {
+    fs.appendFileSync('notifications_log.txt', logEntry, 'utf8');
+    console.log(`✉️ [NOTIFICATION LOGGED] Reset code written to notifications_log.txt for ${recipient}`);
+  } catch (err) {
+    console.error('Failed to write reset email to log file:', err.message);
+  }
+
+  const isEmail = recipient && recipient.includes('@');
+  if (isEmail && process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    try {
+      const nodemailer = (await import('nodemailer')).default;
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT || '587', 10),
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+
+      const mailOptions = {
+        from: process.env.SMTP_FROM || `"SafeHive Security" <${process.env.SMTP_USER}>`,
+        to: recipient,
+        subject: subject,
+        text: body,
+      };
+
+      const info = await transporter.sendMail(mailOptions);
+      console.log('⚡ Reset code email sent successfully via SMTP:', info.messageId);
+      return { success: true, method: 'email', messageId: info.messageId };
+    } catch (err) {
+      console.error('🔴 Failed to send reset code email via SMTP:', err.message);
+      return { success: true, method: 'simulation_fallback', error: err.message };
+    }
+  }
+
+  return { success: true, method: 'simulation' };
+}
+
+// Helper to send reset confirmation email
+async function sendResetConfirmationEmail(recipient) {
+  const subject = `SafeHive Security — Admin Password Reset Successful`;
+  const body = `Dear SafeHive Admin,\n\nYour SafeHive Admin account password has been successfully reset.\n\nYou can now log in using your new password.\n\nBest regards,\nThe SafeHive Security Team\nwww.safehive.com`;
+
+  const logEntry = `
+========================================
+[EMAIL SENT VIA SAFEHIVE SYSTEM]
+Timestamp: ${new Date().toISOString()}
+Recipient: ${recipient} (Admin Reset Confirmation)
+Subject:   ${subject}
+Body:
+${body}
+========================================
+`;
+  try {
+    fs.appendFileSync('notifications_log.txt', logEntry, 'utf8');
+    console.log(`✉️ [NOTIFICATION LOGGED] Reset confirmation written to notifications_log.txt for ${recipient}`);
+  } catch (err) {
+    console.error('Failed to write reset confirmation to log file:', err.message);
+  }
+
+  const isEmail = recipient && recipient.includes('@');
+  if (isEmail && process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    try {
+      const nodemailer = (await import('nodemailer')).default;
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT || '587', 10),
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+
+      const mailOptions = {
+        from: process.env.SMTP_FROM || `"SafeHive Security" <${process.env.SMTP_USER}>`,
+        to: recipient,
+        subject: subject,
+        text: body,
+      };
+
+      await transporter.sendMail(mailOptions);
+    } catch (err) {
+      console.error('🔴 Failed to send reset confirmation email via SMTP:', err.message);
+    }
+  }
+}
+
+// Admin Forgot Password - Request Verification Code
+app.post('/api/admin/forgot-password', async (req, res) => {
+  // Reload environment variables dynamically
+  dotenv.config({ override: true });
+
+  const { email } = req.body;
+  const expectedEmail = process.env.ADMIN_EMAIL || 'admin@safehive.com';
+
+  if (!email) {
+    return res.status(400).json({ error: 'Operator email is required.' });
+  }
+
+  if (email.toLowerCase() !== expectedEmail.toLowerCase()) {
+    return res.status(404).json({ error: 'No operator found with this email address.' });
+  }
+
+  // Generate 6-digit random code
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes from now
+
+  resetCodes.set(email.toLowerCase(), { code, expiresAt });
+
+  // Send the email
+  const emailRes = await sendResetCodeEmail(email, code);
+
+  return res.json({
+    success: true,
+    message: 'A verification code has been sent to your operator email.',
+    simulated: emailRes.method !== 'email'
+  });
+});
+
+// Admin Reset Password - Verify Code & Update Password
+app.post('/api/admin/reset-password', async (req, res) => {
+  // Reload environment variables dynamically
+  dotenv.config({ override: true });
+
+  const { email, code, newPassword } = req.body;
+  const expectedEmail = process.env.ADMIN_EMAIL || 'admin@safehive.com';
+
+  if (!email || !code || !newPassword) {
+    return res.status(400).json({ error: 'Email, verification code, and new password are required.' });
+  }
+
+  if (email.toLowerCase() !== expectedEmail.toLowerCase()) {
+    return res.status(404).json({ error: 'No operator found with this email address.' });
+  }
+
+  const record = resetCodes.get(email.toLowerCase());
+
+  if (!record) {
+    return res.status(400).json({ error: 'No active password reset request found for this email.' });
+  }
+
+  if (record.code !== code.trim()) {
+    return res.status(400).json({ error: 'Invalid verification code.' });
+  }
+
+  if (Date.now() > record.expiresAt) {
+    resetCodes.delete(email.toLowerCase());
+    return res.status(400).json({ error: 'Verification code has expired. Please request a new one.' });
+  }
+
+  // Code is valid! Update password
+  const updated = updateEnvPassword(newPassword);
+
+  // Clear verification code
+  resetCodes.delete(email.toLowerCase());
+
+  // Send reset confirmation email
+  await sendResetConfirmationEmail(email);
+
+  return res.json({
+    success: true,
+    message: 'Your password has been successfully reset. You can now login with your new password.',
+    envUpdated: updated
+  });
 });
 
 // Admin Get Inquiries

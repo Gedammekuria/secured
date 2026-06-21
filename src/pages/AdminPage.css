@@ -28,15 +28,15 @@
 }
 
 .admin-login-logo {
-  width: 65px;
-  height: 65px;
-  border-radius: 18px;
-  background: rgba(226, 88, 34, 0.08);
-  color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 24px;
+}
+
+.admin-logo-img {
+  height: 55px;
+  object-fit: contain;
 }
 
 .admin-login-card h2 {

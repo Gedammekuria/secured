@@ -34,7 +34,8 @@ const defaultProjects = [
     fullDetail: "For Oasis Hotel Apartment, we installaed  a CCTV camera security system. The installation includes high-definition dome and bullet cameras in hallways and common areass. The system provides real-time monitoring and advanced playback capabilities for management.",
     benefit: ["Multi-floor coverage", "Guest privacy optimization", "24/7 hotel monitoring", "Mobile access for management"],
     category: "CCTV Camera",
-    image: "/assets/service/oasis_hotel.png"
+    image: "/assets/service/oasishotel.png"
+
   },
   {
     id: 4,
@@ -45,8 +46,7 @@ const defaultProjects = [
     fullDetail: "Sunrise Real Estate required a CCTV security solution for their residential complex. We installed the Cameras with out blined spot.",
     benefit: ["24/7 continuous recording", "Elimination of blind spots", "Remote global access", "Motion-triggered alerts", "Night vision excellence"],
     category: "CCTV Camera",
-    image: "/assets/service/sunrise_real_estate.png"
-
+    image: "/assets/service/sunrise.JPG"
   },
   {
     id: 5,

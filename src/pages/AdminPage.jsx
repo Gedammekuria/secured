@@ -31,6 +31,15 @@ const AdminPage = ({ onNavigate }) => {
   const [loading, setLoading] = useState(false);
   const [adminEmail, setAdminEmail] = useState('');
 
+  // Password Reset States
+  const [loginView, setLoginView] = useState('login'); // 'login' | 'forgot' | 'verify'
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetCode, setResetCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [resetError, setResetError] = useState('');
+  const [resetSuccess, setResetSuccess] = useState('');
+
   // Inquiries data
   const [inquiries, setInquiries] = useState([]);
   const [selectedInquiry, setSelectedInquiry] = useState(null);
@@ -104,6 +113,76 @@ const AdminPage = ({ onNavigate }) => {
     setLoggedIn(false);
     setAdminEmail('');
     setInquiries([]);
+  };
+
+  const handleSendResetCode = async (e) => {
+    e.preventDefault();
+    setResetError('');
+    setResetSuccess('');
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/admin/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: resetEmail })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send reset code.');
+      }
+
+      setResetSuccess(data.message);
+      setLoginView('verify');
+    } catch (err) {
+      setResetError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyResetCode = async (e) => {
+    e.preventDefault();
+    setResetError('');
+    setResetSuccess('');
+
+    if (newPassword !== confirmNewPassword) {
+      setResetError('Passwords do not match.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/admin/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: resetEmail,
+          code: resetCode,
+          newPassword
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to reset password.');
+      }
+
+      setResetSuccess(data.message);
+      setLoginView('login');
+      setPassword('');
+      setNewPassword('');
+      setConfirmNewPassword('');
+      setResetCode('');
+    } catch (err) {
+      setResetError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fetchInquiries = async (token) => {
@@ -672,44 +751,230 @@ const AdminPage = ({ onNavigate }) => {
           <div className="admin-login-wrapper">
             <div className="admin-login-card animate-fade-in">
               <div className="admin-login-logo">
-                <Lock size={30} />
+                <img src="/assets/safehive.png" alt="Safehive Logo" className="admin-logo-img" />
               </div>
-              <h2>SafeHive Admin</h2>
-              <p>Secure login area for safety operations management.</p>
 
-              {loginError && (
-                <div className="login-error-alert">
-                  <ShieldAlert size={18} style={{ marginRight: '8px', verticalAlign: 'middle', display: 'inline' }} />
-                  {loginError}
-                </div>
+              {loginView === 'login' && (
+                <>
+                  <h2>SafeHive Admin</h2>
+                  <p>Secure login area for safety operations management.</p>
+
+                  {loginError && (
+                    <div className="login-error-alert">
+                      <ShieldAlert size={18} style={{ marginRight: '8px', verticalAlign: 'middle', display: 'inline' }} />
+                      {loginError}
+                    </div>
+                  )}
+
+                  {resetSuccess && (
+                    <div className="login-success-alert" style={{
+                      background: '#f0fdf4',
+                      border: '1px solid #bbf7d0',
+                      color: '#15803d',
+                      borderRadius: '12px',
+                      padding: '12px 16px',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      marginBottom: '24px',
+                      textAlign: 'left'
+                    }}>
+                      {resetSuccess}
+                    </div>
+                  )}
+
+                  <form onSubmit={handleLogin}>
+                    <div className="login-form-group">
+                      <label>Operator Email</label>
+                      <input
+                        type="email"
+                        placeholder="name@safehive.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="login-form-group">
+                      <label>Secret Password</label>
+                      <input
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <button type="submit" disabled={loading} className="btn-login mt-4">
+                      {loading ? 'Authenticating...' : 'Enter Operator Panel'}
+                    </button>
+
+                    <div style={{ textAlign: 'center', marginTop: '16px' }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLoginView('forgot');
+                          setResetError('');
+                          setResetSuccess('');
+                        }}
+                        className="forgot-link"
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#e25822',
+                          fontWeight: '700',
+                          fontSize: '13px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Forgot Password?
+                      </button>
+                    </div>
+                  </form>
+                </>
               )}
 
-              <form onSubmit={handleLogin}>
-                <div className="login-form-group">
-                  <label>Operator Email</label>
-                  <input
-                    type="email"
-                    placeholder="name@safehive.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="login-form-group">
-                  <label>Secret Password</label>
-                  <input
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
+              {loginView === 'forgot' && (
+                <>
+                  <h2>Reset Password</h2>
+                  <p>Enter your Operator Email to receive a verification code.</p>
 
-                <button type="submit" disabled={loading} className="btn-login mt-4">
-                  {loading ? 'Authenticating...' : 'Enter Operator Panel'}
-                </button>
-              </form>
+                  {resetError && (
+                    <div className="login-error-alert">
+                      <ShieldAlert size={18} style={{ marginRight: '8px', verticalAlign: 'middle', display: 'inline' }} />
+                      {resetError}
+                    </div>
+                  )}
+
+                  <form onSubmit={handleSendResetCode}>
+                    <div className="login-form-group">
+                      <label>Operator Email</label>
+                      <input
+                        type="email"
+                        placeholder="name@safehive.com"
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <button type="submit" disabled={loading} className="btn-login mt-4">
+                      {loading ? 'Sending code...' : 'Send Reset Code'}
+                    </button>
+
+                    <div style={{ textAlign: 'center', marginTop: '16px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setLoginView('login')}
+                        className="forgot-link"
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#64748b',
+                          fontWeight: '700',
+                          fontSize: '13px',
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        <ArrowLeft size={14} /> Back to Login
+                      </button>
+                    </div>
+                  </form>
+                </>
+              )}
+
+              {loginView === 'verify' && (
+                <>
+                  <h2>Confirm Reset</h2>
+                  <p>We've sent a code to your email. Enter it below with your new password.</p>
+
+                  {resetError && (
+                    <div className="login-error-alert">
+                      <ShieldAlert size={18} style={{ marginRight: '8px', verticalAlign: 'middle', display: 'inline' }} />
+                      {resetError}
+                    </div>
+                  )}
+
+                  {resetSuccess && (
+                    <div className="login-success-alert" style={{
+                      background: '#f0fdf4',
+                      border: '1px solid #bbf7d0',
+                      color: '#15803d',
+                      borderRadius: '12px',
+                      padding: '12px 16px',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      marginBottom: '24px',
+                      textAlign: 'left'
+                    }}>
+                      {resetSuccess}
+                    </div>
+                  )}
+
+                  <form onSubmit={handleVerifyResetCode}>
+                    <div className="login-form-group">
+                      <label>6-Digit Verification Code</label>
+                      <input
+                        type="text"
+                        placeholder="123456"
+                        maxLength="6"
+                        pattern="\d{6}"
+                        value={resetCode}
+                        onChange={(e) => setResetCode(e.target.value)}
+                        required
+                        style={{ textAlign: 'center', letterSpacing: '8px', fontSize: '18px', fontWeight: '800' }}
+                      />
+                    </div>
+                    <div className="login-form-group">
+                      <label>New Secret Password</label>
+                      <input
+                        type="password"
+                        placeholder="••••••••"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="login-form-group">
+                      <label>Confirm New Password</label>
+                      <input
+                        type="password"
+                        placeholder="••••••••"
+                        value={confirmNewPassword}
+                        onChange={(e) => setConfirmNewPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <button type="submit" disabled={loading} className="btn-login mt-4">
+                      {loading ? 'Resetting...' : 'Reset Password'}
+                    </button>
+
+                    <div style={{ textAlign: 'center', marginTop: '16px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setLoginView('login')}
+                        className="forgot-link"
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#64748b',
+                          fontWeight: '700',
+                          fontSize: '13px',
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        <ArrowLeft size={14} /> Back to Login
+                      </button>
+                    </div>
+                  </form>
+                </>
+              )}
             </div>
           </div>
         ) : selectedInquiry ? (
