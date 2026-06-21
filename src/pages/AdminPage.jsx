@@ -784,7 +784,7 @@ const AdminPage = ({ onNavigate }) => {
 
                   <form onSubmit={handleLogin}>
                     <div className="login-form-group">
-                      <label>Operator Email</label>
+                      <label>Your Email</label>
                       <input
                         type="email"
                         placeholder="name@safehive.com"
@@ -794,7 +794,7 @@ const AdminPage = ({ onNavigate }) => {
                       />
                     </div>
                     <div className="login-form-group">
-                      <label>Secret Password</label>
+                      <label>Your Password</label>
                       <input
                         type="password"
                         placeholder="••••••••"
@@ -805,7 +805,7 @@ const AdminPage = ({ onNavigate }) => {
                     </div>
 
                     <button type="submit" disabled={loading} className="btn-login mt-4">
-                      {loading ? 'Authenticating...' : 'Enter Operator Panel'}
+                      {loading ? 'Authenticating...' : 'Login'}
                     </button>
 
                     <div style={{ textAlign: 'center', marginTop: '16px' }}>
