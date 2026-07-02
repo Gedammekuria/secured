@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Eye, Trash2, LogOut, Search, ShieldAlert, Filter, Calendar, Users, FileText, Database, Lock, X, ChevronDown, Bell, Download, CheckSquare, Square, ArrowLeft, Sheet, Plus, Edit, Camera, Shield, Radio, Home as HomeIcon, DoorOpen, AlertTriangle, Mail } from 'lucide-react';
+import { Eye, EyeOff, Trash2, LogOut, Search, ShieldAlert, Filter, Calendar, Users, FileText, Database, Lock, X, ChevronDown, Bell, Download, CheckSquare, Square, ArrowLeft, Sheet, Plus, Edit, Camera, Shield, Radio, Home as HomeIcon, DoorOpen, AlertTriangle, Mail, ChevronLeft, ChevronRight, LayoutDashboard, Settings, FolderKanban, Globe, CheckCircle, Circle } from 'lucide-react';
+import { useSiteSettings } from '../SiteSettingsContext';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -25,6 +26,7 @@ const STATUS_CONFIG = {
 
 const AdminPage = ({ onNavigate }) => {
   const [loggedIn, setLoggedIn] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
@@ -39,6 +41,39 @@ const AdminPage = ({ onNavigate }) => {
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [resetError, setResetError] = useState('');
   const [resetSuccess, setResetSuccess] = useState('');
+
+  // Show/hide password states
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Password strength checker
+  const getPasswordStrength = (pwd) => {
+    if (!pwd) return { score: 0, label: '', color: '' };
+    let score = 0;
+    if (pwd.length >= 8) score++;
+    if (/[A-Z]/.test(pwd)) score++;
+    if (/[0-9]/.test(pwd)) score++;
+    if (/[^A-Za-z0-9]/.test(pwd)) score++;
+    if (pwd.length >= 12) score++;
+    const levels = [
+      { score: 0, label: '', color: '#e2e8f0' },
+      { score: 1, label: 'Very Weak', color: '#ef4444' },
+      { score: 2, label: 'Weak', color: '#f97316' },
+      { score: 3, label: 'Fair', color: '#eab308' },
+      { score: 4, label: 'Strong', color: '#22c55e' },
+      { score: 5, label: 'Very Strong', color: '#16a34a' },
+    ];
+    return levels[Math.min(score, 5)];
+  };
+
+  const pwdStrength = getPasswordStrength(newPassword);
+  const pwdReqs = [
+    { label: 'At least 8 characters', met: newPassword.length >= 8 },
+    { label: 'Uppercase letter', met: /[A-Z]/.test(newPassword) },
+    { label: 'Number', met: /[0-9]/.test(newPassword) },
+    { label: 'Special character', met: /[^A-Za-z0-9]/.test(newPassword) },
+  ];
 
   // Inquiries data
   const [inquiries, setInquiries] = useState([]);
@@ -64,6 +99,23 @@ const AdminPage = ({ onNavigate }) => {
   const [dateTo, setDateTo] = useState('');
   const [exportFormat, setExportFormat] = useState('excel'); // 'excel' | 'pdf'
 
+  const fetchAdminProfile = async (token) => {
+    try {
+      const response = await fetch('/api/admin/me', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.email) {
+          setAdminEmail(data.email);
+          localStorage.setItem('safehive_admin_email', data.email);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch admin profile:', err);
+    }
+  };
+
   // Check login state on mount
   useEffect(() => {
     const token = localStorage.getItem('safehive_admin_token');
@@ -73,6 +125,7 @@ const AdminPage = ({ onNavigate }) => {
       if (storedEmail) {
         setAdminEmail(storedEmail);
       }
+      fetchAdminProfile(token);
       fetchInquiries(token);
     }
   }, []);
@@ -96,8 +149,9 @@ const AdminPage = ({ onNavigate }) => {
       }
 
       localStorage.setItem('safehive_admin_token', data.token);
-      localStorage.setItem('safehive_admin_email', email);
-      setAdminEmail(email);
+      const dynamicEmail = data.email || email;
+      localStorage.setItem('safehive_admin_email', dynamicEmail);
+      setAdminEmail(dynamicEmail);
       setLoggedIn(true);
       fetchInquiries(data.token);
     } catch (err) {
@@ -589,7 +643,7 @@ const AdminPage = ({ onNavigate }) => {
     doc.setFontSize(7.5);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(148, 163, 184);
-    doc.text('SafeHive Security Systems  •  Confidential Inquiry Record', ML, FY + 4);
+    doc.text('SafeHive Security Systems Confidential Inquiry Record', ML, FY + 4);
     doc.text(`Exported: ${new Date().toLocaleString()}`, PW - MR, FY + 4, { align: 'right' });
   };
 
@@ -751,7 +805,7 @@ const AdminPage = ({ onNavigate }) => {
           <div className="admin-login-wrapper">
             <div className="admin-login-card animate-fade-in">
               <div className="admin-login-logo">
-                <img src="/assets/safehive.png" alt="Safehive Logo" className="admin-logo-img" />
+                <img src="/assets/safehive.webp" alt="Safehive Logo" className="admin-logo-img" />
               </div>
 
               {loginView === 'login' && (
@@ -795,13 +849,24 @@ const AdminPage = ({ onNavigate }) => {
                     </div>
                     <div className="login-form-group">
                       <label>Your Password</label>
-                      <input
-                        type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                      />
+                      <div className="pwd-input-wrapper">
+                        <input
+                          type={showLoginPassword ? 'text' : 'password'}
+                          placeholder="••••••••"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                        />
+                        <button
+                          type="button"
+                          className="pwd-toggle-btn"
+                          onClick={() => setShowLoginPassword(v => !v)}
+                          tabIndex={-1}
+                          aria-label={showLoginPassword ? 'Hide password' : 'Show password'}
+                        >
+                          {showLoginPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
                     </div>
 
                     <button type="submit" disabled={loading} className="btn-login mt-4">
@@ -836,7 +901,7 @@ const AdminPage = ({ onNavigate }) => {
               {loginView === 'forgot' && (
                 <>
                   <h2>Reset Password</h2>
-                  <p>Enter your Operator Email to receive a verification code.</p>
+                  <p>Enter your admin Email to receive a verification code.</p>
 
                   {resetError && (
                     <div className="login-error-alert">
@@ -847,7 +912,7 @@ const AdminPage = ({ onNavigate }) => {
 
                   <form onSubmit={handleSendResetCode}>
                     <div className="login-form-group">
-                      <label>Operator Email</label>
+                      <label>Admin Email</label>
                       <input
                         type="email"
                         placeholder="name@safehive.com"
@@ -929,23 +994,90 @@ const AdminPage = ({ onNavigate }) => {
                     </div>
                     <div className="login-form-group">
                       <label>New Secret Password</label>
-                      <input
-                        type="password"
-                        placeholder="••••••••"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        required
-                      />
+                      <div className="pwd-input-wrapper">
+                        <input
+                          type={showNewPassword ? 'text' : 'password'}
+                          placeholder="••••••••"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          required
+                        />
+                        <button
+                          type="button"
+                          className="pwd-toggle-btn"
+                          onClick={() => setShowNewPassword(v => !v)}
+                          tabIndex={-1}
+                          aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+                        >
+                          {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
+
+                      {/* Strength Bar */}
+                      {newPassword.length > 0 && (
+                        <div className="pwd-strength-wrapper">
+                          <div className="pwd-strength-bar">
+                            {[1, 2, 3, 4, 5].map(i => (
+                              <div
+                                key={i}
+                                className="pwd-strength-segment"
+                                style={{ background: i <= pwdStrength.score ? pwdStrength.color : '#e2e8f0' }}
+                              />
+                            ))}
+                          </div>
+                          {pwdStrength.label && (
+                            <span className="pwd-strength-label" style={{ color: pwdStrength.color }}>
+                              {pwdStrength.label}
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Requirements Checklist */}
+                      {newPassword.length > 0 && (
+                        <div className="pwd-requirements">
+                          {pwdReqs.map((req, i) => (
+                            <div key={i} className={`pwd-req-item ${req.met ? 'met' : ''}`}>
+                              {req.met
+                                ? <CheckCircle size={12} style={{ color: '#22c55e', flexShrink: 0 }} />
+                                : <Circle size={12} style={{ color: '#cbd5e1', flexShrink: 0 }} />
+                              }
+                              <span>{req.label}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
+
                     <div className="login-form-group">
                       <label>Confirm New Password</label>
-                      <input
-                        type="password"
-                        placeholder="••••••••"
-                        value={confirmNewPassword}
-                        onChange={(e) => setConfirmNewPassword(e.target.value)}
-                        required
-                      />
+                      <div className="pwd-input-wrapper">
+                        <input
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          placeholder="••••••••"
+                          value={confirmNewPassword}
+                          onChange={(e) => setConfirmNewPassword(e.target.value)}
+                          required
+                        />
+                        <button
+                          type="button"
+                          className="pwd-toggle-btn"
+                          onClick={() => setShowConfirmPassword(v => !v)}
+                          tabIndex={-1}
+                          aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                        >
+                          {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
+                      {/* Match indicator */}
+                      {confirmNewPassword.length > 0 && (
+                        <div className={`pwd-match-hint ${newPassword === confirmNewPassword ? 'match' : 'no-match'}`}>
+                          {newPassword === confirmNewPassword
+                            ? <><CheckCircle size={12} /> Passwords match</>
+                            : <><ShieldAlert size={12} /> Passwords do not match</>
+                          }
+                        </div>
+                      )}
                     </div>
 
                     <button type="submit" disabled={loading} className="btn-login mt-4">
@@ -1215,7 +1347,6 @@ const AdminPage = ({ onNavigate }) => {
                   className="admin-bell-container"
                   title={`${pendingCount} pending inquiries`}
                   onClick={() => {
-                    // Set status filter to pending to filter the list immediately
                     setStatusFilter('pending');
                   }}
                 >
@@ -1236,481 +1367,568 @@ const AdminPage = ({ onNavigate }) => {
               </div>
             </div>
 
-            {/* Admin Tabs */}
-            <div className="admin-tabs-nav" style={{ display: 'flex', gap: '10px', marginBottom: '24px', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px' }}>
-              <button
-                className={`admin-tab-btn ${adminTab === 'inquiries' ? 'active' : ''}`}
-                onClick={() => setAdminTab('inquiries')}
-                style={{
-                  padding: '10px 24px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  fontSize: '15px',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                  backgroundColor: adminTab === 'inquiries' ? '#635bff' : 'transparent',
-                  color: adminTab === 'inquiries' ? 'white' : '#64748b',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                Inquiries
-              </button>
-              <button
-                className={`admin-tab-btn ${adminTab === 'services' ? 'active' : ''}`}
-                onClick={() => setAdminTab('services')}
-                style={{
-                  padding: '10px 24px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  fontSize: '15px',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                  backgroundColor: adminTab === 'services' ? '#635bff' : 'transparent',
-                  color: adminTab === 'services' ? 'white' : '#64748b',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                Services
-              </button>
-              <button
-                className={`admin-tab-btn ${adminTab === 'projects' ? 'active' : ''}`}
-                onClick={() => setAdminTab('projects')}
-                style={{
-                  padding: '10px 24px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  fontSize: '15px',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                  backgroundColor: adminTab === 'projects' ? '#635bff' : 'transparent',
-                  color: adminTab === 'projects' ? 'white' : '#64748b',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                Projects
-              </button>
-            </div>
+            {/* Dashboard Body — Sidebar + Content */}
+            <div className="admin-dashboard-body">
 
-            {adminTab === 'inquiries' && (
-              <>
-                {/* Status Metrics cards */}
-                <div className="metrics-grid">
-                  <div className="metric-card">
-                    <div className="metric-card-info">
-                      <h3>Pending</h3>
-                      <p style={{ color: '#b45309' }}>{pendingCount}</p>
-                    </div>
-                    <div className="metric-card-icon" style={{ background: '#fef3c7', color: '#b45309' }}>
-                      <Calendar size={16} />
-                    </div>
-                  </div>
-                  <div className="metric-card">
-                    <div className="metric-card-info">
-                      <h3>Accepted</h3>
-                      <p style={{ color: '#1d4ed8' }}>{acceptedCount}</p>
-                    </div>
-                    <div className="metric-card-icon" style={{ background: '#eff6ff', color: '#1d4ed8' }}>
-                      <FileText size={16} />
-                    </div>
-                  </div>
-                  <div className="metric-card">
-                    <div className="metric-card-info">
-                      <h3>In Progress</h3>
-                      <p style={{ color: '#7c3aed' }}>{progressCount}</p>
-                    </div>
-                    <div className="metric-card-icon" style={{ background: '#f5f3ff', color: '#7c3aed' }}>
-                      <Database size={16} />
-                    </div>
-                  </div>
-                  <div className="metric-card">
-                    <div className="metric-card-info">
-                      <h3>Finished</h3>
-                      <p style={{ color: '#15803d' }}>{finishedCount}</p>
-                    </div>
-                    <div className="metric-card-icon" style={{ background: '#f0fdf4', color: '#15803d' }}>
-                      <Users size={16} />
-                    </div>
-                  </div>
-                </div>
+              {/* ── LEFT SIDEBAR ── */}
+              <aside className={`admin-sidebar ${sidebarOpen ? 'sidebar-open' : 'sidebar-collapsed'}`}>
+                {/* Toggle arrow button */}
+                <button
+                  className="sidebar-toggle-btn"
+                  onClick={() => setSidebarOpen(o => !o)}
+                  title={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+                >
+                  {sidebarOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+                </button>
 
-                {/* Filters panel */}
-                <div className="filters-panel">
-                  <div className="filters-row">
-                    {/* Search Bar */}
-                    <div className="search-box-wrapper">
-                      <Search size={16} className="search-icon" />
-                      <input
-                        type="text"
-                        placeholder="Search by client name, email, phone, or location..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                      />
-                    </div>
-
-                    {/* Category selector filter */}
-                    <select
-                      className="filter-select"
-                      value={categoryFilter}
-                      onChange={(e) => setCategoryFilter(e.target.value)}
-                    >
-                      <option value="all">All Service Types</option>
-                      <option value="CCTV Systems">CCTV Camera</option>
-                      <option value="Alarm Systems">Alarm System</option>
-                      <option value="Other">Other Services</option>
-                    </select>
-
-                    {/* Status selector filter */}
-                    <select
-                      className="filter-select"
-                      value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
-                    >
-                      <option value="all">All Statuses</option>
-                      <option value="pending">Pending</option>
-                      <option value="accepted">Accepted</option>
-                      <option value="progress">In Progress</option>
-                      <option value="finished">Finished</option>
-                    </select>
-
-                    {/* Reload data button */}
-                    <button onClick={() => fetchInquiries()} className="btn-logout" style={{ padding: '8px 14px' }}>
-                      Refresh List
-                    </button>
-
-                    {/* Clear Filters button */}
-                    <button
-                      onClick={() => {
-                        setSearchQuery('');
-                        setCategoryFilter('all');
-                        setStatusFilter('all');
-                      }}
-                      className="btn-logout"
-                      style={{ padding: '8px 14px', borderColor: '#cbd5e1', color: '#64748b' }}
-                    >
-                      Clear Filters
-                    </button>
-
-                    {/* Download / Export toggle */}
-                    <button
-                      onClick={() => setShowDownloadPanel(p => !p)}
-                      className="btn-download-toggle"
-                      title="Export / Download"
-                    >
-                      <Download size={15} />
-                      Export
-                    </button>
-                  </div>
-
-                  {/* ── Download Panel ── */}
-                  {showDownloadPanel && (
-                    <div className="download-panel animate-fade-in">
-                      <div className="download-panel-title">
-                        <Download size={14} /> Export Inquiries as {exportFormat === 'pdf' ? 'PDF' : 'Excel'}
-                      </div>
-
-                      {/* Format toggle */}
-                      <div className="export-format-row">
-                        <span className="download-date-label">Format:</span>
-                        <div className="format-toggle-group">
-                          <button
-                            className={`btn-format ${exportFormat === 'excel' ? 'btn-format-active' : ''}`}
-                            onClick={() => setExportFormat('excel')}
-                          >
-                            📊 Excel (.xlsx)
-                          </button>
-                          <button
-                            className={`btn-format ${exportFormat === 'pdf' ? 'btn-format-active btn-format-pdf' : ''}`}
-                            onClick={() => setExportFormat('pdf')}
-                          >
-                            📄 PDF (.pdf)
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Row 1 — quick download buttons */}
-                      <div className="download-actions-row">
-                        <button
-                          className="btn-dl btn-dl-all"
-                          onClick={handleDownloadAll}
-                          title={`Download all ${inquiries.length} records`}
-                        >
-                          <Download size={14} />
-                          Download All ({inquiries.length})
-                        </button>
-
-                        <button
-                          className="btn-dl btn-dl-filtered"
-                          onClick={handleDownloadFiltered}
-                          title={`Download currently filtered ${filteredInquiries.length} records`}
-                        >
-                          <Filter size={14} />
-                          Download Filtered ({filteredInquiries.length})
-                        </button>
-
-                        <button
-                          className={`btn-dl btn-dl-selected ${selectedRows.size === 0 ? 'btn-dl-disabled' : ''}`}
-                          onClick={handleDownloadSelected}
-                          disabled={selectedRows.size === 0}
-                          title={selectedRows.size === 0 ? 'Select rows using checkboxes first' : `Download ${selectedRows.size} selected records`}
-                        >
-                          <CheckSquare size={14} />
-                          Download Selected ({selectedRows.size})
-                        </button>
-                      </div>
-
-                      {/* Row 2 — date range download */}
-                      <div className="download-date-row">
-                        <span className="download-date-label">Date Range:</span>
-                        <div className="date-range-inputs">
-                          <div className="date-input-group">
-                            <label>From</label>
-                            <input
-                              type="date"
-                              value={dateFrom}
-                              onChange={e => setDateFrom(e.target.value)}
-                              className="date-input"
-                            />
-                          </div>
-                          <span className="date-separator">→</span>
-                          <div className="date-input-group">
-                            <label>To</label>
-                            <input
-                              type="date"
-                              value={dateTo}
-                              onChange={e => setDateTo(e.target.value)}
-                              className="date-input"
-                            />
-                          </div>
-                          <button
-                            className="btn-dl btn-dl-daterange"
-                            onClick={handleDownloadDateRange}
-                          >
-                            <Download size={14} />
-                            Download Range
-                          </button>
-                          <button
-                            className="btn-dl btn-dl-clear-dates"
-                            onClick={() => { setDateFrom(''); setDateTo(''); }}
-                            title="Clear dates"
-                          >
-                            <X size={14} />
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="download-hint">
-                        💡 Tick checkboxes on rows to use "Download Selected". Click a row's <Download size={11} style={{ display: 'inline', verticalAlign: 'middle' }} /> icon to export just that one.
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Inquiries list */}
-                {fetchError && (
-                  <div className="login-error-alert mb-4">
-                    Failed to load database entries: {fetchError}
+                {/* Sidebar header */}
+                {sidebarOpen && (
+                  <div className="sidebar-header">
+                    <span className="sidebar-header-label">Navigation</span>
                   </div>
                 )}
 
-                <div className="inquiries-card">
-                  <div className="table-responsive">
-                    <table className="inquiries-table">
-                      <thead>
-                        <tr>
-                          <th style={{ width: '36px', textAlign: 'center' }}>
-                            <button
-                              className="checkbox-btn"
-                              onClick={toggleSelectAll}
-                              title={selectedRows.size === filteredInquiries.length && filteredInquiries.length > 0 ? 'Deselect all' : 'Select all visible'}
-                            >
-                              {selectedRows.size === filteredInquiries.length && filteredInquiries.length > 0
-                                ? <CheckSquare size={15} color="#635bff" />
-                                : <Square size={15} color="#94a3b8" />}
-                            </button>
-                          </th>
-                          <th>Inquiry ID</th>
-                          <th>Client Name</th>
-                          <th>Company</th>
-                          <th>Location</th>
-                          <th>Budget</th>
-                          <th>Services</th>
-                          <th>Request Date</th>
-                          <th>Status</th>
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {currentItems.length === 0 ? (
-                          <tr>
-                            <td colSpan="10" className="no-records">
-                              <Eye size={36} className="opacity-30 mb-2" />
-                              <p>{loading ? 'Loading database items...' : 'No matching inquiries found in the system.'}</p>
-                            </td>
-                          </tr>
-                        ) : (
-                          currentItems.map((item) => {
-                            const status = item.status || 'pending';
-                            const sc = STATUS_CONFIG[status] || STATUS_CONFIG.pending;
-                            const isChecked = selectedRows.has(String(item.id));
-                            return (
-                              <tr
-                                key={item.id}
-                                onClick={() => setSelectedInquiry(item)}
-                                style={{ cursor: 'pointer', background: isChecked ? '#f5f3ff' : undefined }}
-                              >
-                                {/* Checkbox */}
-                                <td style={{ textAlign: 'center', width: '36px' }} onClick={(e) => toggleRowSelect(e, item.id)}>
-                                  <button className="checkbox-btn">
-                                    {isChecked
-                                      ? <CheckSquare size={15} color="#635bff" />
-                                      : <Square size={15} color="#cbd5e1" />}
-                                  </button>
-                                </td>
-                                <td style={{ fontFamily: 'monospace', fontWeight: '800', fontSize: '12px', color: '#635bff', letterSpacing: '0.5px' }}>
-                                  {formatInqId(item.id)}
-                                </td>
-                                <td style={{ fontWeight: '700', color: '#0f172a' }}>{item.full_name}</td>
-                                <td style={{ color: '#64748b', fontSize: '12px' }}>{item.company_name || '—'}</td>
-                                <td style={{ fontWeight: '600' }}>{item.location || 'N/A'}</td>
-                                <td style={{ color: '#097969', fontWeight: '700' }}>{item.budget || 'N/A'}</td>
-                                <td>
-                                  <div className="services-chips">
-                                    {item.inquiry_type && item.inquiry_type.map((t, idx) => (
-                                      <span key={idx} className="service-chip">{t}</span>
-                                    ))}
-                                    {item.custom_inquiry && (
-                                      <span className="service-chip" style={{ background: '#fff3f0', color: 'var(--primary)' }}>
-                                        * {item.custom_inquiry}
-                                      </span>
-                                    )}
-                                    {(!item.inquiry_type || item.inquiry_type.length === 0) && !item.custom_inquiry && (
-                                      <span className="text-muted" style={{ fontSize: '12px' }}>General Consultation</span>
-                                    )}
-                                  </div>
-                                </td>
-                                <td style={{ color: '#64748b', fontSize: '13px' }}>
-                                  {formatDate(item.created_at)}
-                                </td>
-                                <td>
-                                  <span
-                                    className="status-badge"
-                                    style={{ background: sc.bg, color: sc.color, border: `1px solid ${sc.border}` }}
-                                  >
-                                    {sc.label}
-                                  </span>
-                                </td>
-                                <td>
-                                  <div className="action-btns">
-                                    <select
-                                      className="actions-status-select"
-                                      value={status}
-                                      onClick={(e) => e.stopPropagation()}
-                                      onChange={(e) => handleStatusChange(item.id, e.target.value)}
-                                    >
-                                      <option value="pending">Pending</option>
-                                      <option value="accepted">Accepted</option>
-                                      <option value="progress">In Progress</option>
-                                      <option value="finished">Finished</option>
-                                    </select>
+                {/* Nav items */}
+                <nav className="sidebar-nav">
+                  <button
+                    className={`sidebar-nav-item ${adminTab === 'inquiries' ? 'sidebar-nav-active' : ''}`}
+                    onClick={() => setAdminTab('inquiries')}
+                    title="Inquiries"
+                  >
+                    <span className="sidebar-nav-icon"><LayoutDashboard size={18} /></span>
+                    {sidebarOpen && <span className="sidebar-nav-label">Inquiries</span>}
+                    {sidebarOpen && pendingCount > 0 && (
+                      <span className="sidebar-badge">{pendingCount}</span>
+                    )}
+                  </button>
 
-                                    <button
-                                      onClick={(e) => { e.stopPropagation(); setSelectedInquiry(item); }}
-                                      className="btn-icon-action view"
-                                      title="View details"
-                                    >
-                                      <Eye size={14} />
-                                    </button>
-                                    <button
-                                      onClick={(e) => handleDownloadSingleRow(e, item)}
-                                      className="btn-icon-action download"
-                                      title={`Download this record as ${exportFormat.toUpperCase()}`}
-                                    >
-                                      <Download size={14} />
-                                    </button>
-                                    <button
-                                      onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
-                                      className="btn-icon-action delete"
-                                      title="Delete record"
-                                    >
-                                      <Trash2 size={14} />
-                                    </button>
-                                  </div>
-                                </td>
-                              </tr>
-                            );
-                          })
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                  {/* Pagination Controls */}
-                  {filteredInquiries.length > 0 && (
-                    <div className="pagination-bar">
-                      <div className="pagination-info">
-                        Showing <span className="font-semibold">{indexOfFirstItem + 1}</span> to{' '}
-                        <span className="font-semibold">
-                          {Math.min(indexOfLastItem, totalItems)}
-                        </span>{' '}
-                        of <span className="font-semibold">{totalItems}</span> entries
+                  <button
+                    className={`sidebar-nav-item ${adminTab === 'services' ? 'sidebar-nav-active' : ''}`}
+                    onClick={() => setAdminTab('services')}
+                    title="Services"
+                  >
+                    <span className="sidebar-nav-icon"><Settings size={18} /></span>
+                    {sidebarOpen && <span className="sidebar-nav-label">Services</span>}
+                  </button>
+
+                  <button
+                    className={`sidebar-nav-item ${adminTab === 'projects' ? 'sidebar-nav-active' : ''}`}
+                    onClick={() => setAdminTab('projects')}
+                    title="Projects"
+                  >
+                    <span className="sidebar-nav-icon"><FolderKanban size={18} /></span>
+                    {sidebarOpen && <span className="sidebar-nav-label">Projects</span>}
+                  </button>
+
+                  <button
+                    className={`sidebar-nav-item ${adminTab === 'settings' ? 'sidebar-nav-active' : ''}`}
+                    onClick={() => setAdminTab('settings')}
+                    title="Site Settings"
+                  >
+                    <span className="sidebar-nav-icon"><Globe size={18} /></span>
+                    {sidebarOpen && <span className="sidebar-nav-label">Site Settings</span>}
+                  </button>
+
+                  <button
+                    className={`sidebar-nav-item ${adminTab === 'security' ? 'sidebar-nav-active' : ''}`}
+                    onClick={() => setAdminTab('security')}
+                    title="Security Settings"
+                  >
+                    <span className="sidebar-nav-icon"><ShieldAlert size={18} /></span>
+                    {sidebarOpen && <span className="sidebar-nav-label">Security</span>}
+                  </button>
+                </nav>
+
+                {/* Sidebar footer */}
+                {sidebarOpen && (
+                  <div className="sidebar-footer">
+                    <div className="sidebar-footer-admin">
+                      <div className="sidebar-footer-avatar">
+                        {(adminEmail || 'A').charAt(0).toUpperCase()}
                       </div>
-                      <div className="pagination-actions">
-                        <div className="items-per-page-selector">
-                          <span>Show</span>
-                          <select
-                            value={itemsPerPage}
-                            onChange={(e) => {
-                              setItemsPerPage(parseInt(e.target.value, 10));
-                            }}
-                            className="items-per-page-select"
-                            title="Entries per page"
-                          >
-                            <option value={10}>10</option>
-                            <option value={25}>25</option>
-                            <option value={50}>50</option>
-                            <option value={100}>100</option>
-                          </select>
-                          <span>entries</span>
+                      <div className="sidebar-footer-info">
+                        <span className="sidebar-footer-name">Admin</span>
+                        <span className="sidebar-footer-email">{adminEmail || 'admin@safehive.com'}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </aside>
+
+              {/* ── MOBILE BOTTOM TAB BAR (hidden on desktop via CSS) ── */}
+              <nav className="admin-mobile-tabbar">
+                <button
+                  className={`mobile-tab-btn ${adminTab === 'inquiries' ? 'active' : ''}`}
+                  onClick={() => setAdminTab('inquiries')}
+                >
+                  <FileText size={20} />
+                  {pendingCount > 0 && <span className="mobile-tab-badge">{pendingCount}</span>}
+                  Inquiries
+                </button>
+                <button
+                  className={`mobile-tab-btn ${adminTab === 'services' ? 'active' : ''}`}
+                  onClick={() => setAdminTab('services')}
+                >
+                  <Shield size={20} />
+                  Services
+                </button>
+                <button
+                  className={`mobile-tab-btn ${adminTab === 'projects' ? 'active' : ''}`}
+                  onClick={() => setAdminTab('projects')}
+                >
+                  <FolderKanban size={20} />
+                  Projects
+                </button>
+                <button
+                  className={`mobile-tab-btn ${adminTab === 'settings' ? 'active' : ''}`}
+                  onClick={() => setAdminTab('settings')}
+                >
+                  <Globe size={20} />
+                  Settings
+                </button>
+                <button
+                  className={`mobile-tab-btn ${adminTab === 'security' ? 'active' : ''}`}
+                  onClick={() => setAdminTab('security')}
+                >
+                  <Lock size={20} />
+                  Security
+                </button>
+              </nav>
+
+              {/* ── MAIN CONTENT ── */}
+              <div className="admin-main-content">
+
+                {adminTab === 'inquiries' && (
+                  <>
+                    {/* Status Metrics cards */}
+                    <div className="metrics-grid">
+                      <div className="metric-card">
+                        <div className="metric-card-info">
+                          <h3>Pending</h3>
+                          <p style={{ color: '#b45309' }}>{pendingCount}</p>
                         </div>
-                        <div className="pagination-buttons">
-                          <button
-                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                            disabled={currentPage === 1}
-                            className="pagination-btn prev"
-                          >
-                            Previous
-                          </button>
-                          {getPageNumbers().map((num, idx) => (
-                            <button
-                              key={idx}
-                              onClick={() => typeof num === 'number' && setCurrentPage(num)}
-                              disabled={num === '...'}
-                              className={`pagination-btn num ${currentPage === num ? 'active' : ''} ${num === '...' ? 'ellipsis' : ''}`}
-                            >
-                              {num}
-                            </button>
-                          ))}
-                          <button
-                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                            disabled={currentPage === totalPages}
-                            className="pagination-btn next"
-                          >
-                            Next
-                          </button>
+                        <div className="metric-card-icon" style={{ background: '#fef3c7', color: '#b45309' }}>
+                          <Calendar size={16} />
+                        </div>
+                      </div>
+                      <div className="metric-card">
+                        <div className="metric-card-info">
+                          <h3>Accepted</h3>
+                          <p style={{ color: '#1d4ed8' }}>{acceptedCount}</p>
+                        </div>
+                        <div className="metric-card-icon" style={{ background: '#eff6ff', color: '#1d4ed8' }}>
+                          <FileText size={16} />
+                        </div>
+                      </div>
+                      <div className="metric-card">
+                        <div className="metric-card-info">
+                          <h3>In Progress</h3>
+                          <p style={{ color: '#7c3aed' }}>{progressCount}</p>
+                        </div>
+                        <div className="metric-card-icon" style={{ background: '#f5f3ff', color: '#7c3aed' }}>
+                          <Database size={16} />
+                        </div>
+                      </div>
+                      <div className="metric-card">
+                        <div className="metric-card-info">
+                          <h3>Finished</h3>
+                          <p style={{ color: '#15803d' }}>{finishedCount}</p>
+                        </div>
+                        <div className="metric-card-icon" style={{ background: '#f0fdf4', color: '#15803d' }}>
+                          <Users size={16} />
                         </div>
                       </div>
                     </div>
-                  )}
-                </div>
-              </>
-            )}
 
-            {adminTab === 'services' && (
-              <ServicesTab />
-            )}
+                    {/* Filters panel */}
+                    <div className="filters-panel">
+                      <div className="filters-row">
+                        {/* Search Bar */}
+                        <div className="search-box-wrapper">
+                          <Search size={16} className="search-icon" />
+                          <input
+                            type="text"
+                            placeholder="Search by client name, email, phone, or location..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                          />
+                        </div>
 
-            {adminTab === 'projects' && (
-              <ProjectsTab />
-            )}
+                        {/* Category selector filter */}
+                        <select
+                          className="filter-select"
+                          value={categoryFilter}
+                          onChange={(e) => setCategoryFilter(e.target.value)}
+                        >
+                          <option value="all">All Service Types</option>
+                          <option value="CCTV Systems">CCTV Camera</option>
+                          <option value="Alarm Systems">Alarm System</option>
+                          <option value="Other">Other Services</option>
+                        </select>
+
+                        {/* Status selector filter */}
+                        <select
+                          className="filter-select"
+                          value={statusFilter}
+                          onChange={(e) => setStatusFilter(e.target.value)}
+                        >
+                          <option value="all">All Statuses</option>
+                          <option value="pending">Pending</option>
+                          <option value="accepted">Accepted</option>
+                          <option value="progress">In Progress</option>
+                          <option value="finished">Finished</option>
+                        </select>
+
+                        {/* Reload data button */}
+                        <button onClick={() => fetchInquiries()} className="btn-logout" style={{ padding: '8px 14px' }}>
+                          Refresh List
+                        </button>
+
+                        {/* Clear Filters button */}
+                        <button
+                          onClick={() => {
+                            setSearchQuery('');
+                            setCategoryFilter('all');
+                            setStatusFilter('all');
+                          }}
+                          className="btn-logout"
+                          style={{ padding: '8px 14px', borderColor: '#cbd5e1', color: '#64748b' }}
+                        >
+                          Clear Filters
+                        </button>
+
+                        {/* Download / Export toggle */}
+                        <button
+                          onClick={() => setShowDownloadPanel(p => !p)}
+                          className="btn-download-toggle"
+                          title="Export / Download"
+                        >
+                          <Download size={15} />
+                          Export
+                        </button>
+                      </div>
+
+                      {/* ── Download Panel ── */}
+                      {showDownloadPanel && (
+                        <div className="download-panel animate-fade-in">
+                          <div className="download-panel-title">
+                            <Download size={14} /> Export Inquiries as {exportFormat === 'pdf' ? 'PDF' : 'Excel'}
+                          </div>
+
+                          {/* Format toggle */}
+                          <div className="export-format-row">
+                            <span className="download-date-label">Format:</span>
+                            <div className="format-toggle-group">
+                              <button
+                                className={`btn-format ${exportFormat === 'excel' ? 'btn-format-active' : ''}`}
+                                onClick={() => setExportFormat('excel')}
+                              >
+                                📊 Excel (.xlsx)
+                              </button>
+                              <button
+                                className={`btn-format ${exportFormat === 'pdf' ? 'btn-format-active btn-format-pdf' : ''}`}
+                                onClick={() => setExportFormat('pdf')}
+                              >
+                                📄 PDF (.pdf)
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Row 1 — quick download buttons */}
+                          <div className="download-actions-row">
+                            <button
+                              className="btn-dl btn-dl-all"
+                              onClick={handleDownloadAll}
+                              title={`Download all ${inquiries.length} records`}
+                            >
+                              <Download size={14} />
+                              Download All ({inquiries.length})
+                            </button>
+
+                            <button
+                              className="btn-dl btn-dl-filtered"
+                              onClick={handleDownloadFiltered}
+                              title={`Download currently filtered ${filteredInquiries.length} records`}
+                            >
+                              <Filter size={14} />
+                              Download Filtered ({filteredInquiries.length})
+                            </button>
+
+                            <button
+                              className={`btn-dl btn-dl-selected ${selectedRows.size === 0 ? 'btn-dl-disabled' : ''}`}
+                              onClick={handleDownloadSelected}
+                              disabled={selectedRows.size === 0}
+                              title={selectedRows.size === 0 ? 'Select rows using checkboxes first' : `Download ${selectedRows.size} selected records`}
+                            >
+                              <CheckSquare size={14} />
+                              Download Selected ({selectedRows.size})
+                            </button>
+                          </div>
+
+                          {/* Row 2 — date range download */}
+                          <div className="download-date-row">
+                            <span className="download-date-label">Date Range:</span>
+                            <div className="date-range-inputs">
+                              <div className="date-input-group">
+                                <label>From</label>
+                                <input
+                                  type="date"
+                                  value={dateFrom}
+                                  onChange={e => setDateFrom(e.target.value)}
+                                  className="date-input"
+                                />
+                              </div>
+                              <span className="date-separator">→</span>
+                              <div className="date-input-group">
+                                <label>To</label>
+                                <input
+                                  type="date"
+                                  value={dateTo}
+                                  onChange={e => setDateTo(e.target.value)}
+                                  className="date-input"
+                                />
+                              </div>
+                              <button
+                                className="btn-dl btn-dl-daterange"
+                                onClick={handleDownloadDateRange}
+                              >
+                                <Download size={14} />
+                                Download Range
+                              </button>
+                              <button
+                                className="btn-dl btn-dl-clear-dates"
+                                onClick={() => { setDateFrom(''); setDateTo(''); }}
+                                title="Clear dates"
+                              >
+                                <X size={14} />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="download-hint">
+                            💡 Tick checkboxes on rows to use "Download Selected". Click a row's <Download size={11} style={{ display: 'inline', verticalAlign: 'middle' }} /> icon to export just that one.
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Inquiries list */}
+                    {fetchError && (
+                      <div className="login-error-alert mb-4">
+                        Failed to load database entries: {fetchError}
+                      </div>
+                    )}
+
+                    <div className="inquiries-card">
+                      <div className="table-responsive">
+                        <table className="inquiries-table">
+                          <thead>
+                            <tr>
+                              <th style={{ width: '36px', textAlign: 'center' }}>
+                                <button
+                                  className="checkbox-btn"
+                                  onClick={toggleSelectAll}
+                                  title={selectedRows.size === filteredInquiries.length && filteredInquiries.length > 0 ? 'Deselect all' : 'Select all visible'}
+                                >
+                                  {selectedRows.size === filteredInquiries.length && filteredInquiries.length > 0
+                                    ? <CheckSquare size={15} color="#635bff" />
+                                    : <Square size={15} color="#94a3b8" />}
+                                </button>
+                              </th>
+                              <th>Inquiry ID</th>
+                              <th>Client Name</th>
+                              <th>Company</th>
+                              <th>Location</th>
+                              <th>Budget</th>
+                              <th>Services</th>
+                              <th>Request Date</th>
+                              <th>Status</th>
+                              <th>Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {currentItems.length === 0 ? (
+                              <tr>
+                                <td colSpan="10" className="no-records">
+                                  <Eye size={36} className="opacity-30 mb-2" />
+                                  <p>{loading ? 'Loading database items...' : 'No matching inquiries found in the system.'}</p>
+                                </td>
+                              </tr>
+                            ) : (
+                              currentItems.map((item) => {
+                                const status = item.status || 'pending';
+                                const sc = STATUS_CONFIG[status] || STATUS_CONFIG.pending;
+                                const isChecked = selectedRows.has(String(item.id));
+                                return (
+                                  <tr
+                                    key={item.id}
+                                    onClick={() => setSelectedInquiry(item)}
+                                    style={{ cursor: 'pointer', background: isChecked ? '#f5f3ff' : undefined }}
+                                  >
+                                    {/* Checkbox */}
+                                    <td style={{ textAlign: 'center', width: '36px' }} onClick={(e) => toggleRowSelect(e, item.id)}>
+                                      <button className="checkbox-btn">
+                                        {isChecked
+                                          ? <CheckSquare size={15} color="#635bff" />
+                                          : <Square size={15} color="#cbd5e1" />}
+                                      </button>
+                                    </td>
+                                    <td style={{ fontFamily: 'monospace', fontWeight: '800', fontSize: '12px', color: '#635bff', letterSpacing: '0.5px' }}>
+                                      {formatInqId(item.id)}
+                                    </td>
+                                    <td style={{ fontWeight: '700', color: '#0f172a' }}>{item.full_name}</td>
+                                    <td style={{ color: '#64748b', fontSize: '12px' }}>{item.company_name || '—'}</td>
+                                    <td style={{ fontWeight: '600' }}>{item.location || 'N/A'}</td>
+                                    <td style={{ color: '#097969', fontWeight: '700' }}>{item.budget || 'N/A'}</td>
+                                    <td>
+                                      <div className="services-chips">
+                                        {item.inquiry_type && item.inquiry_type.map((t, idx) => (
+                                          <span key={idx} className="service-chip">{t}</span>
+                                        ))}
+                                        {item.custom_inquiry && (
+                                          <span className="service-chip" style={{ background: '#fff3f0', color: 'var(--primary)' }}>
+                                            * {item.custom_inquiry}
+                                          </span>
+                                        )}
+                                        {(!item.inquiry_type || item.inquiry_type.length === 0) && !item.custom_inquiry && (
+                                          <span className="text-muted" style={{ fontSize: '12px' }}>General Consultation</span>
+                                        )}
+                                      </div>
+                                    </td>
+                                    <td style={{ color: '#64748b', fontSize: '13px' }}>
+                                      {formatDate(item.created_at)}
+                                    </td>
+                                    <td>
+                                      <span
+                                        className="status-badge"
+                                        style={{ background: sc.bg, color: sc.color, border: `1px solid ${sc.border}` }}
+                                      >
+                                        {sc.label}
+                                      </span>
+                                    </td>
+                                    <td>
+                                      <div className="action-btns">
+                                        <select
+                                          className="actions-status-select"
+                                          value={status}
+                                          onClick={(e) => e.stopPropagation()}
+                                          onChange={(e) => handleStatusChange(item.id, e.target.value)}
+                                        >
+                                          <option value="pending">Pending</option>
+                                          <option value="accepted">Accepted</option>
+                                          <option value="progress">In Progress</option>
+                                          <option value="finished">Finished</option>
+                                        </select>
+
+                                        <button
+                                          onClick={(e) => { e.stopPropagation(); setSelectedInquiry(item); }}
+                                          className="btn-icon-action view"
+                                          title="View details"
+                                        >
+                                          <Eye size={14} />
+                                        </button>
+                                        <button
+                                          onClick={(e) => handleDownloadSingleRow(e, item)}
+                                          className="btn-icon-action download"
+                                          title={`Download this record as ${exportFormat.toUpperCase()}`}
+                                        >
+                                          <Download size={14} />
+                                        </button>
+                                        <button
+                                          onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
+                                          className="btn-icon-action delete"
+                                          title="Delete record"
+                                        >
+                                          <Trash2 size={14} />
+                                        </button>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                );
+                              })
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                      {/* Pagination Controls */}
+                      {filteredInquiries.length > 0 && (
+                        <div className="pagination-bar">
+                          <div className="pagination-info">
+                            Showing <span className="font-semibold">{indexOfFirstItem + 1}</span> to{' '}
+                            <span className="font-semibold">
+                              {Math.min(indexOfLastItem, totalItems)}
+                            </span>{' '}
+                            of <span className="font-semibold">{totalItems}</span> entries
+                          </div>
+                          <div className="pagination-actions">
+                            <div className="items-per-page-selector">
+                              <span>Show</span>
+                              <select
+                                value={itemsPerPage}
+                                onChange={(e) => {
+                                  setItemsPerPage(parseInt(e.target.value, 10));
+                                }}
+                                className="items-per-page-select"
+                                title="Entries per page"
+                              >
+                                <option value={10}>10</option>
+                                <option value={25}>25</option>
+                                <option value={50}>50</option>
+                                <option value={100}>100</option>
+                              </select>
+                              <span>entries</span>
+                            </div>
+                            <div className="pagination-buttons">
+                              <button
+                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1}
+                                className="pagination-btn prev"
+                              >
+                                Previous
+                              </button>
+                              {getPageNumbers().map((num, idx) => (
+                                <button
+                                  key={idx}
+                                  onClick={() => typeof num === 'number' && setCurrentPage(num)}
+                                  disabled={num === '...'}
+                                  className={`pagination-btn num ${currentPage === num ? 'active' : ''} ${num === '...' ? 'ellipsis' : ''}`}
+                                >
+                                  {num}
+                                </button>
+                              ))}
+                              <button
+                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                disabled={currentPage === totalPages}
+                                className="pagination-btn next"
+                              >
+                                Next
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                {adminTab === 'services' && (
+                  <ServicesTab />
+                )}
+
+                {adminTab === 'projects' && (
+                  <ProjectsTab />
+                )}
+
+                {adminTab === 'settings' && (
+                  <SettingsTab />
+                )}
+
+                {adminTab === 'security' && (
+                  <SecurityTab adminEmail={adminEmail} />
+                )}
+
+              </div> {/* end admin-main-content */}
+            </div> {/* end admin-dashboard-body */}
           </div>
         )}
 
@@ -1792,6 +2010,179 @@ const AdminPage = ({ onNavigate }) => {
   );
 };
 
+/* ─────────────────────────────────────────────────────────────────────────
+   ImageUploader — drag-and-drop + click-to-upload with live preview
+   Props: value (current URL string), onChange(url), label
+───────────────────────────────────────────────────────────────────────── */
+const ImageUploader = ({ value, onChange, label = 'Image' }) => {
+  const [uploading, setUploading] = React.useState(false);
+  const [uploadError, setUploadError] = React.useState('');
+  const [dragOver, setDragOver] = React.useState(false);
+  const fileInputRef = React.useRef(null);
+  const token = localStorage.getItem('safehive_admin_token');
+
+  const handleFile = async (file) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Please select an image file (JPG, PNG, WEBP, etc.)');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadError('File is too large. Max size is 10 MB.');
+      return;
+    }
+    setUploadError('');
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Upload failed');
+      onChange(data.url);
+    } catch (err) {
+      setUploadError(err.message || 'Upload failed. Try again.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files[0];
+    handleFile(file);
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <label style={{ fontSize: '14px', fontWeight: '700', color: '#475569' }}>{label}</label>
+
+      {/* Preview */}
+      {value && (
+        <div style={{ position: 'relative', width: '100%', maxWidth: '320px' }}>
+          <img
+            src={value.startsWith('http') ? value : encodeURI(value)}
+            alt="preview"
+            style={{
+              width: '100%',
+              height: '160px',
+              objectFit: 'cover',
+              borderRadius: '10px',
+              border: '1px solid #e2e8f0',
+              display: 'block',
+              background: '#f1f5f9'
+            }}
+            onError={e => {
+              e.target.style.objectFit = 'contain';
+              e.target.style.padding = '12px';
+              e.target.style.background = '#f8fafc';
+              e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='1.5'%3E%3Crect x='3' y='3' width='18' height='18' rx='2'/%3E%3Ccircle cx='8.5' cy='8.5' r='1.5'/%3E%3Cpath d='m21 15-5-5L5 21'/%3E%3C/svg%3E";
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => onChange('')}
+            style={{
+              position: 'absolute',
+              top: '6px',
+              right: '6px',
+              background: 'rgba(0,0,0,0.55)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '50%',
+              width: '24px',
+              height: '24px',
+              cursor: 'pointer',
+              fontWeight: '900',
+              fontSize: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              lineHeight: 1
+            }}
+            title="Remove image"
+          >×</button>
+          {/* Show current path hint */}
+          <div style={{ fontSize: '11px', color: '#64748b', marginTop: '4px', wordBreak: 'break-all', padding: '0 2px' }}>
+            📁 {value}
+          </div>
+        </div>
+      )}
+
+
+      {/* Drop zone */}
+      <div
+        onClick={() => fileInputRef.current?.click()}
+        onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={handleDrop}
+        style={{
+          border: `2px dashed ${dragOver ? '#635bff' : '#cbd5e1'}`,
+          borderRadius: '10px',
+          padding: '18px 12px',
+          textAlign: 'center',
+          cursor: 'pointer',
+          background: dragOver ? '#eef2ff' : '#f8fafc',
+          transition: 'all 0.2s ease',
+          userSelect: 'none'
+        }}
+      >
+        {uploading ? (
+          <div style={{ color: '#635bff', fontWeight: '700', fontSize: '13px' }}>
+            ⏳ Uploading image…
+          </div>
+        ) : (
+          <>
+            <div style={{ fontSize: '24px', marginBottom: '4px' }}>📷</div>
+            <div style={{ fontSize: '13px', fontWeight: '700', color: '#475569' }}>
+              {value ? 'Click or drag to replace image' : 'Click or drag & drop to upload'}
+            </div>
+            <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '2px' }}>
+              JPG, PNG, WEBP, GIF · Max 10 MB
+            </div>
+          </>
+        )}
+      </div>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={e => handleFile(e.target.files[0])}
+      />
+
+      {/* Upload error */}
+      {uploadError && (
+        <span style={{ fontSize: '12px', color: '#dc2626', fontWeight: '600' }}>
+          ✗ {uploadError}
+        </span>
+      )}
+
+      {/* Manual URL fallback */}
+      <input
+        type="text"
+        value={value || ''}
+        onChange={e => onChange(e.target.value)}
+        placeholder="Or paste image URL / path…"
+        style={{
+          padding: '8px 12px',
+          borderRadius: '8px',
+          border: '1px solid #e2e8f0',
+          fontSize: '12.5px',
+          color: '#64748b',
+          backgroundColor: '#f8fafc'
+        }}
+      />
+    </div>
+  );
+};
+
 const iconMap = {
   Camera: <Camera size={20} />,
   Bell: <Bell size={20} />,
@@ -1845,7 +2236,7 @@ const ServicesTab = () => {
       setServices(prev => prev.filter(s => s.id !== id));
       sessionStorage.removeItem('safehive_services_cache');
     } catch (err) {
-      alert(err.message);
+      setError(err.message);
     }
   };
 
@@ -1879,7 +2270,7 @@ const ServicesTab = () => {
       sessionStorage.removeItem('safehive_services_cache');
       setEditingService(null);
     } catch (err) {
-      alert(err.message);
+      throw err; // propagate to ServiceForm for inline display
     }
   };
 
@@ -1981,6 +2372,9 @@ const ServiceForm = ({ service, onSave, onCancel }) => {
   const [icon, setIcon] = useState(service.icon || 'Camera');
   const [tagline, setTagline] = useState(service.tagline || '');
   const [cards, setCards] = useState(service.cards || []);
+  const [formError, setFormError] = useState('');
+  const [formSuccess, setFormSuccess] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleAddCard = () => {
     setCards([...cards, { title: '', description: '', image: '' }]);
@@ -1995,19 +2389,29 @@ const ServiceForm = ({ service, onSave, onCancel }) => {
     setCards(updated);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setFormError('');
+    setFormSuccess('');
     if (!category.trim()) {
-      alert('Category name is required');
+      setFormError('Category name is required.');
       return;
     }
-    onSave({
-      ...service,
-      category,
-      icon,
-      tagline,
-      cards
-    });
+    setIsSaving(true);
+    try {
+      await onSave({
+        ...service,
+        category,
+        icon,
+        tagline,
+        cards
+      });
+      setFormSuccess('Service saved successfully!');
+    } catch (err) {
+      setFormError(err.message || 'Failed to save service.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -2114,7 +2518,7 @@ const ServiceForm = ({ service, onSave, onCancel }) => {
                 </button>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '16px', marginBottom: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '12px' }}>
                 <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   <label style={{ fontSize: '13px', fontWeight: '600', color: '#64748b' }}>Card Title</label>
                   <input
@@ -2126,16 +2530,11 @@ const ServiceForm = ({ service, onSave, onCancel }) => {
                   />
                 </div>
 
-                <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label style={{ fontSize: '13px', fontWeight: '600', color: '#64748b' }}>Card Image Path</label>
-                  <input
-                    type="text"
-                    value={c.image}
-                    onChange={e => handleCardChange(idx, 'image', e.target.value)}
-                    placeholder="e.g. /assets/service/outdoor.webp"
-                    style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px' }}
-                  />
-                </div>
+                <ImageUploader
+                  label="Card Image"
+                  value={c.image}
+                  onChange={url => handleCardChange(idx, 'image', url)}
+                />
               </div>
 
               <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -2152,7 +2551,17 @@ const ServiceForm = ({ service, onSave, onCancel }) => {
           ))}
         </div>
 
-        <div className="form-actions-row" style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+        <div className="form-actions-row" style={{ display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+          {formError && (
+            <span style={{ fontSize: '13px', color: '#dc2626', fontWeight: '700', padding: '6px 12px', background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '20px' }}>
+              ✗ {formError}
+            </span>
+          )}
+          {formSuccess && (
+            <span style={{ fontSize: '13px', color: '#15803d', fontWeight: '700', padding: '6px 12px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '20px' }}>
+              ✓ {formSuccess}
+            </span>
+          )}
           <button
             type="button"
             className="btn-cancel"
@@ -2248,7 +2657,7 @@ const ProjectsTab = () => {
       sessionStorage.removeItem('safehive_all_projects_cache');
       sessionStorage.removeItem('safehive_featured_projects_cache');
     } catch (err) {
-      alert(err.message);
+      setError(err.message);
     }
   };
 
@@ -2276,7 +2685,7 @@ const ProjectsTab = () => {
         throw new Error(data.error || 'Failed to update');
       }
     } catch (err) {
-      alert(err.message);
+      setError(err.message);
       fetchProjects();
     }
   };
@@ -2324,7 +2733,7 @@ const ProjectsTab = () => {
       sessionStorage.removeItem('safehive_featured_projects_cache');
       setEditingProject(null);
     } catch (err) {
-      alert(err.message);
+      throw err; // propagate to ProjectForm for inline display
     }
   };
 
@@ -2457,6 +2866,9 @@ const ProjectForm = ({ project, onSave, onCancel }) => {
   const [category, setCategory] = useState(project.category || 'CCTV Camera');
   const [image, setImage] = useState(project.image || '');
   const [showOnHome, setShowOnHome] = useState(project.showOnHome || false);
+  const [formError, setFormError] = useState('');
+  const [formSuccess, setFormSuccess] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleAddBenefit = (e) => {
     e.preventDefault();
@@ -2470,24 +2882,34 @@ const ProjectForm = ({ project, onSave, onCancel }) => {
     setBenefit(benefit.filter((_, i) => i !== idx));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setFormError('');
+    setFormSuccess('');
     if (!title.trim()) {
-      alert('Project title is required');
+      setFormError('Project title is required.');
       return;
     }
-    onSave({
-      ...project,
-      title,
-      clientName,
-      location,
-      description,
-      fullDetail,
-      benefit,
-      category,
-      image,
-      showOnHome
-    });
+    setIsSaving(true);
+    try {
+      await onSave({
+        ...project,
+        title,
+        clientName,
+        location,
+        description,
+        fullDetail,
+        benefit,
+        category,
+        image,
+        showOnHome
+      });
+      setFormSuccess('Project saved successfully!');
+    } catch (err) {
+      setFormError(err.message || 'Failed to save project.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -2575,14 +2997,11 @@ const ProjectForm = ({ project, onSave, onCancel }) => {
           />
         </div>
 
-        <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '24px' }}>
-          <label style={{ fontSize: '14px', fontWeight: '700', color: '#475569' }}>Image Path / URL</label>
-          <input
-            type="text"
+        <div className="form-group" style={{ marginBottom: '24px' }}>
+          <ImageUploader
+            label="Project Image"
             value={image}
-            onChange={e => setImage(e.target.value)}
-            placeholder="e.g. /assets/service/oasis_hotel.png"
-            style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '15px' }}
+            onChange={setImage}
           />
         </div>
 
@@ -2646,7 +3065,17 @@ const ProjectForm = ({ project, onSave, onCancel }) => {
           </label>
         </div>
 
-        <div className="form-actions-row" style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+        <div className="form-actions-row" style={{ display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+          {formError && (
+            <span style={{ fontSize: '13px', color: '#dc2626', fontWeight: '700', padding: '6px 12px', background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '20px' }}>
+              ✗ {formError}
+            </span>
+          )}
+          {formSuccess && (
+            <span style={{ fontSize: '13px', color: '#15803d', fontWeight: '700', padding: '6px 12px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '20px' }}>
+              ✓ {formSuccess}
+            </span>
+          )}
           <button
             type="button"
             className="btn-cancel"
@@ -2678,6 +3107,563 @@ const ProjectForm = ({ project, onSave, onCancel }) => {
             }}
           >
             Save Project
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+const SecurityTab = ({ adminEmail }) => {
+  const [step, setStep] = useState('request'); // 'request' | 'verify'
+  const [verificationCode, setVerificationCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  // Password strength checker helper
+  const getPasswordStrength = (pwd) => {
+    if (!pwd) return { score: 0, label: '', color: '' };
+    let score = 0;
+    if (pwd.length >= 8) score++;
+    if (/[A-Z]/.test(pwd)) score++;
+    if (/[0-9]/.test(pwd)) score++;
+    if (/[^A-Za-z0-9]/.test(pwd)) score++;
+    if (pwd.length >= 12) score++;
+    const levels = [
+      { score: 0, label: '', color: '#e2e8f0' },
+      { score: 1, label: 'Very Weak', color: '#ef4444' },
+      { score: 2, label: 'Weak', color: '#f97316' },
+      { score: 3, label: 'Fair', color: '#eab308' },
+      { score: 4, label: 'Strong', color: '#22c55e' },
+      { score: 5, label: 'Very Strong', color: '#16a34a' },
+    ];
+    return levels[Math.min(score, 5)];
+  };
+
+  const pwdStrength = getPasswordStrength(newPassword);
+  const pwdReqs = [
+    { label: 'At least 8 characters', met: newPassword.length >= 8 },
+    { label: 'One uppercase letter', met: /[A-Z]/.test(newPassword) },
+    { label: 'One number', met: /[0-9]/.test(newPassword) },
+    { label: 'One special character', met: /[^A-Za-z0-9]/.test(newPassword) },
+  ];
+
+  const handleSendCode = async () => {
+    setError('');
+    setSuccess('');
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/admin/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: adminEmail })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send verification code.');
+      }
+
+      setSuccess('Verification code has been sent to your email.');
+      setStep('verify');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (newPassword !== confirmNewPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/admin/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: adminEmail,
+          code: verificationCode,
+          newPassword
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to change password.');
+      }
+
+      setSuccess('Your password has been successfully updated.');
+      setStep('request');
+      setVerificationCode('');
+      setNewPassword('');
+      setConfirmNewPassword('');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="admin-tab-content animate-fade-in" style={{ marginTop: '20px' }}>
+      <div className="tab-header-row" style={{ marginBottom: '24px' }}>
+        <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>Security & Credentials</h2>
+        <p style={{ fontSize: '13px', color: '#64748b', marginTop: '4px' }}>
+          Change your administrator password. A verification code will be sent to <strong>{adminEmail}</strong> for security reasons.
+        </p>
+      </div>
+
+      <div style={{ maxWidth: '600px', background: 'white', padding: '30px', borderRadius: '20px', border: '1px solid #f1f5f9', boxShadow: '0 4px 15px rgba(0,0,0,0.01)' }}>
+        {error && <div className="login-error-alert mb-4">{error}</div>}
+        {success && (
+          <div style={{
+            background: '#f0fdf4',
+            border: '1px solid #bbf7d0',
+            color: '#15803d',
+            borderRadius: '12px',
+            padding: '12px 16px',
+            fontSize: '13px',
+            fontWeight: '600',
+            marginBottom: '20px',
+            textAlign: 'left'
+          }}>
+            ✓ {success}
+          </div>
+        )}
+
+        {step === 'request' ? (
+          <div>
+            <h3 style={{ fontSize: '15px', fontWeight: '850', color: '#0a2540', marginBottom: '16px' }}>
+              🔒 Request Password Change
+            </h3>
+            <p style={{ fontSize: '13.5px', color: '#475569', lineHeight: '1.6', marginBottom: '20px' }}>
+              To update your administrator password, we must first verify your identity.
+              Click the button below to receive a 6-digit confirmation code on your administrator email <strong>{adminEmail}</strong>.
+            </p>
+            <button
+              onClick={handleSendCode}
+              disabled={loading}
+              style={{
+                width: '100%',
+                padding: '14px',
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #635bff 0%, #7c74ff 100%)',
+                color: 'white',
+                border: 'none',
+                fontWeight: '700',
+                fontSize: '14px',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(99,91,255,0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                transition: 'opacity 0.2s',
+                outline: 'none'
+              }}
+            >
+              {loading ? 'Sending Code...' : (
+                <>
+                  <Mail size={16} /> Request Verification Code
+                </>
+              )}
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleResetPassword} className="admin-form">
+            <h3 style={{ fontSize: '15px', fontWeight: '850', color: '#0a2540', marginBottom: '16px' }}>
+              🔑 Set New Password
+            </h3>
+
+            <div className="login-form-group" style={{ marginBottom: '20px' }}>
+              <label>Enter 6-Digit Verification Code</label>
+              <input
+                type="text"
+                placeholder="e.g. 123456"
+                value={verificationCode}
+                onChange={(e) => setVerificationCode(e.target.value)}
+                maxLength={6}
+                required
+                style={{ letterSpacing: '2px', textAlign: 'center', fontSize: '18px', fontWeight: '700' }}
+              />
+            </div>
+
+            <div className="login-form-group" style={{ marginBottom: '20px' }}>
+              <label>New Secret Password</label>
+              <div className="pwd-input-wrapper">
+                <input
+                  type={showNewPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="pwd-toggle-btn"
+                  onClick={() => setShowNewPassword(v => !v)}
+                  tabIndex={-1}
+                  aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+
+              {/* Strength Bar */}
+              {newPassword.length > 0 && (
+                <div className="pwd-strength-wrapper">
+                  <div className="pwd-strength-bar">
+                    {[1, 2, 3, 4, 5].map(i => (
+                      <div
+                        key={i}
+                        className="pwd-strength-segment"
+                        style={{ background: i <= pwdStrength.score ? pwdStrength.color : '#e2e8f0' }}
+                      />
+                    ))}
+                  </div>
+                  {pwdStrength.label && (
+                    <span className="pwd-strength-label" style={{ color: pwdStrength.color }}>
+                      {pwdStrength.label}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* Requirements Checklist */}
+              {newPassword.length > 0 && (
+                <div className="pwd-requirements">
+                  {pwdReqs.map((req, i) => (
+                    <div key={i} className={`pwd-req-item ${req.met ? 'met' : ''}`}>
+                      {req.met
+                        ? <CheckCircle size={12} style={{ color: '#22c55e', flexShrink: 0 }} />
+                        : <Circle size={12} style={{ color: '#cbd5e1', flexShrink: 0 }} />
+                      }
+                      <span>{req.label}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="login-form-group" style={{ marginBottom: '24px' }}>
+              <label>Confirm New Password</label>
+              <div className="pwd-input-wrapper">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="pwd-toggle-btn"
+                  onClick={() => setShowConfirmPassword(v => !v)}
+                  tabIndex={-1}
+                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              {/* Match indicator */}
+              {confirmNewPassword.length > 0 && (
+                <div className={`pwd-match-hint ${newPassword === confirmNewPassword ? 'match' : 'no-match'}`}>
+                  {newPassword === confirmNewPassword
+                    ? <><CheckCircle size={12} /> Passwords match</>
+                    : <><ShieldAlert size={12} /> Passwords do not match</>
+                  }
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                type="button"
+                onClick={() => { setStep('request'); setError(''); setSuccess(''); }}
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  background: '#f1f5f9',
+                  color: '#475569',
+                  border: 'none',
+                  borderRadius: '12px',
+                  fontWeight: '700',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  flex: 2,
+                  padding: '12px',
+                  background: 'linear-gradient(135deg, var(--primary) 0%, #ff7500 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  fontWeight: '700',
+                  boxShadow: '0 4px 12px rgba(226, 88, 34, 0.25)',
+                  cursor: 'pointer'
+                }}
+              >
+                {loading ? 'Updating...' : 'Update Password'}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const SettingsTab = () => {
+  const { settings, updateSettings, loading: settingsLoading } = useSiteSettings();
+  const [form, setForm] = useState({ ...settings });
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState(null);
+
+  useEffect(() => {
+    setForm({ ...settings });
+  }, [settings]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    setSaveStatus(null);
+    try {
+      await updateSettings(form);
+      setSaveStatus({ success: true, message: 'Site settings updated successfully!' });
+      setTimeout(() => setSaveStatus(null), 3000);
+    } catch (err) {
+      setSaveStatus({ success: false, message: err.message || 'Failed to update settings.' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (settingsLoading) {
+    return <div className="text-center" style={{ padding: '40px', color: '#64748b' }}>Loading settings...</div>;
+  }
+
+  return (
+    <div className="admin-tab-content animate-fade-in" style={{ marginTop: '20px' }}>
+      <div className="tab-header-row" style={{ marginBottom: '24px' }}>
+        <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>Global Site Settings</h2>
+        <p style={{ fontSize: '13px', color: '#64748b', marginTop: '4px' }}>
+          Update the contact info, social media links, and statistics shown across the main SafeHive website.
+        </p>
+      </div>
+
+
+
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        {/* Contact info section */}
+        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f1f5f9', boxShadow: '0 4px 15px rgba(0,0,0,0.01)' }}>
+          <h3 style={{ fontSize: '15px', fontWeight: '800', color: '#0a2540', borderBottom: '1px solid #f1f5f9', paddingBottom: '12px', marginBottom: '16px' }}>
+            📞 Company Contact Information
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label style={{ fontSize: '13px', fontWeight: '700', color: '#475569' }}>Phone Number</label>
+              <input
+                type="text"
+                name="phone"
+                value={form.phone || ''}
+                onChange={handleChange}
+                placeholder="+251 923 55 55 54"
+                style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px' }}
+              />
+            </div>
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label style={{ fontSize: '13px', fontWeight: '700', color: '#475569' }}>Company Email</label>
+              <input
+                type="email"
+                name="company_email"
+                value={form.company_email || ''}
+                onChange={handleChange}
+                placeholder="info@safehive.com"
+                style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px' }}
+              />
+            </div>
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label style={{ fontSize: '13px', fontWeight: '700', color: '#475569' }}>Location / Address</label>
+              <input
+                type="text"
+                name="location"
+                value={form.location || ''}
+                onChange={handleChange}
+                placeholder="22 Mazoriya MAF Building"
+                style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px' }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Social media section */}
+        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f1f5f9', boxShadow: '0 4px 15px rgba(0,0,0,0.01)' }}>
+          <h3 style={{ fontSize: '15px', fontWeight: '800', color: '#0a2540', borderBottom: '1px solid #f1f5f9', paddingBottom: '12px', marginBottom: '16px' }}>
+            🌐 Social Media Links
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label style={{ fontSize: '13px', fontWeight: '700', color: '#475569' }}>Facebook URL</label>
+              <input
+                type="url"
+                name="facebook_url"
+                value={form.facebook_url || ''}
+                onChange={handleChange}
+                placeholder="https://facebook.com/safehive"
+                style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px' }}
+              />
+            </div>
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label style={{ fontSize: '13px', fontWeight: '700', color: '#475569' }}>Instagram URL</label>
+              <input
+                type="url"
+                name="instagram_url"
+                value={form.instagram_url || ''}
+                onChange={handleChange}
+                placeholder="https://instagram.com/safehive"
+                style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px' }}
+              />
+            </div>
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label style={{ fontSize: '13px', fontWeight: '700', color: '#475569' }}>TikTok URL</label>
+              <input
+                type="url"
+                name="tiktok_url"
+                value={form.tiktok_url || ''}
+                onChange={handleChange}
+                placeholder="https://tiktok.com/@safehive"
+                style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px' }}
+              />
+            </div>
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label style={{ fontSize: '13px', fontWeight: '700', color: '#475569' }}>LinkedIn URL</label>
+              <input
+                type="url"
+                name="linkedin_url"
+                value={form.linkedin_url || ''}
+                onChange={handleChange}
+                placeholder="https://linkedin.com/company/safehive"
+                style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px' }}
+              />
+            </div>
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label style={{ fontSize: '13px', fontWeight: '700', color: '#475569' }}>YouTube URL</label>
+              <input
+                type="url"
+                name="youtube_url"
+                value={form.youtube_url || ''}
+                onChange={handleChange}
+                placeholder="https://youtube.com/@safehive"
+                style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px' }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Company stats section */}
+        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f1f5f9', boxShadow: '0 4px 15px rgba(0,0,0,0.01)' }}>
+          <h3 style={{ fontSize: '15px', fontWeight: '800', color: '#0a2540', borderBottom: '1px solid #f1f5f9', paddingBottom: '12px', marginBottom: '16px' }}>
+            📊 Company Performance Statistics
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label style={{ fontSize: '13px', fontWeight: '700', color: '#475569' }}>Successful Installations</label>
+              <input
+                type="text"
+                name="stat_installations"
+                value={form.stat_installations || ''}
+                onChange={handleChange}
+                placeholder="e.g. 100+"
+                style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px' }}
+              />
+            </div>
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label style={{ fontSize: '13px', fontWeight: '700', color: '#475569' }}>Years Experience</label>
+              <input
+                type="text"
+                name="stat_years_experience"
+                value={form.stat_years_experience || ''}
+                onChange={handleChange}
+                placeholder="e.g. 17+"
+                style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px' }}
+              />
+            </div>
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label style={{ fontSize: '13px', fontWeight: '700', color: '#475569' }}>Client Retention</label>
+              <input
+                type="text"
+                name="stat_client_retention"
+                value={form.stat_client_retention || ''}
+                onChange={handleChange}
+                placeholder="e.g. 99%"
+                style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px' }}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'flex-end', marginTop: '10px', flexWrap: 'wrap' }}>
+          {saveStatus && (
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 14px',
+              borderRadius: '20px',
+              fontSize: '13px',
+              fontWeight: '700',
+              border: saveStatus.success ? '1px solid #bbf7d0' : '1px solid #fca5a5',
+              background: saveStatus.success ? '#f0fdf4' : '#fef2f2',
+              color: saveStatus.success ? '#15803d' : '#dc2626',
+              animation: 'fadeInUp 0.25s ease'
+            }}>
+              {saveStatus.success ? '✓' : '✗'} {saveStatus.message}
+            </span>
+          )}
+          <button
+            type="submit"
+            disabled={isSaving}
+            style={{
+              padding: '12px 28px',
+              background: '#635bff',
+              border: 'none',
+              borderRadius: '8px',
+              fontWeight: '700',
+              cursor: 'pointer',
+              color: 'white',
+              boxShadow: '0 4px 12px rgba(99,91,255,0.2)',
+              transition: 'all 0.2s ease',
+              opacity: isSaving ? 0.7 : 1
+            }}
+          >
+            {isSaving ? 'Saving Changes...' : 'Save Site Settings'}
           </button>
         </div>
       </form>

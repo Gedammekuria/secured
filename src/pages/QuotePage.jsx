@@ -119,8 +119,8 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
     if (name === 'fullName') {
       if (!value || !value.trim()) {
         error = 'Full name is required.';
-      } else if (value.trim().length < 3) {
-        error = 'Full name must be at least 3 characters.';
+      } else if (value.trim().length < 5) {
+        error = 'Full name must be at least 5 characters.';
       }
     }
     if (name === 'initialContact') {
@@ -595,7 +595,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                               value={formData.fullName}
                               onChange={handleChange}
                               onBlur={handleBlur}
-                              placeholder="Your Full Name"
+                              placeholder=" "
                               required
                               style={{
                                 border: touched.fullName
@@ -623,7 +623,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                               value={formData.initialContact}
                               onChange={handleChange}
                               onBlur={handleBlur}
-                              placeholder="Direct contact method"
+                              placeholder=" "
                               required
                               style={{
                                 border: touched.initialContact
@@ -654,7 +654,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                               value={formData.customInquiry}
                               onChange={handleChange}
                               onBlur={handleBlur}
-                              placeholder="e.g. Smart Lock, Intercom, etc."
+                              placeholder=" "
                               required
                               style={{
                                 border: touched.customInquiry
@@ -710,7 +710,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                               </div>
                               <div>
                                 <div style={{ fontSize: '15px', fontWeight: '800', color: '#0a2540' }}>{formData.fullName}</div>
-                                <div style={{ fontSize: '13px', color: '#64748b', fontWeight: '600' }}>{formData.initialContact} • Lead Secured</div>
+                                <div style={{ fontSize: '13px', color: '#64748b', fontWeight: '600' }}>{formData.initialContact}</div>
                               </div>
                             </div>
                             <button
@@ -724,7 +724,6 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                         </div>
 
                         <div className="text-center mb-5">
-                          <div className="badge-pill mb-3" style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '8px 20px', borderRadius: '50px', fontSize: '11px', fontWeight: '800', display: 'inline-block', letterSpacing: '1px', textTransform: 'uppercase' }}>Step 2: Technical Specs</div>
                           <h3 style={{ fontWeight: '800', color: '#0a2540' }}>{activeCategory} Requirements</h3>
                         </div>
 
@@ -737,7 +736,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                               value={formData.location}
                               onChange={handleChange}
                               onBlur={handleBlur}
-                              placeholder="e.g. Addis Ababa"
+                              placeholder=" "
                               required
                               style={{
                                 border: touched.location
@@ -765,7 +764,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                               value={formData.companyName}
                               onChange={handleChange}
                               onBlur={handleBlur}
-                              placeholder="Your Company"
+                              placeholder=" "
                               style={{
                                 border: touched.companyName && formData.companyName
                                   ? '2.5px solid #22c55e'
@@ -783,7 +782,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
 
                         <div className="qf-group mb-5">
                           <label className="mb-2 d-block font-weight-bold" style={{ fontSize: '14px' }}>
-                            {isEmailInitial ? 'Contact Phone Number' : 'Personal/Work Email'}
+                            {isEmailInitial ? 'Contact Phone Number' : 'Email'}
                             <span className="req">*</span>
                           </label>
                           {isEmailInitial ? (
@@ -798,7 +797,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                                 name="alternativeContact"
                                 value={formData.alternativeContact}
                                 onChange={handleChange}
-                                placeholder="With country code (e.g. +251...)"
+                                placeholder=" "
                                 size="lg"
                               />
                             </div>
@@ -809,7 +808,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                               value={typeof formData.alternativeContact === 'object' ? '' : (formData.alternativeContact || '')}
                               onChange={handleChange}
                               onBlur={handleBlur}
-                              placeholder="email@example.com"
+                              placeholder=" "
                               required
                               style={{
                                 border: touched.alternativeContact
@@ -834,10 +833,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                         {/* --- CATEGORY SPECIFIC FIELDS --- */}
                         {activeCategory === 'CCTV Systems' && (
                           <div className="animate-slide-down mb-5">
-                            <div className="d-flex align-items-center gap-2 mb-4">
-                              <Shield size={20} className="text-primary" />
-                              <h4 style={{ fontSize: '18px', fontWeight: '700', marginBottom: 0 }}>CCTV Requirements</h4>
-                            </div>
+
                             <div className="row">
                               <div className="qf-group mb-4">
                                 <label className="mb-2 d-block font-weight-bold">Estimated Number of Cameras needed?</label>
@@ -882,10 +878,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
 
                         {activeCategory === 'Alarm Systems' && (
                           <div className="animate-slide-down mb-5">
-                            <div className="d-flex align-items-center gap-2 mb-4">
-                              <Bell size={20} className="text-primary" />
-                              <h4 style={{ fontSize: '18px', fontWeight: '700', marginBottom: 0 }}>Alarm System Specifications</h4>
-                            </div>
+
                             <div className="row">
                               <div className="qf-group mb-4">
                                 <label className="mb-2 d-block font-weight-bold">Property Type</label>
@@ -908,7 +901,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                                   name="numSensors"
                                   value={formData.numSensors}
                                   onChange={handleChange}
-                                  placeholder="e.g. 6"
+                                  placeholder=" "
                                   style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}
                                 />
                               </div>
@@ -1012,7 +1005,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                             name="message"
                             value={formData.message}
                             onChange={handleChange}
-                            placeholder="Any specifics you'd like to share..."
+                            placeholder=" "
                             style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '18px 24px', width: '100%', fontSize: '16px' }}
                           />
                         </div>
@@ -1063,7 +1056,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                               }}
                               className="hover-lift"
                             >
-                              Add CCTV Setup
+                              Add CCTV System
                             </button>
                           )}
 

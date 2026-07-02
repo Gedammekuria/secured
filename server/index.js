@@ -1,13 +1,42 @@
+import dotenv from 'dotenv';
+// Load environment variables FIRST, before anything else
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import pool from './db.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import multer from 'multer';
 
-// Load environment variables
-dotenv.config();
+// Resolve __dirname for ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Multer: save uploads to public/assets/service/
+const uploadDir = path.join(__dirname, '..', 'public', 'assets', 'service');
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, uploadDir),
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const base = path.basename(file.originalname, ext)
+      .replace(/[^a-zA-Z0-9._-]/g, '_')
+      .toLowerCase();
+    const unique = `${Date.now()}_${base}${ext}`;
+    cb(null, unique);
+  }
+});
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
+  fileFilter: (_req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) cb(null, true);
+    else cb(new Error('Only image files are allowed'));
+  }
+});
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -67,6 +96,23 @@ let mockInquiries = [
   }
 ];
 
+// Default Site Settings
+const defaultSiteSettings = {
+  phone: '+251 923 55 55 54',
+  company_email: 'info@safehive.com',
+  location: '22 Mazoriya MAF Building',
+  facebook_url: '',
+  instagram_url: '',
+  tiktok_url: '',
+  linkedin_url: '',
+  youtube_url: '',
+  stat_installations: '100+',
+  stat_years_experience: '17+',
+  stat_client_retention: '99%'
+};
+
+let mockSiteSettings = { ...defaultSiteSettings };
+
 // Default Mock Data for Services and Projects
 const defaultServices = [
   {
@@ -88,7 +134,7 @@ const defaultServices = [
       {
         title: "Remote Access",
         description: "You can view any incidence from your property by using  smartphone everywhere remotely.",
-        image: "/assets/service/mobile view.jpg"
+        image: "/assets/service/mobile view.webp"
       }
     ]
   },
@@ -111,7 +157,7 @@ const defaultServices = [
       {
         title: "Ajax Remote Control",
         description: "Our systems are simple to access remotely with cellphone ",
-        image: "/assets/service/ajax control.jpg"
+        image: "/assets/service/ajax control.webp"
       }
     ]
   }
@@ -135,7 +181,7 @@ const defaultProjects = [
     title: "Jotun CCTV Installation",
     client_name: "Jotun Paint manufacturing",
     location: "Addis Ababa, Ethiopia",
-    description: "the client needed cctv camera to control his employe's and their properties any where to reduce wastage and increase the productivity of the manufacturing plant.",
+    description: "The client needed cctv camera to control his employe's and their properties any where to reduce wastage and increase the productivity of the manufacturing plant.",
     full_detail: "Surveillance in industry is vital to control the employees and their properties any where to reduce wastage and increase the productivity of the manufacturing plant. We deployed explosion-proof CCTV housings and long-range thermal cameras to monitor process equipment and ensure site safety.",
     benefit: ["24/7 continuous recording", "Elimination of blind spots", "Remote access from any where", "Increase productivity", "Use their time properly", "Highly minimized the wastage"],
     category: "CCTV Camera",
@@ -193,7 +239,7 @@ async function initDb() {
 
   try {
     console.log('⏳ Connecting to Postgres and checking tables...');
-    
+
     // Create inquiries table if it doesn't exist
     const createTableQuery = `
       CREATE TABLE IF NOT EXISTS inquiries (
@@ -304,6 +350,49 @@ async function initDb() {
       }
     }
 
+    // Create site_settings table if it doesn't exist
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS site_settings (
+        id INT PRIMARY KEY,
+        phone VARCHAR(100),
+        company_email VARCHAR(255),
+        location VARCHAR(255),
+        facebook_url VARCHAR(255),
+        instagram_url VARCHAR(255),
+        tiktok_url VARCHAR(255),
+        linkedin_url VARCHAR(255),
+        youtube_url VARCHAR(255),
+        stat_installations VARCHAR(100),
+        stat_years_experience VARCHAR(100),
+        stat_client_retention VARCHAR(100)
+      );
+    `);
+
+    // Seed site settings if empty
+    const settingsCount = await pool.query('SELECT COUNT(*) FROM site_settings;');
+    if (parseInt(settingsCount.rows[0].count, 10) === 0) {
+      console.log('🌱 Seeding initial site settings table...');
+      await pool.query(`
+        INSERT INTO site_settings (
+          id, phone, company_email, location,
+          facebook_url, instagram_url, tiktok_url, linkedin_url, youtube_url,
+          stat_installations, stat_years_experience, stat_client_retention
+        ) VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
+      `, [
+        defaultSiteSettings.phone,
+        defaultSiteSettings.company_email,
+        defaultSiteSettings.location,
+        defaultSiteSettings.facebook_url,
+        defaultSiteSettings.instagram_url,
+        defaultSiteSettings.tiktok_url,
+        defaultSiteSettings.linkedin_url,
+        defaultSiteSettings.youtube_url,
+        defaultSiteSettings.stat_installations,
+        defaultSiteSettings.stat_years_experience,
+        defaultSiteSettings.stat_client_retention
+      ]);
+    }
+
     console.log('🟢 Database initialized successfully. Tables are ready.');
   } catch (err) {
     console.error('🔴 Database initialization failed:', err.message);
@@ -363,7 +452,7 @@ app.post('/api/inquiries', async (req, res) => {
       const existingIndex = mockInquiries.findIndex(item => String(item.id) === String(id));
       if (existingIndex !== -1) {
         const existingRecord = mockInquiries[existingIndex];
-        
+
         const getValue = (newValue, existingValue) => {
           if (newValue !== undefined && newValue !== null && newValue !== '') return newValue;
           return existingValue;
@@ -394,7 +483,7 @@ app.post('/api/inquiries', async (req, res) => {
           timeframe: getValue(cctvTimeframe, existingRecord.timeframe),
           installedsystem: getValue(cctvInstalledSystem, existingRecord.installedsystem)
         };
-        
+
         console.log(`📝 [SIMULATED INQUIRY UPDATE] Updated mock inquiry. ID: ${id}`);
         return res.status(200).json({
           success: true,
@@ -430,10 +519,10 @@ app.post('/api/inquiries', async (req, res) => {
       timeframe: cctvTimeframe || null,
       installedsystem: cctvInstalledSystem || null
     };
-    
+
     // Add to simulated memory
     mockInquiries.unshift(mockRecord);
-    
+
     console.log(`📝 [SIMULATED INQUIRY] Saved mock inquiry to memory. Current count: ${mockInquiries.length}`);
     return res.status(201).json({
       success: true,
@@ -646,6 +735,25 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
+// ── Image Upload Route ────────────────────────────────────────────────────
+// POST /api/admin/upload  — saves image to /public/assets/service/ and
+// returns { url: '/assets/service/filename.ext' }
+app.post('/api/admin/upload', (req, res, next) => {
+  // Check auth header first
+  dotenv.config({ override: true });
+  const authHeader = req.headers.authorization;
+  const expected = process.env.ADMIN_TOKEN || 'safehive_secret_token_2026';
+  if (!authHeader || !authHeader.startsWith('Bearer ') || authHeader.split(' ')[1] !== expected) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  next();
+}, upload.single('image'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No image file provided' });
+  const url = `/assets/service/${req.file.filename}`;
+  console.log(`🖼️  Image uploaded: ${url}`);
+  return res.json({ url });
+});
+
 // Admin Authentication Middleware
 function authenticateAdmin(req, res, next) {
   // Reload environment variables dynamically
@@ -653,16 +761,16 @@ function authenticateAdmin(req, res, next) {
 
   const authHeader = req.headers.authorization;
   const expectedToken = process.env.ADMIN_TOKEN || 'safehive_secret_token_2026';
-  
+
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Unauthorized: Missing session token.' });
   }
-  
+
   const token = authHeader.split(' ')[1];
   if (token !== expectedToken) {
     return res.status(401).json({ error: 'Unauthorized: Invalid session token.' });
   }
-  
+
   next();
 }
 
@@ -683,15 +791,38 @@ app.post('/api/admin/login', (req, res) => {
   if (email.toLowerCase() === expectedEmail.toLowerCase() && password === expectedPassword) {
     return res.json({
       success: true,
-      token: secretToken
+      token: secretToken,
+      email: expectedEmail
     });
   } else {
     return res.status(401).json({ error: 'Invalid email or password.' });
   }
 });
 
+// Admin Profile route - fetches the dynamic configured email directly from process.env/.env
+app.get('/api/admin/me', authenticateAdmin, (req, res) => {
+  dotenv.config({ override: true });
+  return res.json({
+    email: process.env.ADMIN_EMAIL || 'admin@safehive.com'
+  });
+});
+
 // Temporary store for reset codes: email -> { code, expiresAt }
 const resetCodes = new Map();
+
+// Password history store: keeps last 5 plain-text passwords per admin email
+// (for a production app, use hashed values — here we keep it simple)
+const passwordHistory = new Map();
+
+// Initialize history with the current password from env
+function initPasswordHistory() {
+  const currentEmail = (process.env.ADMIN_EMAIL || 'admin@safehive.com').toLowerCase();
+  const currentPassword = process.env.ADMIN_PASSWORD || 'safehiveadmin';
+  if (!passwordHistory.has(currentEmail)) {
+    passwordHistory.set(currentEmail, [currentPassword]);
+  }
+}
+initPasswordHistory();
 
 // Helper to update password in .env file
 function updateEnvPassword(newPassword) {
@@ -830,11 +961,11 @@ app.post('/api/admin/forgot-password', async (req, res) => {
   const expectedEmail = process.env.ADMIN_EMAIL || 'admin@safehive.com';
 
   if (!email) {
-    return res.status(400).json({ error: 'Operator email is required.' });
+    return res.status(400).json({ error: 'Admin email is required.' });
   }
 
   if (email.toLowerCase() !== expectedEmail.toLowerCase()) {
-    return res.status(404).json({ error: 'No operator found with this email address.' });
+    return res.status(404).json({ error: 'No Admin found with this email address.' });
   }
 
   // Generate 6-digit random code
@@ -848,7 +979,7 @@ app.post('/api/admin/forgot-password', async (req, res) => {
 
   return res.json({
     success: true,
-    message: 'A verification code has been sent to your operator email.',
+    message: 'A verification code has been sent to your admin email.',
     simulated: emailRes.method !== 'email'
   });
 });
@@ -866,7 +997,7 @@ app.post('/api/admin/reset-password', async (req, res) => {
   }
 
   if (email.toLowerCase() !== expectedEmail.toLowerCase()) {
-    return res.status(404).json({ error: 'No operator found with this email address.' });
+    return res.status(404).json({ error: 'No Admin found with this email address.' });
   }
 
   const record = resetCodes.get(email.toLowerCase());
@@ -884,8 +1015,33 @@ app.post('/api/admin/reset-password', async (req, res) => {
     return res.status(400).json({ error: 'Verification code has expired. Please request a new one.' });
   }
 
+  // ── Password strength validation (server-side) ──────────────────────────
+  const strengthErrors = [];
+  if (newPassword.length < 8) strengthErrors.push('at least 8 characters');
+  if (!/[A-Z]/.test(newPassword)) strengthErrors.push('one uppercase letter');
+  if (!/[0-9]/.test(newPassword)) strengthErrors.push('one number');
+  if (!/[^A-Za-z0-9]/.test(newPassword)) strengthErrors.push('one special character');
+  if (strengthErrors.length > 0) {
+    return res.status(400).json({
+      error: `Password must include: ${strengthErrors.join(', ')}.`
+    });
+  }
+
+  // ── Password history check (last 5 passwords) ───────────────────────────
+  const emailKey = email.toLowerCase();
+  const history = passwordHistory.get(emailKey) || [];
+  if (history.includes(newPassword)) {
+    return res.status(400).json({
+      error: 'You cannot reuse one of your last 5 passwords. Please choose a different password.'
+    });
+  }
+
   // Code is valid! Update password
   const updated = updateEnvPassword(newPassword);
+
+  // Save to history (keep only last 5)
+  const updatedHistory = [newPassword, ...history].slice(0, 5);
+  passwordHistory.set(emailKey, updatedHistory);
 
   // Clear verification code
   resetCodes.delete(email.toLowerCase());
@@ -898,6 +1054,83 @@ app.post('/api/admin/reset-password', async (req, res) => {
     message: 'Your password has been successfully reset. You can now login with your new password.',
     envUpdated: updated
   });
+});
+
+// Public Settings GET Route
+app.get('/api/settings', async (req, res) => {
+  if (!process.env.DATABASE_URL) {
+    return res.json(mockSiteSettings);
+  }
+  try {
+    const result = await pool.query('SELECT * FROM site_settings WHERE id = 1;');
+    if (result.rows.length > 0) {
+      return res.json(result.rows[0]);
+    }
+    return res.json(defaultSiteSettings);
+  } catch (err) {
+    console.error('🔴 Failed to fetch settings from DB:', err.message);
+    return res.status(500).json({ error: 'Failed to retrieve site settings.' });
+  }
+});
+
+// Admin Settings PUT Route
+app.put('/api/admin/settings', authenticateAdmin, async (req, res) => {
+  const {
+    phone, company_email, location,
+    facebook_url, instagram_url, tiktok_url, linkedin_url, youtube_url,
+    stat_installations, stat_years_experience, stat_client_retention
+  } = req.body;
+
+  if (!process.env.DATABASE_URL) {
+    mockSiteSettings = {
+      phone: phone || '',
+      company_email: company_email || '',
+      location: location || '',
+      facebook_url: facebook_url || '',
+      instagram_url: instagram_url || '',
+      tiktok_url: tiktok_url || '',
+      linkedin_url: linkedin_url || '',
+      youtube_url: youtube_url || '',
+      stat_installations: stat_installations || '',
+      stat_years_experience: stat_years_experience || '',
+      stat_client_retention: stat_client_retention || ''
+    };
+    console.log('📝 [SIMULATED] Site settings updated:', mockSiteSettings);
+    return res.json({ success: true, message: 'Site settings updated successfully (Simulated).', settings: mockSiteSettings });
+  }
+
+  try {
+    const updateQuery = `
+      INSERT INTO site_settings (
+        id, phone, company_email, location,
+        facebook_url, instagram_url, tiktok_url, linkedin_url, youtube_url,
+        stat_installations, stat_years_experience, stat_client_retention
+      ) VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      ON CONFLICT (id) DO UPDATE SET
+        phone = EXCLUDED.phone,
+        company_email = EXCLUDED.company_email,
+        location = EXCLUDED.location,
+        facebook_url = EXCLUDED.facebook_url,
+        instagram_url = EXCLUDED.instagram_url,
+        tiktok_url = EXCLUDED.tiktok_url,
+        linkedin_url = EXCLUDED.linkedin_url,
+        youtube_url = EXCLUDED.youtube_url,
+        stat_installations = EXCLUDED.stat_installations,
+        stat_years_experience = EXCLUDED.stat_years_experience,
+        stat_client_retention = EXCLUDED.stat_client_retention
+      RETURNING *;
+    `;
+    const result = await pool.query(updateQuery, [
+      phone, company_email, location,
+      facebook_url, instagram_url, tiktok_url, linkedin_url, youtube_url,
+      stat_installations, stat_years_experience, stat_client_retention
+    ]);
+    console.log('📥 Updated site settings in database.');
+    return res.json({ success: true, message: 'Site settings updated successfully.', settings: result.rows[0] });
+  } catch (err) {
+    console.error('🔴 Failed to update site settings in DB:', err.message);
+    return res.status(500).json({ error: 'Failed to update site settings.' });
+  }
 });
 
 // Admin Get Inquiries
@@ -950,9 +1183,9 @@ async function sendNotificationEmail(inquiry, status) {
   const name = inquiry.full_name || 'Valued Customer';
   const recipient = inquiry.initial_contact;
   const isEmail = recipient && recipient.includes('@');
-  
-  const serviceText = Array.isArray(inquiry.inquiry_type) && inquiry.inquiry_type.length > 0 
-    ? inquiry.inquiry_type.join(', ') 
+
+  const serviceText = Array.isArray(inquiry.inquiry_type) && inquiry.inquiry_type.length > 0
+    ? inquiry.inquiry_type.join(', ')
     : (inquiry.source === 'quote' ? 'Security Quote Request' : 'Contact Inquiry');
 
   let subject = '';
@@ -1045,10 +1278,10 @@ app.put('/api/admin/inquiries/:id/status', authenticateAdmin, async (req, res) =
     }
     mockInquiries[index].status = status;
     console.log(`📝 [SIMULATED STATUS UPDATE] Updated inquiry ${id} status to ${status}`);
-    
+
     // Trigger notification
     const notifyRes = await sendNotificationEmail(mockInquiries[index], status);
-    
+
     // Save to simulated notifications list
     const newNotify = {
       status,
@@ -1060,9 +1293,9 @@ app.put('/api/admin/inquiries/:id/status', authenticateAdmin, async (req, res) =
     };
     mockInquiries[index].notifications = mockInquiries[index].notifications || [];
     mockInquiries[index].notifications.push(newNotify);
-    
-    return res.json({ 
-      success: true, 
+
+    return res.json({
+      success: true,
       message: 'Status updated successfully (Simulated).',
       notification: newNotify
     });
@@ -1084,7 +1317,7 @@ app.put('/api/admin/inquiries/:id/status', authenticateAdmin, async (req, res) =
     }
 
     console.log(`📥 Updated inquiry ID ${id} status to ${status} in database.`);
-    
+
     // Trigger notification
     const notifyRes = await sendNotificationEmail(result.rows[0], status);
 
@@ -1105,8 +1338,8 @@ app.put('/api/admin/inquiries/:id/status', authenticateAdmin, async (req, res) =
       [JSON.stringify(currentNotifications), numericId]
     );
 
-    return res.json({ 
-      success: true, 
+    return res.json({
+      success: true,
       message: 'Status updated successfully.',
       notification: newNotify
     });
@@ -1415,3 +1648,6 @@ app.listen(PORT, async () => {
   console.log(`🚀 SafeHive backend running on port ${PORT}`);
   await initDb();
 });
+
+// Trigger reload for nodemon clean start 3
+

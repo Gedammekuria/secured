@@ -38,11 +38,11 @@ const ProjectDetailPage = ({ project, onBack, onNavigate }) => {
       {/* Detail Content */}
       <section className="container" style={{ marginTop: '40px', position: 'relative', zIndex: 10 }}>
         <div className="bg-white rounded-32 shadow-lg overflow-hidden">
-          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+          <div className="project-detail-flex">
             {/* Left: Image & Quick Stats */}
-            <div style={{ flex: '1 0 450px', backgroundColor: '#f8fafc' }}>
-              <img src={project.image} alt={project.title} style={{ width: '100%', height: '500px', objectFit: 'cover' }} loading="lazy" decoding="async" />
-              <div style={{ padding: '40px' }}>
+            <div className="project-detail-left">
+              <img src={project.image} alt={project.title} className="project-detail-img" loading="lazy" decoding="async" />
+              <div className="project-detail-info-block">
                 <h4 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '24px', color: '#0a2540' }}>Project information</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid #e2e8f0' }}>
@@ -57,7 +57,7 @@ const ProjectDetailPage = ({ project, onBack, onNavigate }) => {
                     <span style={{ color: '#64748b', fontWeight: '600' }}>Client Location</span>
                     <span style={{ color: '#0a2540', fontWeight: '700' }}>{project.location}</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid #e2e8f0' }}>
                     <span style={{ color: '#64748b', fontWeight: '600' }}>Project Status</span>
                     <span style={{ color: '#10b981', fontWeight: '800' }}>COMPLETED</span>
                   </div>
@@ -66,7 +66,7 @@ const ProjectDetailPage = ({ project, onBack, onNavigate }) => {
             </div>
 
             {/* Right: Technical Description */}
-            <div style={{ flex: '1 0 500px', padding: '60px' }}>
+            <div className="project-detail-right">
               <div style={{ marginBottom: '40px' }}>
                 <div style={{ color: '#635bff', fontWeight: '800', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '16px' }}>Case Study Detail</div>
                 <h2 style={{ fontSize: '36px', fontWeight: '800', color: '#0a2540', marginBottom: '24px', lineHeight: '1.2' }}>Professional CCTV System Installation</h2>
@@ -98,10 +98,9 @@ const ProjectDetailPage = ({ project, onBack, onNavigate }) => {
                 </div>
               </div>
 
-              <div style={{ marginTop: '56px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="project-detail-btn-group">
                 <button
-                  className="btn-primary w-80"
-                  style={{ padding: '20px', borderRadius: '18px', fontSize: '16px', fontWeight: '800' }}
+                  className="btn-primary project-detail-btn"
                   onClick={() => {
                     const cat = (project.category || '').toLowerCase();
                     if (cat.includes('cctv')) {
@@ -117,16 +116,7 @@ const ProjectDetailPage = ({ project, onBack, onNavigate }) => {
                 </button>
                 <button
                   onClick={onBack}
-                  className="btn-primary w-80"
-                  style={{
-                    padding: '18px',
-                    borderRadius: '18px',
-                    fontSize: '15px',
-                    fontWeight: '700',
-                    background: '#f8fafc',
-                    border: '2px solid #e2e8f0',
-                    color: '#64748b'
-                  }}
+                  className="btn-primary project-detail-btn-secondary"
                 >
                   View Other Projects
                 </button>
@@ -138,7 +128,7 @@ const ProjectDetailPage = ({ project, onBack, onNavigate }) => {
 
       {/* Client Relationship & Support Section */}
       <section className="container section-margin" style={{ marginTop: '80px', marginBottom: '80px' }}>
-        <div className="bg-white rounded-32 p-5 shadow-lg border" style={{ padding: '60px' }}>
+        <div className="bg-white rounded-32 p-5 shadow-lg border project-commitment-card">
           <div style={{ textAlign: 'center', marginBottom: '48px' }}>
             <div style={{ color: '#635bff', fontWeight: '800', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '16px' }}>The SafeHive Commitment</div>
             <h2 style={{ fontSize: '36px', fontWeight: '800', color: '#0a2540', marginBottom: '20px' }}>Become Our Partner</h2>
@@ -147,43 +137,21 @@ const ProjectDetailPage = ({ project, onBack, onNavigate }) => {
               and alarm system installation for residential and commercial clients.            </p>
           </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: '5px',
-            alignItems: 'stretch'
-          }}>
+          <div className="project-feature-grid">
             {[
               { title: 'Precision Installation', desc: 'Our technicians ensure optimal device placement and network stability.' },
               { title: 'Best security Solutions', desc: ' From CCTV camera to wireless alarm systems, we configure every setup.' },
               { title: 'Strict Confidentiality', desc: 'Your security data and privacy are handled with the highest level of encryption.' },
               { title: 'Ongoing Support', desc: 'We don’t just install; we provide the technical support your clients depend on' }
             ].map((feature, i) => (
-              <div key={i} className="p-4 rounded-24" style={{
-                background: 'linear-gradient(135deg, #0a2540, #1a3a5a)',
-                padding: "30px",
-                borderRadius: '24px',
-                border: '2px solid #f1f5f9',
-                transition: 'all 0.3s ease',
-                width: '250px',
-              }}>
+              <div key={i} className="p-4 rounded-24 project-feature-card">
                 <h5 style={{ fontWeight: '900', fontSize: '15px', color: 'white', marginBottom: '12px' }}>{feature.title}</h5>
                 <p style={{ fontSize: '14px', color: 'white', margin: 0, lineHeight: '1.6' }}>{feature.desc}</p>
               </div>
             ))}
           </div>
 
-          <div style={{
-            marginTop: '60px',
-            padding: '60px 40px',
-            background: 'linear-gradient(135deg, #0a2540, #1a3a5a)',
-            borderRadius: '24px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            textAlign: 'center',
-            gap: '32px'
-          }}>
+          <div className="project-commitment-box">
             <div style={{ color: 'white' }}>
               <h4 style={{ fontWeight: '800', marginBottom: '16px', fontSize: '36px', color: 'white' }}>Ready for a Secure Relationship?</h4>
               <p style={{ opacity: '0.8', margin: 0, fontSize: '17px', maxWidth: '600px' }}> Discover why hundreds of clients across Ethiopia choose SafeHive for their protection.</p>

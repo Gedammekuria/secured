@@ -7,35 +7,34 @@ const defaultProjects = [
     title: "Amibara Properties",
     clientName: "Amibara Properties",
     location: "Addis Ababa, Ethiopia",
-    description: "The client needed a cost-effective, high-definition security system with zero blind spots, local video backup redundancy, and secure remote access.",
-    fullDetail: "A massive security deployment for a large commercial properties group. We engineered a high resolution IP camera network designed for 360-degree blind-spot coverage. The system features advanced motion analytics to monitor high-traffic areas and thermal detection for sensitive zones.",
+    description: "The client needed a cost-effective, high-definition security system with zero blind spots, local video backup and secure remote access.",
+    fullDetail: "A massive security deployment for a large commercial properties group. We engineered a high resolution IP cameras. The system features advanced motion analytics to monitor high-traffic areas and thermal detection for sensitive zones.",
     benefit: ["24/7 continuous recording", "Elimination of blind spots", "Remote global access", "Motion detection", "Minimized risks of employee's and property loses", "Take immediate action for the problem"],
     category: "CCTV Camera",
-    image: "/assets/service/amibara project.JPG",
+    image: "/assets/service/amibara project.webp",
   },
   {
     id: 2,
     title: "Jotun ",
-    clientName: "Jotun Paint manufacturing",
+    clientName: "Jotun Paint Manufacturing",
     location: "Addis Ababa, Ethiopia",
     description: "The client needed cctv camera to control his employe's and their properties any where to reduce wastage and increase the productivity of the manufacturing plant.",
     fullDetail: "Surveillance in industry is vital to control the employees and their properties any where to reduce wastage and increase the productivity of the manufacturing plant. We deployed explosion-proof CCTV housings and long-range thermal cameras to monitor process equipment and ensure site safety.",
     benefit: ["24/7 continuous recording", "Elimination of blind spots", "Remote access from any where", "Increase productivity", "Use their time properly", "Highly minimized the wastage"],
 
     category: "CCTV Camera",
-    image: "/assets/service/jotun cctv.jpg"
+    image: "/assets/service/jotun cctv.webp"
   },
   {
     id: 3,
     title: "Oasis Hotel Apartment",
     clientName: "Oasis Hotel Apartment",
     location: "Addis Ababa, Ethiopia",
-    description: "Comprehensive surveillance system for guest safety and high-traffic area monitoring across multiple floors.",
-    fullDetail: "For Oasis Hotel Apartment, we installaed  a CCTV camera security system. The installation includes high-definition dome and bullet cameras in hallways and common areass. The system provides real-time monitoring and advanced playback capabilities for management.",
-    benefit: ["Multi-floor coverage", "Guest privacy optimization", "24/7 hotel monitoring", "Mobile access for management"],
+    description: "The client needed cctv camera for controling the guest safety and high-traffic area monitoring across multiple floors.",
+    fullDetail: "For Oasis Hotel Apartment, we installed  a CCTV camera security system. The installation includes high-definition dome and bullet cameras in hallways and common areass. The system provides real-time monitoring and advanced playback capabilities for management.",
+    benefit: ["24/7 continuous recording", "Multi-floor coverage", "Guest privacy optimization", "24/7 hotel monitoring"],
     category: "CCTV Camera",
-    image: "/assets/service/oasishotel.png"
-
+    image: "/assets/service/oasishotel.webp"
   },
   {
     id: 4,
@@ -44,9 +43,9 @@ const defaultProjects = [
     location: "Addis Ababa, Ethiopia",
     description: "We installed high-definition CCTV surveillance system for Sunrise Real Estate to safeguard property assets and ensure tenant security .",
     fullDetail: "Sunrise Real Estate required a CCTV security solution for their residential complex. We installed the Cameras with out blined spot.",
-    benefit: ["24/7 continuous recording", "Elimination of blind spots", "Remote global access", "Motion-triggered alerts", "Night vision excellence"],
+    benefit: ["24/7 continuous recording", "Elimination of blind spots", " ", "Remote global access", "Motion-triggered alerts", "Night vision excellence"],
     category: "CCTV Camera",
-    image: "/assets/service/sunrise.JPG"
+    image: "/assets/service/sunrise.webp"
   },
   {
     id: 5,
@@ -57,7 +56,7 @@ const defaultProjects = [
     fullDetail: "We designed a powerful CCTV system for Maryod Bakery. Key focus areas include the point of sale for transaction security and the production area to monitor quality control. The high-resolution cameras provide clear footage even in low-light conditions during night shifts.",
     benefit: ["24/7 continuous recording", "Elimination of blind spots", "Quality control oversight", "Remote operational checks", "POS transaction monitoring", "Time managment"],
     category: "CCTV Camera",
-    image: "/assets/service/maryod_bakery.jpg"
+    image: "/assets/service/maryod_bakery.webp"
   },
 ];
 
@@ -166,6 +165,7 @@ const PortfolioPage = ({ onSelectProject, onNavigate }) => {
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   className="transition-transform"
                   loading="lazy"
+                  decoding="async"
                 />
                 <div style={{ position: 'absolute', top: '20px', left: '20px' }}>
                   <span className="badge-light" style={{ backgroundColor: 'rgba(10, 37, 64, 0.8)', color: 'white', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.1)' }}>{project.category}</span>

@@ -34,8 +34,8 @@ const SERVICES_DATA = [
       },
       {
         title: "Remote Access",
-        description: "You can view any incidence from your property by using  smartphone everywhere remotely.",
-        image: "/assets/service/mobile view.jpg"
+        description: "You can monitor any incident on your property remotely from your smartphone anywhere in the world",
+        image: "/assets/service/mobile view.webp"
       },
     ]
   },
@@ -56,8 +56,8 @@ const SERVICES_DATA = [
       },
       {
         title: "Ajax Remote Control",
-        description: "Our systems are simple to access remotely with cellphone ",
-        image: "/assets/service/ajax control.jpg"
+        description: "Our systems are easy to access remotely from your smartphone. ",
+        image: "/assets/service/ajax control.webp"
       }
     ]
   }
@@ -85,12 +85,12 @@ const Hero = ({ onNavigate, onQuoteOpen, onViewServicesClick }) => {
 
 const Partners = () => {
   const logos = [
-    { src: '/assets/partners/Dahua.png', height: 50 },
-    { src: '/assets/partners/Hikvision.png', height: 110 },
-    { src: '/assets/partners/WD-Logo-removebg-preview.png', height: 55 },
-    { src: '/assets/partners/ajax.png', height: 36 },
-    { src: '/assets/partners/tp-link.png', height: 50 },
-    { src: '/assets/partners/unifi.png', height: 36 },
+    { src: '/assets/partners/Dahua.webp', height: 50 },
+    { src: '/assets/partners/Hikvision.webp', height: 110 },
+    { src: '/assets/partners/WD-Logo-removebg-preview.webp', height: 55 },
+    { src: '/assets/partners/ajax.webp', height: 36 },
+    { src: '/assets/partners/tp-link.webp', height: 50 },
+    { src: '/assets/partners/unifi.webp', height: 36 },
   ];
 
   return (
@@ -100,7 +100,7 @@ const Partners = () => {
           <div className="marquee-content">
             {[...logos, ...logos].map((logo, index) => (
               <div key={index} className="partner-logo">
-                <img src={logo.src} alt={`Partner ${index}`} style={{ height: `${logo.height}px` }} loading="lazy" />
+                <img src={logo.src} alt={`Partner ${index}`} style={{ height: `${logo.height}px` }} loading="lazy" decoding="async" />
               </div>
             ))}
           </div>
@@ -183,7 +183,7 @@ const Services = ({ onNavigate, onQuoteOpen }) => {
     return (
       <div key={i} className="gallery-card" style={{ animationDelay: `${i * 0.08}s` }}>
         <div className="gallery-img-wrap">
-          <img src={card.image} alt={card.title} className="gallery-img" loading="lazy" />
+          <img src={card.image} alt={card.title} className="gallery-img" loading="lazy" decoding="async" />
           <div className="gallery-label">{card.title}</div>
         </div>
         <div className="gallery-desc">
@@ -211,8 +211,7 @@ const Services = ({ onNavigate, onQuoteOpen }) => {
       <div className="container">
         <div className="section-header">
           <h2>The Pillars of Complete Security</h2>
-          <p> Whether you need watchful eyes, an unblinking alarm, a backup line that works when the internet doesn't,
-            or a smarter front door, we've got a system built for the job. </p>
+          <p> Whether you need watchful eyes, an unblinking alarm, a backup line that works when the internet doesn't, we've got a system built for the job. </p>
         </div>
         {!isMobile && (
           <div className="services-layout-top">
@@ -283,7 +282,7 @@ const Process = () => {
     {
       title: "System Design",
       description: "Our engineers create a custom blueprint using the latest tech to ensure 100% coverage and zero blind spots.",
-      image: "/assets/service/drawing.jpg",
+      image: "/assets/service/drawing.webp",
       icon: <PenTool size={22} />
     },
     {
@@ -295,7 +294,7 @@ const Process = () => {
     {
       title: "Training and Support",
       description: "We walk you through every feature and provide ongoing support to keep your hive running smoothly 24/7.",
-      image: "/assets/service/training.jpg",
+      image: "/assets/service/training.webp",
       icon: <Users size={22} />
     }
   ];
@@ -312,7 +311,7 @@ const Process = () => {
             <div key={i} className="process-step">
               <div className="process-card">
                 <div className="process-img-wrap">
-                  <img src={step.image} alt={step.title} loading="lazy" />
+                  <img src={step.image} alt={step.title} loading="lazy" decoding="async" />
                   <div className="process-label">{step.title}</div>
                   <div className="step-number">{i + 1}</div>
                 </div>
@@ -336,7 +335,7 @@ const CTA = ({ onQuoteOpen }) => (
     <div className="container cta-container">
       <div className="cta-content">
         <h2>Ready to feel safe at home?</h2>
-        <p>Looking to upgrade or install a new system? SafeHive is always ready.</p>
+        <p>Looking to upgrade or install a new system? Safehive is always ready.</p>
         <a
           href="#quote"
           className="btn-primary"
@@ -358,7 +357,7 @@ const WhyChooseUs = () => {
     },
     {
       title: "Premium Brands",
-      description: "We use only top-tier brands like Hikvision, Dahua and Ajax for reliability and durability.",
+      description: "We use only top-tier brands like Hikvision, Dahua, Imou, GSM burgar alarm and Ajax for reliability and durability.",
       icon: <ShieldCheck size={30} />
     },
     {
@@ -488,6 +487,29 @@ const FeaturedProjects = ({ onNavigate, onSelectProject }) => {
               </div>
             </div>
           ))}
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '48px' }}>
+          <button
+            onClick={() => onNavigate('portfolio')}
+            className="btn-primary"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              padding: '16px 36px',
+              borderRadius: '16px',
+              fontWeight: '700',
+              fontSize: '16px',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 10px 25px -5px rgba(99, 91, 255, 0.3)',
+              transition: 'all 0.3s ease'
+            }}
+          >
+            View More Projects <ArrowRight size={18} />
+          </button>
         </div>
       </div>
     </section>

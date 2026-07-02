@@ -51,11 +51,21 @@
 }
 
 .footer-brand .logo-img {
-  height: 48px;
+  max-width: 100%;
+  height: auto;
+  max-height: 48px;
+  object-fit: contain;
   margin-top: 0;
   margin-bottom: 4px;
   margin-left: 0;
   filter: brightness(0) invert(1);
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .footer-brand .logo-img {
+    max-height: 40px;
+  }
 }
 
 .nav-links {
@@ -969,7 +979,7 @@
   margin-top: var(--nav-height);
   /* Offset for the fixed navbar */
   overflow: hidden;
-  background: linear-gradient(rgba(24, 24, 24, 0.5), rgba(139, 218, 224, 0.2)), url('/hero page.jpg');
+  background: linear-gradient(rgba(24, 24, 24, 0.5), rgba(139, 218, 224, 0.2)), url('/hero page.webp');
   background-size: cover;
   background-position: right center;
 }
@@ -1368,6 +1378,8 @@
   display: flex;
   transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
   width: 100%;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .services-gallery-slide {
@@ -1415,6 +1427,8 @@
   height: 340px;
   box-shadow: var(--shadow-md);
   animation: floatCard 6s ease-in-out infinite;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 @keyframes floatCard {
@@ -1444,6 +1458,7 @@
       transparent);
   transform: skewX(-20deg);
   animation: shimmerGlare 4s infinite;
+  will-change: transform;
   z-index: 2;
   pointer-events: none;
 }
@@ -1771,6 +1786,10 @@
   font-size: 20px;
   opacity: 0.8;
   margin-bottom: 40px;
+}
+
+.cta-container .btn-primary {
+  margin-bottom: 16px;
 }
 
 /* Footer */
@@ -2792,6 +2811,7 @@
   position: relative;
   overflow: hidden;
   z-index: 1;
+  margin-top: 40px;
 }
 
 .benefit-card::before {
@@ -4323,4 +4343,9 @@
   .hero-text h1 {
     font-size: 34px !important;
   }
+}
+
+.hexagon:hover {
+  color: var(--primary);
+
 }

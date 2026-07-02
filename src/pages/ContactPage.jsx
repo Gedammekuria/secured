@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Mail, Phone, MapPin, Send, MessageSquare, Clock, Shield, ArrowRight, CheckCircle, Bell, XCircle } from 'lucide-react';
 import PhoneInput from '../components/PhoneInput';
+import { useSiteSettings } from '../SiteSettingsContext';
 
 /* ─────────────────────────────────────────────
    Tiny helper – input border colour by state
@@ -84,6 +85,7 @@ const ErrorBanner = ({ message }) => (
    Main Component
 ───────────────────────────────────────────── */
 const ContactPage = () => {
+  const { settings } = useSiteSettings();
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
   const emptyForm = {
@@ -448,7 +450,7 @@ const ContactPage = () => {
                           value={formData.fullName}
                           onChange={handleChange}
                           onBlur={handleBlur}
-                          placeholder="Your Full Name"
+                          placeholder=" "
                           style={{ width: '100%', padding: '16px', borderRadius: '12px', border: fieldBorder('fullName', errors, touched), background: '#f8fafc', outline: 'none', transition: 'border 0.2s' }}
                         />
                         <FieldMsg name="fullName" errors={errors} touched={touched} />
@@ -457,7 +459,7 @@ const ContactPage = () => {
                       {/* Email / Phone */}
                       <div className="form-group">
                         <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
-                          Email Address or Phone Number<span className="req">*</span>
+                          Email or Phone<span className="req">*</span>
                         </label>
                         <input
                           type="text"
@@ -465,7 +467,7 @@ const ContactPage = () => {
                           value={formData.initialContact}
                           onChange={handleChange}
                           onBlur={handleBlur}
-                          placeholder="Email or phone number"
+                          placeholder=" "
                           style={{ width: '100%', padding: '16px', borderRadius: '12px', border: fieldBorder('initialContact', errors, touched), background: '#f8fafc', outline: 'none', transition: 'border 0.2s' }}
                         />
                         <FieldMsg name="initialContact" errors={errors} touched={touched} />
@@ -527,7 +529,7 @@ const ContactPage = () => {
                           value={formData.customInquiry}
                           onChange={handleChange}
                           onBlur={handleBlur}
-                          placeholder="Specify your security requirement..."
+                          placeholder=" "
                           style={{ width: '100%', padding: '18px', borderRadius: '12px', border: fieldBorder('customInquiry', errors, touched), background: '#f8fafc', fontSize: '16px', outline: 'none' }}
                         />
                         <FieldMsg name="customInquiry" errors={errors} touched={touched} />
@@ -595,7 +597,7 @@ const ContactPage = () => {
                       {/* Location */}
                       <div className="form-group">
                         <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
-                          Project Location / Address<span className="req">*</span>
+                          Project Location<span className="req">*</span>
                         </label>
                         <input
                           type="text"
@@ -646,18 +648,18 @@ const ContactPage = () => {
                         </h4>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px' }}>
                           <div className="form-group">
-                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Number of required Cameras</label>
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Estimated Number of Cameras needed?</label>
                             <input
                               type="number"
                               name="numCameras"
                               value={formData.numCameras}
                               onChange={handleChange}
-                              placeholder="e.g. 4"
+                              placeholder=" "
                               style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }}
                             />
                           </div>
                           <div className="form-group">
-                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Estimate timeframe to complete the project?</label>
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Your estimate timeframe to complete the project?</label>
                             <select
                               name="timeframe"
                               value={formData.timeframe}
@@ -675,31 +677,19 @@ const ContactPage = () => {
 
 
                           <div className="form-group">
-                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Is there previously installed system?</label>
-                            <select
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>If there was previously installed system type the brand here?</label>
+
+                            <input
+                              type="text"
                               name="previousinstalled"
                               value={formData.previousinstalled}
                               onChange={handleChange}
+                              placeholder=""
                               style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }}
-                            >
-                              <option value="">Select</option>
-                              <option value="Yes">Yes</option>
-                              <option value="No">No</option>
-
-                            </select>
+                            />
                           </div>
                         </div>
-                        <div className="form-group" style={{ marginTop: '20px' }}>
-                          <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Other Requirements</label>
-                          <input
-                            type="text"
-                            name="cctvOther"
-                            value={formData.cctvOther}
-                            onChange={handleChange}
-                            placeholder=""
-                            style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }}
-                          />
-                        </div>
+
                       </div>
                     )}
 
@@ -731,13 +721,13 @@ const ContactPage = () => {
                               name="numSensors"
                               value={formData.numSensors}
                               onChange={handleChange}
-                              placeholder="e.g. 6"
+                              placeholder=" "
                               style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }}
                             />
                           </div>
                         </div>
                         <div className="form-group" style={{ marginTop: '20px' }}>
-                          <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Preferred System Type</label>
+                          <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>System preference</label>
                           <select
                             name="alarmSystemType"
                             value={formData.alarmSystemType}
@@ -748,6 +738,40 @@ const ContactPage = () => {
                             <option value="Wireless (Ajax)">Wireless (Ajax)</option>
                             <option value="GSM Burglar Alarm">GSM Burglar Alarm</option>
                           </select>
+
+
+                          <div className="row">
+                            <div className="qf-group mb-4">
+                              <label className="mb-2 d-block font-weight-bold">Your estimate timeframe to complete the project?</label>
+                              <select
+                                name="alarmTimeframe"
+                                value={formData.alarmTimeframe}
+                                onChange={handleChange}
+                                style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}
+                              >
+                                <option value="">select</option>
+                                <option value="Urgent">Urgent</option>
+                                <option value="Based on your schedule">Based on your schedule</option>
+                                <option value="With in a Week">With in a Week</option>
+                                <option value="With in a month">With in a Month</option>
+                              </select>
+                            </div>
+                            <div className="qf-group mb-4">
+                              <label className="mb-2 d-block font-weight-bold">If there was previously installed system type the brand here?</label>
+                              <input
+                                type="text"
+                                name="alarmInstalledSystem"
+                                value={formData.alarmInstalledSystem}
+                                onChange={handleChange}
+                                placeholder=""
+                                style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}
+                              />
+                            </div>
+                          </div>
+
+
+
+
                         </div>
                       </div>
                     )}
@@ -755,7 +779,7 @@ const ContactPage = () => {
                     {/* Message */}
                     <div className="form-group" style={{ marginBottom: '32px' }}>
                       <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
-                        Detail Your Requirements<span className="req">*</span>
+                        If you have any other information, please type it here <span className="req">*</span>
                       </label>
                       <textarea
                         rows="4"
@@ -763,7 +787,7 @@ const ContactPage = () => {
                         value={formData.message}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        placeholder="Tell us about the scope of your security project..."
+                        placeholder=" "
                         style={{ width: '100%', padding: '15px', borderRadius: '12px', border: fieldBorder('message', errors, touched), background: '#f8fafc', outline: 'none', resize: 'vertical' }}
                       />
                       <FieldMsg name="message" errors={errors} touched={touched} />
@@ -800,7 +824,6 @@ const ContactPage = () => {
             )}
           </div>
         </div>
-
         {/* Contact Info Row */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
           <div className="bg-white rounded-24 shadow-sm p-4 border text-center">
@@ -808,14 +831,14 @@ const ContactPage = () => {
               <Phone size={30} className="text-primary" />
             </div>
             <h5 className="font-weight-bold mb-2">Call Us</h5>
-            <p className="mb-1 font-weight-bold" style={{ color: '#0a2540' }}>+251 923 55 55 54</p>
+            <p className="mb-1 font-weight-bold" style={{ color: '#0a2540' }}>{settings.phone}</p>
           </div>
           <div className="bg-white rounded-24 shadow-sm p-4 border text-center">
             <div className="faq-icon-small mb-3 mx-auto" style={{ width: '50px', height: '50px' }}>
               <Mail size={30} className="text-primary" />
             </div>
             <h5 className="font-weight-bold mb-2">Email Us</h5>
-            <p className="mb-1 font-weight-bold" style={{ color: '#0a2540' }}>info@safehive.com</p>
+            <p className="mb-1 font-weight-bold" style={{ color: '#0a2540' }}>{settings.company_email}</p>
             <p className="text-muted mb-0" style={{ fontSize: '13px' }}>Online support</p>
           </div>
           <div className="bg-white rounded-24 shadow-sm p-4 border text-center">
@@ -823,7 +846,7 @@ const ContactPage = () => {
               <MapPin size={30} className="text-primary" />
             </div>
             <h5 className="font-weight-bold mb-2">Visit Us</h5>
-            <p className="mb-1 font-weight-bold" style={{ color: '#0a2540' }}>22 Mazoriya MAF Building</p>
+            <p className="mb-1 font-weight-bold" style={{ color: '#0a2540' }}>{settings.location}</p>
             <p className="text-muted mb-0" style={{ fontSize: '13px' }}>Ethiopia</p>
           </div>
           <div className="bg-white rounded-24 shadow-sm p-4 border text-center">
@@ -844,7 +867,7 @@ const ContactPage = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <MapPin size={28} color="#635bff" />
               <span style={{ color: 'white', fontWeight: '700', fontSize: '15px' }}>
-                Megenagna 22 MAF Building, Addis Ababa, Ethiopia
+                {settings.location}, Addis Ababa, Ethiopia
               </span>
             </div>
             <a

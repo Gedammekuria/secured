@@ -1,0 +1,9 @@
+{
+    "ignore": [
+        ".env",
+        "notifications_log.txt",
+        "node_modules",
+        "dist",
+        "public"
+    ]
+}

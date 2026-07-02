@@ -9,6 +9,42 @@ import {
   Wifi, Lock, Smartphone, Monitor, Menu, X, ArrowRight,
   Briefcase, HelpCircle, FileText, BookOpen, Send, FileEdit
 } from 'lucide-react';
+import { useSiteSettings } from './SiteSettingsContext';
+
+const FacebookIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+  </svg>
+);
+
+const InstagramIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+  </svg>
+);
+
+const LinkedInIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+    <rect width="4" height="12" x="2" y="9" />
+    <circle cx="4" cy="4" r="2" />
+  </svg>
+);
+
+const YouTubeIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+    <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17z" />
+    <polygon points="10 15 15 12 10 9" />
+  </svg>
+);
+
+const TikTokIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+  </svg>
+);
 
 // Lazy loading components for faster initial load
 import Home from './pages/Home';
@@ -166,7 +202,7 @@ const Navbar = ({
       <div className="nav-overlay" onClick={() => setMobileMenuOpen(false)}></div>
       <div className="container nav-content">
         <a href="#" className="logo" onClick={handleLogoClick}>
-          <img src="/assets/safehive.png" alt="Safehive Logo" className="logo-img" fetchpriority="high" />
+          <img src="/assets/safehive.webp" alt="Safehive Logo" className="logo-img" fetchpriority="high" />
         </a>
         <button className="mobile-toggle" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
           {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
@@ -296,7 +332,7 @@ const Navbar = ({
                   <div className="featured-card">
                     <span className="badge-featured" style={{ background: 'rgba(255, 152, 0, 0.1)', color: '#ff9800' }}>Exclusive Offer</span>
                     <h5>Secure Your Peace of Mind</h5>
-                    <p>Don't leave your protection to chance. Every second counts—book a priority consultation now to receive a customized security blueprint from our elite engineering team.</p>
+                    <p>Don't leave your protection to chance. Every second counts book a priority consultation now to receive a customized security blueprint from our elite engineering team.</p>
                     <button className="btn-primary-sm" onClick={(e) => { e.preventDefault(); onNavigate('contact'); setProjectsMegaVisible(false); }}>Book Now <ArrowRight size={14} /></button>
                   </div>
                 </div>
@@ -346,6 +382,8 @@ const Navbar = ({
 };
 
 const Footer = ({ onNavigate }) => {
+  const { settings } = useSiteSettings();
+
   const handleNav = (e, target) => {
     e.preventDefault();
     onNavigate(target);
@@ -357,12 +395,52 @@ const Footer = ({ onNavigate }) => {
       <div className="container">
         <div className="footer-grid">
           <div className="footer-brand">
-            <img src="/assets/hexagon-logo.png" alt="Safehive Logo" className="logo-img" loading="lazy" />
-            <p>Safehive is sister company of hexagon conputer systems specialized in security solutions.</p>
+            <img src="/assets/hexagon-logo.webp" alt="Safehive Logo" className="logo-img" loading="lazy" />
+            <p style={{ marginBottom: '16px' }}>
+              Safehive is a sister company of<br />
+              <a href="https://www.hexagonview.com" className='hexagon'>
+                hexagon computer systems
+              </a><br />
+              specialized in security solutions.
+            </p>
+
+
+
+
+
+
+            {/* Social media icons */}
+            <div className="footer-socials" style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+              {settings.facebook_url && (
+                <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="Facebook" style={{ color: 'rgba(255,255,255,0.6)', transition: 'color 0.2s' }}>
+                  <FacebookIcon size={18} />
+                </a>
+              )}
+              {settings.instagram_url && (
+                <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="Instagram" style={{ color: 'rgba(255,255,255,0.6)', transition: 'color 0.2s' }}>
+                  <InstagramIcon size={18} />
+                </a>
+              )}
+              {settings.tiktok_url && (
+                <a href={settings.tiktok_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="TikTok" style={{ color: 'rgba(255,255,255,0.6)', transition: 'color 0.2s' }}>
+                  <TikTokIcon size={18} />
+                </a>
+              )}
+              {settings.linkedin_url && (
+                <a href={settings.linkedin_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="LinkedIn" style={{ color: 'rgba(255,255,255,0.6)', transition: 'color 0.2s' }}>
+                  <LinkedInIcon size={18} />
+                </a>
+              )}
+              {settings.youtube_url && (
+                <a href={settings.youtube_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="YouTube" style={{ color: 'rgba(255,255,255,0.6)', transition: 'color 0.2s' }}>
+                  <YouTubeIcon size={18} />
+                </a>
+              )}
+            </div>
           </div>
           <div className="footer-links">
             <h4>Services</h4>
-            <a href="#cctv" onClick={(e) => handleNav(e, 'cctv')}><Camera size={18} /> CCTV Installation</a>
+            <a href="#cctv" onClick={(e) => handleNav(e, 'cctv')} style={{ whiteSpace: 'nowrap' }}><Camera size={18} /> CCTV Installation</a>
             <a href="#alarm" onClick={(e) => handleNav(e, 'alarm')}><Bell size={18} /> Alarm Systems</a>
 
           </div>
@@ -382,15 +460,15 @@ const Footer = ({ onNavigate }) => {
           </div>
           <div className="footer-links">
             <h4>Contact Info</h4>
-            <a href="tel:+251 923 55 55 54" className="footer-contact-item">
-              <Phone size={14} className="text-primary" /> +251 923 55 55 54
+            <a href={`tel:${settings.phone}`} className="footer-contact-item">
+              <Phone size={14} className="text-primary" /> {settings.phone}
             </a>
-            <a href="mailto:info@safehive.com" className="footer-contact-item" >
-              <Mail size={14} className="text-primary" /> info@safehive.com
+            <a href={`mailto:${settings.company_email}`} className="footer-contact-item" >
+              <Mail size={14} className="text-primary" /> {settings.company_email}
             </a>
 
             <div className="footer-contact-item" style={{ color: 'rgba(255,255,255,0.6)', fontSize: '15px', display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <MapPin size={14} className="text-primary" />22 Mazoriya MAF Building
+              <MapPin size={14} className="text-primary" />{settings.location}
             </div>
             <div className="footer-contact-item" style={{ color: 'rgba(255,255,255,0.6)', fontSize: '15px', display: 'flex', gap: '10px', alignItems: 'center' }}>
               <Clock size={14} className="text-primary" /> Mon - Fri: 7:00 AM - 4:00 PM

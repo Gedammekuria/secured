@@ -269,3 +269,155 @@ Best regards,
 The SafeHive Security Team
 www.safehive.com
 ========================================
+
+========================================
+[EMAIL SENT VIA SAFEHIVE SYSTEM]
+Timestamp: 2026-07-01T05:10:39.356Z
+Recipient: gedu0194@gmail.com (Admin Reset Code)
+Subject:   SafeHive Security — Admin Password Reset Code
+Body:
+Dear SafeHive Admin,
+
+You requested a password reset code for the admin console.
+
+Your 6-digit verification code is: 448330
+
+This code will expire in 10 minutes.
+
+If you did not request this, please secure your admin credentials immediately.
+
+Best regards,
+The SafeHive Security Team
+www.safehive.com
+========================================
+
+========================================
+[EMAIL SENT VIA SAFEHIVE SYSTEM]
+Timestamp: 2026-07-01T05:12:11.383Z
+Recipient: gedu0194@gmail.com (Admin Reset Confirmation)
+Subject:   SafeHive Security — Admin Password Reset Successful
+Body:
+Dear SafeHive Admin,
+
+Your SafeHive Admin account password has been successfully reset.
+
+You can now log in using your new password.
+
+Best regards,
+The SafeHive Security Team
+www.safehive.com
+========================================
+
+========================================
+[EMAIL SENT VIA SAFEHIVE SYSTEM]
+Timestamp: 2026-07-01T05:14:24.207Z
+Recipient: gedu0194@gmail.com (Admin Reset Code)
+Subject:   SafeHive Security — Admin Password Reset Code
+Body:
+Dear SafeHive Admin,
+
+You requested a password reset code for the admin console.
+
+Your 6-digit verification code is: 697582
+
+This code will expire in 10 minutes.
+
+If you did not request this, please secure your admin credentials immediately.
+
+Best regards,
+The SafeHive Security Team
+www.safehive.com
+========================================
+
+========================================
+[EMAIL SENT VIA SAFEHIVE SYSTEM]
+Timestamp: 2026-07-01T05:23:15.172Z
+Recipient: gedu0194@gmail.com (Admin Reset Code)
+Subject:   SafeHive Security — Admin Password Reset Code
+Body:
+Dear SafeHive Admin,
+
+You requested a password reset code for the admin console.
+
+Your 6-digit verification code is: 538731
+
+This code will expire in 10 minutes.
+
+If you did not request this, please secure your admin credentials immediately.
+
+Best regards,
+The SafeHive Security Team
+www.safehive.com
+========================================
+
+========================================
+[EMAIL SENT VIA SAFEHIVE SYSTEM]
+Timestamp: 2026-07-01T05:24:56.207Z
+Recipient: gedu0194@gmail.com (Admin Reset Confirmation)
+Subject:   SafeHive Security — Admin Password Reset Successful
+Body:
+Dear SafeHive Admin,
+
+Your SafeHive Admin account password has been successfully reset.
+
+You can now log in using your new password.
+
+Best regards,
+The SafeHive Security Team
+www.safehive.com
+========================================
+
+========================================
+[EMAIL SENT VIA SAFEHIVE SYSTEM]
+Timestamp: 2026-07-01T06:05:20.903Z
+Recipient: gedu0194@gmail.com (Email)
+Subject:   SafeHive Security — Request Accepted (Ref: 49)
+Body:
+Dear Gedam Mekuria Berihun,
+
+Thank you for choosing SafeHive Security.
+
+We are pleased to inform you that your request for "CCTV Systems" has been accepted by our team.
+
+Our security experts are currently reviewing your requirements and will reach out to you shortly to schedule an onsite assessment or discuss next steps.
+
+Best regards,
+The SafeHive Security Team
+www.safehive.com
+========================================
+
+========================================
+[EMAIL SENT VIA SAFEHIVE SYSTEM]
+Timestamp: 2026-07-01T06:06:44.450Z
+Recipient: gmcheralia21@gmail.com (Email)
+Subject:   SafeHive Security — Project In Progress (Ref: 47)
+Body:
+Dear Gedam Mekuria Berihun,
+
+We are pleased to update you that your security installation project for "CCTV Systems" is now officially IN PROGRESS.
+
+Our engineering and installation crews are coordinating the equipment and setups. We will keep you posted on the daily milestones.
+
+Best regards,
+The SafeHive Security Team
+www.safehive.com
+========================================
+
+========================================
+[EMAIL SENT VIA SAFEHIVE SYSTEM]
+Timestamp: 2026-07-01T07:39:17.204Z
+Recipient: gedu0194@gmail.com (Email)
+Subject:   SafeHive Security — Request Accepted (Ref: 55)
+Body:
+Dear Gedam Mekuria,
+
+Thank you for choosing SafeHive Security.
+
+We are pleased to inform you that your request for "CCTV Systems, Alarm Systems" has been accepted by our team.
+
+Our security experts are currently reviewing your requirements and will reach out to you shortly to schedule an onsite assessment or discuss next steps.
+
+Best regards,
+The SafeHive Security Team
+www.safehive.com
+========================================

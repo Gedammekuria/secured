@@ -17,37 +17,37 @@ const CCTVPage = ({ onNavigate }) => {
       title: "High Resolution Quality",
       desc: "Crystal clear resolution that captures every detail with precision, day or night.",
       icon: <Eye className="text-blue-500" />,
-      image: "/assets/service/high resolution.jpg"
+      image: "/assets/service/high resolution.webp"
     },
     {
       title: "Night Vision Pro",
       desc: "Advanced infrared and night-color technology for total visibility in complete darkness.",
       icon: <Camera className="text-blue-500" />,
-      image: "/assets/service/night vision.png"
+      image: "/assets/service/night vision.webp"
     },
     {
       title: "Motion Detection",
       desc: "Human and vehicle detection to reduce false alarms and focus on what matters.",
       icon: <Cpu className="text-blue-500" />,
-      image: "/assets/service/detection.jpg"
+      image: "/assets/service/detection.webp"
     },
     {
       title: "Weatherproof IP67",
       desc: "Built to withstand the toughest weather, from heavy rain to extreme heat.",
       icon: <Shield className="text-blue-500" />,
-      image: "/assets/service/waterproof.jpg"
+      image: "/assets/service/waterproof.webp"
     },
     {
       title: "Remote Access",
       desc: "Access your live feed and recordings from anywhere in the world via your smartphone.",
       icon: <PhoneIcon className="text-blue-500" />,
-      image: "/assets/service/Remote access.jpg"
+      image: "/assets/service/Remote access.webp"
     },
     {
       title: "Local NVR recording",
       desc: "Footage records to a hard drive on-site no monthly cloud fees, no reliance on your internet. 15-30 days retention.",
       icon: <HardDrive className="text-blue-500" />,
-      image: "/assets/service/data_storage.png"
+      image: "/assets/service/data_storage.webp"
     }
   ];
 
@@ -126,7 +126,7 @@ const CCTVPage = ({ onNavigate }) => {
                   </div>
                   {/* Inline image — only visible on mobile, shown next to each feature row */}
                   <div className="mobile-feature-img">
-                    <img src={f.image} alt={f.title} loading="lazy" />
+                    <img src={f.image} alt={f.title} loading="lazy" decoding="async" />
                   </div>
                 </div>
               ))}
@@ -141,6 +141,7 @@ const CCTVPage = ({ onNavigate }) => {
                     alt={f.title}
                     className={`main-tech-img ${activeIndex === i ? 'active' : ''}`}
                     loading="lazy"
+                    decoding="async"
                   />
                 ))}
                 <div className="hover-description-overlay">
@@ -178,7 +179,7 @@ const CCTVPage = ({ onNavigate }) => {
 
           <div className="why-cctv-spotlight">
             <div className="spotlight-image">
-              <img src="/assets/service/live view.jpg" alt="Live View Surveillance" loading="lazy" />
+              <img src="/assets/service/live view.webp" alt="Live View Surveillance" loading="lazy" decoding="async" />
               <div className="live-tag">
                 <span className="live-dot"></span>
                 LIVE VIEW
@@ -186,7 +187,7 @@ const CCTVPage = ({ onNavigate }) => {
             </div>
             <div className="spotlight-text">
               <h3>Easy to take immediate action</h3>
-              <p>Seeing is responding. Our high-speed live view technology allows you to monitor your property in real-time from anywhere in the world. Identify unauthorized access instantly and take immediate action—whether it's communicating through two-way audio or alerting authorities before the incident even begins.</p>
+              <p>Seeing is responding. Our high-speed live view technology allows you to monitor your property in real-time from anywhere in the world. Identify unauthorized access instantly and take immediate action whether it's communicating through two-way audio or alerting authorities before the incident even begins.</p>
 
             </div>
           </div>

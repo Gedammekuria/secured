@@ -70,7 +70,7 @@ const AlarmPage = ({ onNavigate }) => {
             </div>
             <div className="split-image">
               <div className="image-frame warning">
-                <img src="/assets/service/ajax.jpg" alt="Ajax Detector" className="rounded-2xl shadow-2xl" loading="lazy" />
+                <img src="/assets/service/ajax.webp" alt="Ajax Detector" className="rounded-2xl shadow-2xl" loading="lazy" decoding="async" />
               </div>
             </div>
           </div>
@@ -97,7 +97,7 @@ const AlarmPage = ({ onNavigate }) => {
             </div>
             <div className="split-image">
               <div className="image-frame">
-                <img src="/assets/service/GSm burglar alarm.jpg" alt="Burglar Alarm" className="rounded-2xl shadow-xl" loading="lazy" />
+                <img src="/assets/service/GSm burglar alarm.webp" alt="Burglar Alarm" className="rounded-2xl shadow-xl" loading="lazy" decoding="async" />
               </div>
             </div>
           </div>

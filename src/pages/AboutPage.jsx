@@ -1,15 +1,18 @@
 import React, { useEffect } from 'react';
 import { Shield, Target, Users, Award, CheckCircle, ArrowRight, ShieldCheck, Zap, Heart } from 'lucide-react';
+import { useSiteSettings } from '../SiteSettingsContext';
 
 const AboutPage = ({ onNavigate }) => {
+  const { settings } = useSiteSettings();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   const stats = [
-    { label: "Successful Installations", value: "100+" },
-    { label: "Years Experience", value: "17+" },
-    { label: "Client Retention", value: "99%" },
+    { label: "Successful Installations", value: settings.stat_installations || "100+" },
+    { label: "Years Experience", value: settings.stat_years_experience || "17+" },
+    { label: "Client Retention", value: settings.stat_client_retention || "99%" },
   ];
 
   const values = [
@@ -120,7 +123,7 @@ const AboutPage = ({ onNavigate }) => {
           <div className="text-center mb-5 pb-4">
             <h2 className="display-4 font-weight-bold mb-3" style={{ color: '#0a2540' }}>Built on Trust</h2>
             <p className="text-muted mx-auto" style={{ maxWidth: '600px' }}>
-              The foundations of SafeHive are built on three core pillars that guide every installation and service call.
+              The foundations of Safehive are built on three core pillars that guide every installation and service call.
             </p>
           </div>
 
@@ -140,7 +143,7 @@ const AboutPage = ({ onNavigate }) => {
       <section className="container py-24">
         <div className="bg-dark rounded-32 p-5 text-white overflow-hidden position-relative" style={{ padding: 'min(80px, 10vw)', textAlign: 'center' }}>
           <div style={{ position: 'relative', zIndex: 2 }}>
-            <h2 className="display-4 font-weight-bold mb-4">Experience the <br /> SafeHive Standard</h2>
+            <h2 className="display-4 font-weight-bold mb-4">Experience the <br /> Safehive Standard</h2>
             <p className="lead opacity-70 mx-auto mb-5" style={{ maxWidth: '600px' }}>
               Don't leave your most valuable assets to chance. Join like as our cients property owners who sleep soundly under our protection.
             </p>
