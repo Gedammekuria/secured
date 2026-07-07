@@ -616,6 +616,12 @@
 }
 
 /* --- Project Detail Responsive Design --- */
+.project-detail-flex {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+
 .project-detail-left {
   flex: 1 1 450px !important;
   background-color: #f8fafc;
@@ -723,6 +729,10 @@
 }
 
 @media (max-width: 900px) {
+
+  .project-detail-flex {
+    flex-direction: column;
+  }
 
   .project-detail-left,
   .project-detail-right {

@@ -97,7 +97,7 @@ const AdminPage = ({ onNavigate }) => {
   const [showDownloadPanel, setShowDownloadPanel] = useState(false);
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
-  const [exportFormat, setExportFormat] = useState('excel'); // 'excel' | 'pdf'
+  const [exportFormat, setExportFormat] = useState('pdf'); // 'excel' | 'pdf'
 
   const fetchAdminProfile = async (token) => {
     try {
@@ -386,7 +386,7 @@ const AdminPage = ({ onNavigate }) => {
   const EXPORT_HEADERS = [
     'Inquiry ID', 'Full Name', 'Company', 'Primary Contact', 'Secondary Contact',
     'Location', 'Budget', 'Source', 'Service Types', 'Custom Inquiry', 'Status',
-    'Num Cameras', 'Footage Duration', 'CCTV Notes', 'Alarm Property Type',
+    'Num Cameras', 'Footage Duration', 'CCTV Timeframe', 'CCTV Previous System', 'CCTV Notes', 'Alarm Property Type',
     'Num Sensors', 'Alarm System Type', 'Alarm Timeframe', 'Alarm Previous System', 'Message', 'Request Date'
   ];
 
@@ -403,7 +403,9 @@ const AdminPage = ({ onNavigate }) => {
     item.custom_inquiry || '',
     STATUS_CONFIG[item.status || 'pending']?.label || 'Pending',
     item.num_cameras || '',
+    item.footage_duration || '',
     item.timeframe || '',
+    item.installedsystem || '',
     item.cctv_other || '',
     item.alarm_property_type || '',
     item.num_sensors || '',
@@ -419,8 +421,8 @@ const AdminPage = ({ onNavigate }) => {
     if (!rows || rows.length === 0) { alert('No records to export.'); return; }
     const wsData = [EXPORT_HEADERS, ...rows.map(inquiryToRow)];
     const ws = XLSX.utils.aoa_to_sheet(wsData);
-    // Column widths
-    ws['!cols'] = [10, 18, 18, 22, 22, 16, 12, 10, 20, 20, 12, 12, 16, 18, 20, 12, 20, 16, 20, 30, 20].map(w => ({ wch: w }));
+    // Column widths (23 columns)
+    ws['!cols'] = [10, 18, 18, 22, 22, 16, 12, 10, 20, 20, 12, 12, 16, 18, 20, 20, 20, 12, 20, 16, 20, 30, 20].map(w => ({ wch: w }));
     // Bold header row
     EXPORT_HEADERS.forEach((_, ci) => {
       const cellRef = XLSX.utils.encode_cell({ r: 0, c: ci });
@@ -433,7 +435,7 @@ const AdminPage = ({ onNavigate }) => {
 
   // ── PDF Invoice Export ────────────────────────────────────────────────────────
   // Draws a single inquiry as an invoice page inside `doc` starting at `startY`
-  const drawInvoicePage = (doc, item, isFirst) => {
+  const drawInvoicePage = (doc, item, isFirst, logoDataUrl) => {
     const PW = 210; // A4 portrait width mm
     const ML = 14;  // margin left
     const MR = 14;  // margin right
@@ -444,21 +446,38 @@ const AdminPage = ({ onNavigate }) => {
     if (!isFirst) doc.addPage();
 
     // ── Brand header bar ──
+    // Bottom orange accent line
     doc.setFillColor(226, 88, 34);
-    doc.rect(0, 0, PW, 22, 'F');
-    doc.setTextColor(255, 255, 255);
+    doc.rect(0, 21.2, PW, 0.8, 'F');
+
+    // Header Background: clean white
+    doc.setFillColor(255, 255, 255);
+    doc.rect(0, 0, PW, 21.2, 'F');
+
+    // Logo (if logoDataUrl is available)
+    if (logoDataUrl) {
+      doc.addImage(logoDataUrl, 'PNG', ML, 3.1, 40, 15);
+    } else {
+      // Fallback text if logo is not loaded
+      doc.setTextColor(226, 88, 34);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.text('SAFEHIVE', ML, 12);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 116, 139);
+      doc.text('SafeHive Security Systems', ML, 18);
+    }
+
+    // Right elements (Dark text now since background is white)
+    doc.setTextColor(10, 37, 64);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(16);
-    doc.text('SAFEHIVE', ML, 14);
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.text('SafeHive Security Systems', ML, 20);
     doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.text('INQUIRY RECORD', PW - MR - 38, 13);
-    doc.setFontSize(8);
+    doc.text('INQUIRY RECORD', PW - MR - 38, 12);
+    doc.setFontSize(8.5);
     doc.setFont('helvetica', 'normal');
-    doc.text(`ID: ${formatInqId(item.id)}`, PW - MR - 38, 19);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`ID: ${formatInqId(item.id)}`, PW - MR - 38, 18);
 
     let y = 30;
 
@@ -547,7 +566,7 @@ const AdminPage = ({ onNavigate }) => {
     y = doc.lastAutoTable.finalY + 8;
 
     // ── SERVICE SPECIFICATIONS ──
-    const hasCctv = item.num_cameras || item.timeframe || item.cctv_other;
+    const hasCctv = item.num_cameras || item.footage_duration || item.timeframe || item.installedsystem || item.cctv_other;
     const hasAlarm = item.alarm_property_type || item.num_sensors || item.alarm_system_type || item.alarm_timeframe || item.alarm_installed_system;
     const hasCustom = item.custom_inquiry;
 
@@ -558,7 +577,9 @@ const AdminPage = ({ onNavigate }) => {
       if (hasCctv) {
         specRows.push([{ content: 'CCTV Surveillance System', colSpan: 2, styles: { fontStyle: 'bold', textColor: [226, 88, 34], fillColor: [255, 248, 245], fontSize: 8.5, cellPadding: { top: 4, bottom: 4, left: 6, right: 4 } } }]);
         if (item.num_cameras) specRows.push(['Number of Cameras', item.num_cameras]);
+        if (item.footage_duration) specRows.push(['Footage Duration', item.footage_duration]);
         if (item.timeframe) specRows.push(['Your estimate timeframe to complete the project?', item.timeframe]);
+        if (item.installedsystem) specRows.push(['Previously Installed System', item.installedsystem]);
         if (item.cctv_other) specRows.push(['Special Surveillance Needs', item.cctv_other]);
       }
       if (hasAlarm) {
@@ -647,16 +668,63 @@ const AdminPage = ({ onNavigate }) => {
     doc.text(`Exported: ${new Date().toLocaleString()}`, PW - MR, FY + 4, { align: 'right' });
   };
 
-  const downloadPDF = (rows, filename) => {
+  const getPngBase64FromWebp = (url) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'Anonymous';
+      img.src = url;
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          resolve(canvas.toDataURL('image/png'));
+        } catch (err) {
+          console.warn('Canvas conversion failed, trying fallback:', err);
+          try {
+            const fallbackImg = new Image();
+            fallbackImg.src = url;
+            fallbackImg.onload = () => {
+              try {
+                const canvas2 = document.createElement('canvas');
+                canvas2.width = fallbackImg.naturalWidth;
+                canvas2.height = fallbackImg.naturalHeight;
+                canvas2.getContext('2d').drawImage(fallbackImg, 0, 0);
+                resolve(canvas2.toDataURL('image/png'));
+              } catch (e2) {
+                resolve(null);
+              }
+            };
+            fallbackImg.onerror = () => resolve(null);
+          } catch (e3) {
+            resolve(null);
+          }
+        }
+      };
+      img.onerror = () => resolve(null);
+    });
+  };
+
+  const downloadPDF = async (rows, filename) => {
     if (!rows || rows.length === 0) { alert('No records to export.'); return; }
+
+    let logoDataUrl = null;
+    try {
+      logoDataUrl = await getPngBase64FromWebp('/assets/safehive.webp');
+    } catch (e) {
+      console.warn('Failed to load logo for PDF:', e);
+    }
+
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    rows.forEach((item, idx) => drawInvoicePage(doc, item, idx === 0));
+    rows.forEach((item, idx) => drawInvoicePage(doc, item, idx === 0, logoDataUrl));
     doc.save(filename + '.pdf');
   };
 
   // ── Unified download dispatcher ───────────────────────────────────────────────
-  const doExport = (rows, baseName) => {
-    if (exportFormat === 'pdf') downloadPDF(rows, baseName);
+  const doExport = async (rows, baseName) => {
+    if (exportFormat === 'pdf') await downloadPDF(rows, baseName);
     else downloadExcel(rows, baseName);
   };
 
@@ -915,7 +983,7 @@ const AdminPage = ({ onNavigate }) => {
                       <label>Admin Email</label>
                       <input
                         type="email"
-                        placeholder="name@safehive.com"
+                        placeholder=" "
                         value={resetEmail}
                         onChange={(e) => setResetEmail(e.target.value)}
                         required
@@ -983,7 +1051,7 @@ const AdminPage = ({ onNavigate }) => {
                       <label>6-Digit Verification Code</label>
                       <input
                         type="text"
-                        placeholder="123456"
+                        placeholder=" "
                         maxLength="6"
                         pattern="\d{6}"
                         value={resetCode}
@@ -997,7 +1065,7 @@ const AdminPage = ({ onNavigate }) => {
                       <div className="pwd-input-wrapper">
                         <input
                           type={showNewPassword ? 'text' : 'password'}
-                          placeholder="••••••••"
+                          placeholder=" "
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
                           required
@@ -1054,7 +1122,7 @@ const AdminPage = ({ onNavigate }) => {
                       <div className="pwd-input-wrapper">
                         <input
                           type={showConfirmPassword ? 'text' : 'password'}
-                          placeholder="••••••••"
+                          placeholder=" "
                           value={confirmNewPassword}
                           onChange={(e) => setConfirmNewPassword(e.target.value)}
                           required
@@ -1332,7 +1400,7 @@ const AdminPage = ({ onNavigate }) => {
             {/* Header */}
             <div className="admin-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
-                <img src="/assets/safehive.png" alt="Safehive Logo" style={{ height: '45px', display: 'block' }} />
+                <img src="/assets/safehive.webp" alt="Safehive Logo" style={{ height: '45px', display: 'block' }} />
                 <div className="admin-header-title">
                   <h1>Admin Page Panel</h1>
                 </div>
@@ -3291,12 +3359,11 @@ const SecurityTab = ({ adminEmail }) => {
             <h3 style={{ fontSize: '15px', fontWeight: '850', color: '#0a2540', marginBottom: '16px' }}>
               🔑 Set New Password
             </h3>
-
             <div className="login-form-group" style={{ marginBottom: '20px' }}>
               <label>Enter 6-Digit Verification Code</label>
               <input
                 type="text"
-                placeholder="e.g. 123456"
+                placeholder=""
                 value={verificationCode}
                 onChange={(e) => setVerificationCode(e.target.value)}
                 maxLength={6}
@@ -3304,13 +3371,12 @@ const SecurityTab = ({ adminEmail }) => {
                 style={{ letterSpacing: '2px', textAlign: 'center', fontSize: '18px', fontWeight: '700' }}
               />
             </div>
-
             <div className="login-form-group" style={{ marginBottom: '20px' }}>
               <label>New Secret Password</label>
               <div className="pwd-input-wrapper">
                 <input
                   type={showNewPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
+                  placeholder=" "
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
@@ -3367,7 +3433,7 @@ const SecurityTab = ({ adminEmail }) => {
               <div className="pwd-input-wrapper">
                 <input
                   type={showConfirmPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
+                  placeholder=" "
                   value={confirmNewPassword}
                   onChange={(e) => setConfirmNewPassword(e.target.value)}
                   required

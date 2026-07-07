@@ -38,10 +38,16 @@ const ProjectDetailPage = ({ project, onBack, onNavigate }) => {
       {/* Detail Content */}
       <section className="container" style={{ marginTop: '40px', position: 'relative', zIndex: 10 }}>
         <div className="bg-white rounded-32 shadow-lg overflow-hidden">
+
+          {/* Two-column: Image LEFT | Project Info RIGHT */}
           <div className="project-detail-flex">
-            {/* Left: Image & Quick Stats */}
+            {/* Left: Image only */}
             <div className="project-detail-left">
               <img src={project.image} alt={project.title} className="project-detail-img" loading="lazy" decoding="async" />
+            </div>
+
+            {/* Right: Project Information */}
+            <div className="project-detail-right">
               <div className="project-detail-info-block">
                 <h4 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '24px', color: '#0a2540' }}>Project information</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -64,63 +70,65 @@ const ProjectDetailPage = ({ project, onBack, onNavigate }) => {
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Right: Technical Description */}
-            <div className="project-detail-right">
-              <div style={{ marginBottom: '40px' }}>
-                <div style={{ color: '#635bff', fontWeight: '800', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '16px' }}>Case Study Detail</div>
-                <h2 style={{ fontSize: '36px', fontWeight: '800', color: '#0a2540', marginBottom: '24px', lineHeight: '1.2' }}>Professional CCTV System Installation</h2>
-                <p className="text-muted" style={{ fontSize: '18px', lineHeight: '1.8' }}>
-                  {project.fullDetail}
-                </p>
-              </div>
+          {/* Full-width below the two-column row: Case Study + Solution Architecture + Benefits + Buttons */}
+          <div style={{ padding: '60px', borderTop: '1px solid #f1f5f9' }}>
+            <div style={{ marginBottom: '40px' }}>
+              <div style={{ color: '#635bff', fontWeight: '800', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '16px' }}>Case Study Detail</div>
+              <h2 style={{ fontSize: '36px', fontWeight: '800', color: '#0a2540', marginBottom: '24px', lineHeight: '1.2' }}>Professional CCTV System Installation</h2>
+              <p className="text-muted" style={{ fontSize: '18px', lineHeight: '1.8' }}>
+                {project.fullDetail}
+              </p>
+            </div>
 
-              <div style={{ marginBottom: '48px' }}>
-                <h4 style={{ fontSize: '20px', fontWeight: '800', color: '#0a2540', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <Shield size={24} color="#635bff" /> Solution Architecture
-                </h4>
-                <p className="text-muted" style={{ lineHeight: '1.7', fontSize: '16px' }}>
-                  The primary objective was to ensure a zero-blind-spot environment while maintaining a clean, professional aesthetic fitting for {project.title}. Our engineers performed a site survey to calculate optimal camera angles and focal lengths for maximum coverage.
-                </p>
-              </div>
+            <div style={{ marginBottom: '48px' }}>
+              <h4 style={{ fontSize: '20px', fontWeight: '800', color: '#0a2540', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Shield size={24} color="#635bff" /> Solution Architecture
+              </h4>
+              <p className="text-muted" style={{ lineHeight: '1.7', fontSize: '16px' }}>
+                The primary objective was to ensure a zero-blind-spot environment while maintaining a clean, professional aesthetic fitting for {project.title}. Our engineers performed a site survey to calculate optimal camera angles and focal lengths for maximum coverage.
+              </p>
+            </div>
 
-              <div>
-                <h4 style={{ fontSize: '20px', fontWeight: '800', color: '#0a2540', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <Camera size={24} color="#635bff" />Benefits they obtained
-                </h4>
-                <div className="modal-benefit-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
-                  {project.benefit.map((item, i) => (
-                    <div key={i} className="modal-benefit-item">
-                      <CheckCircle2 size={18} />
-                      {item}
-                    </div>
-                  ))}
-                </div>
+            <div style={{ marginBottom: '48px' }}>
+              <h4 style={{ fontSize: '20px', fontWeight: '800', color: '#0a2540', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Camera size={24} color="#635bff" /> Benefits they obtained
+              </h4>
+              <div className="modal-benefit-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
+                {project.benefit.map((item, i) => (
+                  <div key={i} className="modal-benefit-item">
+                    <CheckCircle2 size={18} />
+                    {item}
+                  </div>
+                ))}
               </div>
+            </div>
 
-              <div className="project-detail-btn-group">
-                <button
-                  className="btn-primary project-detail-btn"
-                  onClick={() => {
-                    const cat = (project.category || '').toLowerCase();
-                    if (cat.includes('cctv')) {
-                      onNavigate('cctv-quote');
-                    } else if (cat.includes('alarm')) {
-                      onNavigate('alarm-quote');
-                    } else {
-                      onNavigate('quote');
-                    }
-                  }}
-                >
-                  Discuss A Project Like This
-                </button>
-                <button
-                  onClick={onBack}
-                  className="btn-primary project-detail-btn-secondary"
-                >
-                  View Other Projects
-                </button>
-              </div>
+            <div className="project-detail-btn-group" style={{ flexDirection: 'row', flexWrap: 'wrap', gap: '16px', marginTop: '32px' }}>
+              <button
+                className="btn-primary project-detail-btn"
+                style={{ flex: '1', minWidth: '220px' }}
+                onClick={() => {
+                  const cat = (project.category || '').toLowerCase();
+                  if (cat.includes('cctv')) {
+                    onNavigate('cctv-quote');
+                  } else if (cat.includes('alarm')) {
+                    onNavigate('alarm-quote');
+                  } else {
+                    onNavigate('quote');
+                  }
+                }}
+              >
+                Discuss A Project Like This
+              </button>
+              <button
+                onClick={onBack}
+                className="btn-primary project-detail-btn-secondary"
+                style={{ flex: '1', minWidth: '180px' }}
+              >
+                View Other Projects
+              </button>
             </div>
           </div>
         </div>
