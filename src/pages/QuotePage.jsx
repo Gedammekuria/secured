@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { CheckCircle, FileEdit, ArrowRight, Send, X, ClipboardList, Bell, Shield, Save } from 'lucide-react';
+import { CheckCircle, FileEdit, ArrowRight, Send, X, ClipboardList, Bell, Shield, Save, KeyRound } from 'lucide-react';
 import PhoneInput from '../components/PhoneInput';
 const QuotePage = ({ onNavigate, initialCategory = null }) => {
   useEffect(() => {
@@ -8,6 +8,57 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
 
   const [view, setView] = useState(initialCategory ? 'form' : 'selection'); // 'selection', 'form', 'success'
   const [activeCategory, setActiveCategory] = useState(initialCategory);
+  const quoteCategories = [
+    { id: 'CCTV Systems', label: 'CCTV System' },
+    { id: 'Alarm Systems', label: 'Alarm System' },
+    { id: 'Smart Door Locks', label: 'Smart Door Locks' },
+    { id: 'Other', label: 'Other Services' }
+  ];
+  
+  const prepareFormDataForSubmission = (fd) => {
+    const copy = { ...fd };
+    
+    // Combine lockType + lockTypeOther
+    if (copy.lockTypeShowOther && copy.lockTypeOther) {
+      const standard = copy.lockType ? copy.lockType.split(', ').map(v => v.trim()) : [];
+      const combined = [...standard, `Other: ${copy.lockTypeOther}`].join(', ');
+      copy.lockType = combined;
+    }
+    
+    // Combine lockPropertyType + lockPropertyTypeOther
+    if (copy.lockPropertyTypeShowOther && copy.lockPropertyTypeOther) {
+      const standard = copy.lockPropertyType ? copy.lockPropertyType.split(', ').map(v => v.trim()) : [];
+      const combined = [...standard, `Other: ${copy.lockPropertyTypeOther}`].join(', ');
+      copy.lockPropertyType = combined;
+    }
+    
+    // Combine alarmPropertyType + alarmPropertyTypeOther
+    if (copy.alarmPropertyTypeShowOther && copy.alarmPropertyTypeOther) {
+      const standard = copy.alarmPropertyType ? copy.alarmPropertyType.split(', ').map(v => v.trim()) : [];
+      const combined = [...standard, `Other: ${copy.alarmPropertyTypeOther}`].join(', ');
+      copy.alarmPropertyType = combined;
+    }
+    
+    // Combine alarmSystemType + alarmSystemTypeOther
+    if (copy.alarmSystemTypeShowOther && copy.alarmSystemTypeOther) {
+      const standard = copy.alarmSystemType ? copy.alarmSystemType.split(', ').map(v => v.trim()) : [];
+      const combined = [...standard, `Other: ${copy.alarmSystemTypeOther}`].join(', ');
+      copy.alarmSystemType = combined;
+    }
+    
+    // Clean up frontend-only "Other" fields before sending
+    delete copy.lockTypeShowOther;
+    delete copy.lockTypeOther;
+    delete copy.lockPropertyTypeShowOther;
+    delete copy.lockPropertyTypeOther;
+    delete copy.alarmPropertyTypeShowOther;
+    delete copy.alarmPropertyTypeOther;
+    delete copy.alarmSystemTypeShowOther;
+    delete copy.alarmSystemTypeOther;
+    
+    return copy;
+  };
+
   const [contactSubmitted, setContactSubmitted] = useState(false);
   const [completedCategories, setCompletedCategories] = useState([]);
   const [dbRecordId, setDbRecordId] = useState(null);
@@ -60,7 +111,20 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
     numSensors: '',
     alarmSystemType: '',
     alarmTimeframe: '',
-    alarmInstalledSystem: ''
+    alarmInstalledSystem: '',
+    lockType: '',
+    lockPropertyType: '',
+    numDoors: '',
+    lockTimeframe: '',
+    lockInstalledSystem: '',
+    lockTypeShowOther: false,
+    lockTypeOther: '',
+    lockPropertyTypeShowOther: false,
+    lockPropertyTypeOther: '',
+    alarmPropertyTypeShowOther: false,
+    alarmPropertyTypeOther: '',
+    alarmSystemTypeShowOther: false,
+    alarmSystemTypeOther: ''
   });
   const [isEmailInitial, setIsEmailInitial] = useState(true);
   const [submitted, setSubmitted] = useState(false);
@@ -93,7 +157,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
           body: JSON.stringify({
             id: currentDbRecordId,
             source: 'quote',
-            ...currentFormData,
+            ...prepareFormDataForSubmission(currentFormData),
             budget: combinedBudget,
             inquiryType: currentFormData.inquiryType.includes(currentActiveCategory)
               ? currentFormData.inquiryType
@@ -208,8 +272,12 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
       return;
     }
 
-    // Auto-save for select/dropdown changes in step 2
-    const selectFields = ['budget', 'timeframe', 'installedsystem', 'alarmPropertyType', 'alarmSystemType', 'alarmTimeframe'];
+    // Auto-save for select/dropdown/number changes in step 2
+    const selectFields = [
+      'budget', 'timeframe', 'installedsystem', 
+      'alarmPropertyType', 'alarmSystemType', 'alarmTimeframe', 
+      'lockTimeframe', 'lockInstalledSystem', 'numDoors'
+    ];
     if (selectFields.includes(name) && contactSubmitted && formDataRef.current) {
       triggerAutoSave(formDataRef.current, dbRecordId, updatedBudgets, activeCategory);
     }
@@ -232,6 +300,8 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
       onNavigate('cctv-quote');
     } else if (category === 'Alarm Systems') {
       onNavigate('alarm-quote');
+    } else if (category === 'Smart Door Locks') {
+      onNavigate('smartdoorlock-quote');
     } else {
       onNavigate('other-quote');
     }
@@ -340,7 +410,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
         body: JSON.stringify({
           id: dbRecordId,
           source: 'quote',
-          ...formData,
+          ...prepareFormDataForSubmission(formData),
           budget: combinedBudget,
           inquiryType: formData.inquiryType.includes(activeCategory) ? formData.inquiryType : [...formData.inquiryType, activeCategory]
         })
@@ -377,6 +447,8 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
         onNavigate('cctv-quote');
       } else if (targetCategory === 'Alarm Systems') {
         onNavigate('alarm-quote');
+      } else if (targetCategory === 'Smart Door Locks') {
+        onNavigate('smartdoorlock-quote');
       } else {
         onNavigate('other-quote');
       }
@@ -429,7 +501,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
         body: JSON.stringify({
           id: dbRecordId,
           source: 'quote',
-          ...formData,
+          ...prepareFormDataForSubmission(formData),
           budget: combinedBudget
         })
       });
@@ -450,6 +522,143 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const renderCheckboxGroup = (fieldName, options, showOtherKey, otherKey, placeholder = "Please specify...") => {
+    const currentVal = formData[fieldName] || '';
+    const selectedValues = currentVal ? currentVal.split(', ').map(v => v.trim()) : [];
+    const isOtherChecked = !!formData[showOtherKey];
+
+    const toggleOption = (option) => {
+      let updatedValues;
+      if (selectedValues.includes(option)) {
+        updatedValues = selectedValues.filter(v => v !== option);
+      } else {
+        updatedValues = [...selectedValues, option];
+      }
+      const updatedStr = updatedValues.join(', ');
+      
+      setFormData(prev => {
+        const updated = { ...prev, [fieldName]: updatedStr };
+        formDataRef.current = updated;
+        triggerAutoSave(updated, dbRecordId, categoryBudgets, activeCategory);
+        return updated;
+      });
+    };
+
+    const toggleOther = () => {
+      setFormData(prev => {
+        const nextShowOther = !prev[showOtherKey];
+        const updated = { 
+          ...prev, 
+          [showOtherKey]: nextShowOther,
+          [otherKey]: nextShowOther ? prev[otherKey] : ''
+        };
+        formDataRef.current = updated;
+        triggerAutoSave(updated, dbRecordId, categoryBudgets, activeCategory);
+        return updated;
+      });
+    };
+
+    return (
+      <div className="checkbox-group-wrapper text-left">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: isOtherChecked ? '12px' : '0' }}>
+          {options.map(option => {
+            const isSelected = selectedValues.includes(option);
+            return (
+              <div
+                key={option}
+                onClick={() => toggleOption(option)}
+                style={{
+                  padding: '14px',
+                  borderRadius: '12px',
+                  border: `2px solid ${isSelected ? 'var(--primary)' : '#f1f5f9'}`,
+                  background: isSelected ? 'rgba(226, 88, 34, 0.05)' : '#f8fafc',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  transition: 'all 0.2s ease',
+                  userSelect: 'none'
+                }}
+              >
+                <div style={{
+                  width: '18px',
+                  height: '18px',
+                  borderRadius: '4px',
+                  border: `2px solid ${isSelected ? 'var(--primary)' : '#cbd5e1'}`,
+                  background: isSelected ? 'var(--primary)' : 'transparent',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease'
+                }}>
+                  {isSelected && <CheckCircle size={12} color="white" />}
+                </div>
+                <span style={{ fontSize: '14px', fontWeight: '600', color: isSelected ? 'var(--primary)' : '#475569' }}>
+                  {option}
+                </span>
+              </div>
+            );
+          })}
+          
+          <div
+            onClick={toggleOther}
+            style={{
+              padding: '14px',
+              borderRadius: '12px',
+              border: `2px solid ${isOtherChecked ? 'var(--primary)' : '#f1f5f9'}`,
+              background: isOtherChecked ? 'rgba(226, 88, 34, 0.05)' : '#f8fafc',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              transition: 'all 0.2s ease',
+              userSelect: 'none'
+            }}
+          >
+            <div style={{
+              width: '18px',
+              height: '18px',
+              borderRadius: '4px',
+              border: `2px solid ${isOtherChecked ? 'var(--primary)' : '#cbd5e1'}`,
+              background: isOtherChecked ? 'var(--primary)' : 'transparent',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s ease'
+            }}>
+              {isOtherChecked && <CheckCircle size={12} color="white" />}
+            </div>
+            <span style={{ fontSize: '14px', fontWeight: '600', color: isOtherChecked ? 'var(--primary)' : '#475569' }}>
+              Other
+            </span>
+          </div>
+        </div>
+
+        {isOtherChecked && (
+          <div className="animate-slide-down">
+            <input
+              type="text"
+              name={otherKey}
+              value={formData[otherKey] || ''}
+              onChange={handleChange}
+              placeholder={placeholder}
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                borderRadius: '12px',
+                border: '2px solid #f1f5f9',
+                background: 'white',
+                fontSize: '14px',
+                outline: 'none',
+                marginTop: '8px'
+              }}
+            />
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -497,6 +706,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                       {[
                         { id: 'CCTV Systems', name: 'CCTV Camera', icon: <Shield size={32} />, desc: 'High-definition surveillance' },
                         { id: 'Alarm Systems', name: 'Alarm System', icon: <Bell size={32} />, desc: 'Intrusion detection' },
+                        { id: 'Smart Door Locks', name: 'Smart Door Locks', icon: <KeyRound size={32} />, desc: 'Video, biometric & glass locks' },
                         { id: 'Other', name: 'Other Services', icon: <ClipboardList size={32} />, desc: 'Custom security solutions' }
                       ].map((cat) => (
                         <div
@@ -878,22 +1088,17 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
 
                         {activeCategory === 'Alarm Systems' && (
                           <div className="animate-slide-down mb-5">
+                            <div className="qf-group mb-4">
+                              <label className="mb-2 d-block font-weight-bold">Property Type</label>
+                              {renderCheckboxGroup('alarmPropertyType', ['Residential', 'Commercial', 'Industrial'], 'alarmPropertyTypeShowOther', 'alarmPropertyTypeOther', 'Please specify other property type...')}
+                            </div>
+
+                            <div className="qf-group mb-4">
+                              <label className="mb-2 d-block font-weight-bold">System preference</label>
+                              {renderCheckboxGroup('alarmSystemType', ['Wireless (Ajax)', 'GSM Burglar Alarm'], 'alarmSystemTypeShowOther', 'alarmSystemTypeOther', 'Please specify other system preference...')}
+                            </div>
 
                             <div className="row">
-                              <div className="qf-group mb-4">
-                                <label className="mb-2 d-block font-weight-bold">Property Type</label>
-                                <select
-                                  name="alarmPropertyType"
-                                  value={formData.alarmPropertyType}
-                                  onChange={handleChange}
-                                  style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}
-                                >
-                                  <option value="">Select type</option>
-                                  <option value="Residential">Residential</option>
-                                  <option value="Commercial">Commercial</option>
-                                  <option value="Industrial">Industrial</option>
-                                </select>
-                              </div>
                               <div className="qf-group mb-4">
                                 <label className="mb-2 d-block font-weight-bold">Number of required Sensors</label>
                                 <input
@@ -905,21 +1110,6 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                                   style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}
                                 />
                               </div>
-                            </div>
-                            <div className="qf-group mb-4">
-                              <label className="mb-2 d-block font-weight-bold">System preference</label>
-                              <select
-                                name="alarmSystemType"
-                                value={formData.alarmSystemType}
-                                onChange={handleChange}
-                                style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}
-                              >
-                                <option value="">Select preference</option>
-                                <option value="Wireless (Ajax)">Wireless (Ajax)</option>
-                                <option value="GSM Burglar Alarm">GSM Burglar Alarm</option>
-                              </select>
-                            </div>
-                            <div className="row">
                               <div className="qf-group mb-4">
                                 <label className="mb-2 d-block font-weight-bold">Your estimate timeframe to complete the project?</label>
                                 <select
@@ -935,22 +1125,75 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                                   <option value="With in a month">With in a Month</option>
                                 </select>
                               </div>
-                              <div className="qf-group mb-4">
-                                <label className="mb-2 d-block font-weight-bold">If there was previously installed system type the brand here?</label>
-                                <input
-                                  type="text"
-                                  name="alarmInstalledSystem"
-                                  value={formData.alarmInstalledSystem}
-                                  onChange={handleChange}
-                                  placeholder=""
-                                  style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}
-                                />
-                              </div>
+                            </div>
+                            <div className="qf-group mb-4">
+                              <label className="mb-2 d-block font-weight-bold">If there was previously installed system type the brand here?</label>
+                              <input
+                                type="text"
+                                name="alarmInstalledSystem"
+                                value={formData.alarmInstalledSystem}
+                                onChange={handleChange}
+                                placeholder=""
+                                style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}
+                              />
                             </div>
                           </div>
                         )}
 
+                        {activeCategory === 'Smart Door Locks' && (
+                          <div className="animate-slide-down mb-5">
+                            <div className="qf-group mb-4">
+                              <label className="mb-2 d-block font-weight-bold">Lock Type Needed</label>
+                              {renderCheckboxGroup('lockType', ['Ring Video Doorbell', 'Biometric Smart Video Door Lock', 'Smart Glass Door Lock'], 'lockTypeShowOther', 'lockTypeOther', 'Please specify other lock type...')}
+                            </div>
 
+                            <div className="qf-group mb-4">
+                              <label className="mb-2 d-block font-weight-bold">Property Type</label>
+                              {renderCheckboxGroup('lockPropertyType', ['Residential', 'Commercial', 'Office', 'Industrial'], 'lockPropertyTypeShowOther', 'lockPropertyTypeOther', 'Please specify other property type...')}
+                            </div>
+
+                            <div className="row">
+                              <div className="qf-group mb-4">
+                                <label className="mb-2 d-block font-weight-bold">Number of Doors to Secure</label>
+                                <input
+                                  type="number"
+                                  name="numDoors"
+                                  value={formData.numDoors}
+                                  onChange={handleChange}
+                                  placeholder=" "
+                                  style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}
+                                />
+                              </div>
+                              <div className="qf-group mb-4">
+                                <label className="mb-2 d-block font-weight-bold">Estimated Timeframe</label>
+                                <select
+                                  name="lockTimeframe"
+                                  value={formData.lockTimeframe}
+                                  onChange={handleChange}
+                                  style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}
+                                >
+                                  <option value="">Select timeframe</option>
+                                  <option value="Urgent">Urgent</option>
+                                  <option value="Based on your schedule">Based on your schedule</option>
+                                  <option value="With in a Week">Within a Week</option>
+                                  <option value="With in a month">Within a Month</option>
+                                </select>
+                              </div>
+                            </div>
+
+                            <div className="qf-group mb-4">
+                              <label className="mb-2 d-block font-weight-bold">Previously installed system? (brand / type)</label>
+                              <input
+                                type="text"
+                                name="lockInstalledSystem"
+                                value={formData.lockInstalledSystem}
+                                onChange={handleChange}
+                                placeholder="e.g. Yale, Samsung, none"
+                                style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}
+                              />
+                            </div>
+                          </div>
+                        )}
 
                         <div className="qf-group mb-4">
                           <label className="mb-2 d-block font-weight-bold">Estimated Budget<span className="req">*</span></label>
@@ -1015,51 +1258,43 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                             Error: {submitError}
                           </div>
                         )}
+                        
+                        {quoteCategories.filter(cat => cat.id !== activeCategory && !completedCategories.includes(cat.id)).length > 0 && (
+                          <div className="mb-4 text-left animate-slide-down">
+                            <label className="mb-2 d-block font-weight-bold" style={{ fontSize: '15px', color: '#475569' }}>
+                              Want to request another service in this quote?
+                            </label>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+                              {quoteCategories
+                                .filter(cat => cat.id !== activeCategory && !completedCategories.includes(cat.id))
+                                .map(cat => (
+                                  <button
+                                    key={cat.id}
+                                    type="button"
+                                    onClick={() => handleAddAnother(cat.id)}
+                                    style={{
+                                      background: '#fff3f0',
+                                      border: '2.5px solid var(--primary)',
+                                      color: 'var(--primary)',
+                                      fontWeight: '800',
+                                      padding: '14px 20px',
+                                      borderRadius: '16px',
+                                      fontSize: '14px',
+                                      letterSpacing: '0.5px',
+                                      transition: 'all 0.3s ease',
+                                      cursor: 'pointer',
+                                      textAlign: 'center'
+                                    }}
+                                    className="hover-lift"
+                                  >
+                                    + Add {cat.label}
+                                  </button>
+                                ))}
+                            </div>
+                          </div>
+                        )}
 
-                        <div className="d-flex gap-3 mt-4 pt-2">
-                          {!completedCategories.includes('Alarm Systems') && activeCategory === 'CCTV Systems' && (
-                            <button
-                              type="button"
-                              onClick={() => handleAddAnother('Alarm Systems')}
-                              style={{
-                                background: '#fff3f0',
-                                border: '2px solid var(--primary)',
-                                color: 'var(--primary)',
-                                fontWeight: '800',
-                                padding: '16px 0',
-                                borderRadius: '20px',
-                                flex: 1,
-                                fontSize: '15px',
-                                letterSpacing: '0.5px',
-                                transition: 'all 0.3s ease'
-                              }}
-                              className="hover-lift"
-                            >
-                              Add Alarm System
-                            </button>
-                          )}
-                          {activeCategory !== 'CCTV Systems' && !completedCategories.includes('CCTV Systems') && (
-                            <button
-                              type="button"
-                              onClick={() => handleAddAnother('CCTV Systems')}
-                              style={{
-                                background: '#fff3f0',
-                                border: '2px solid var(--primary)',
-                                color: 'var(--primary)',
-                                fontWeight: '800',
-                                padding: '16px 0',
-                                borderRadius: '20px',
-                                flex: 1,
-                                fontSize: '15px',
-                                letterSpacing: '0.5px',
-                                transition: 'all 0.3s ease'
-                              }}
-                              className="hover-lift"
-                            >
-                              Add CCTV System
-                            </button>
-                          )}
-
+                        <div className="d-flex mt-4 pt-2">
                           <button
                             type="submit"
                             disabled={submitting}
@@ -1071,7 +1306,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                               border: 'none',
                               boxShadow: '0 8px 20px rgba(226, 88, 34, 0.3)',
                               padding: '16px 0',
-                              flex: 1.5,
+                              width: '100%',
                               opacity: submitting ? 0.7 : 1,
                               cursor: submitting ? 'not-allowed' : 'pointer'
                             }}

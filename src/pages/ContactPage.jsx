@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { Mail, Phone, MapPin, Send, MessageSquare, Clock, Shield, ArrowRight, CheckCircle, Bell, XCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, MessageSquare, Clock, Shield, ArrowRight, CheckCircle, Bell, XCircle, KeyRound } from 'lucide-react';
 import PhoneInput from '../components/PhoneInput';
 import { useSiteSettings } from '../SiteSettingsContext';
 
@@ -104,7 +104,22 @@ const ContactPage = () => {
     cctvOther: '',
     alarmPropertyType: '',
     numSensors: '',
-    alarmSystemType: ''
+    alarmSystemType: '',
+    alarmTimeframe: '',
+    alarmInstalledSystem: '',
+    lockType: '',
+    lockPropertyType: '',
+    numDoors: '',
+    lockTimeframe: '',
+    lockInstalledSystem: '',
+    lockTypeShowOther: false,
+    lockTypeOther: '',
+    lockPropertyTypeShowOther: false,
+    lockPropertyTypeOther: '',
+    alarmPropertyTypeShowOther: false,
+    alarmPropertyTypeOther: '',
+    alarmSystemTypeShowOther: false,
+    alarmSystemTypeOther: ''
   };
 
   const [formStep, setFormStep] = useState(1);
@@ -160,6 +175,31 @@ const ContactPage = () => {
     setErrors(prev => ({ ...prev, [name]: validateField(name, value) }));
   };
 
+  const prepareFormDataForSubmission = (fd) => {
+    const copy = { ...fd };
+    if (copy.lockTypeShowOther && copy.lockTypeOther) {
+      const standard = copy.lockType ? copy.lockType.split(', ').map(v => v.trim()) : [];
+      copy.lockType = [...standard, `Other: ${copy.lockTypeOther}`].join(', ');
+    }
+    if (copy.lockPropertyTypeShowOther && copy.lockPropertyTypeOther) {
+      const standard = copy.lockPropertyType ? copy.lockPropertyType.split(', ').map(v => v.trim()) : [];
+      copy.lockPropertyType = [...standard, `Other: ${copy.lockPropertyTypeOther}`].join(', ');
+    }
+    if (copy.alarmPropertyTypeShowOther && copy.alarmPropertyTypeOther) {
+      const standard = copy.alarmPropertyType ? copy.alarmPropertyType.split(', ').map(v => v.trim()) : [];
+      copy.alarmPropertyType = [...standard, `Other: ${copy.alarmPropertyTypeOther}`].join(', ');
+    }
+    if (copy.alarmSystemTypeShowOther && copy.alarmSystemTypeOther) {
+      const standard = copy.alarmSystemType ? copy.alarmSystemType.split(', ').map(v => v.trim()) : [];
+      copy.alarmSystemType = [...standard, `Other: ${copy.alarmSystemTypeOther}`].join(', ');
+    }
+    delete copy.lockTypeShowOther; delete copy.lockTypeOther;
+    delete copy.lockPropertyTypeShowOther; delete copy.lockPropertyTypeOther;
+    delete copy.alarmPropertyTypeShowOther; delete copy.alarmPropertyTypeOther;
+    delete copy.alarmSystemTypeShowOther; delete copy.alarmSystemTypeOther;
+    return copy;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => {
@@ -170,7 +210,7 @@ const ContactPage = () => {
     if (touched[name]) setErrors(prev => ({ ...prev, [name]: validateField(name, value) }));
 
     // Autosave on select field change in step 2
-    const selectFields = ['budget', 'timeframe', 'previousinstalled', 'alarmPropertyType', 'alarmSystemType'];
+    const selectFields = ['budget', 'timeframe', 'previousinstalled', 'alarmPropertyType', 'alarmSystemType', 'alarmTimeframe', 'lockType', 'lockPropertyType', 'lockTimeframe'];
     if (selectFields.includes(name) && formStep === 2 && formDataRef.current) {
       triggerAutoSave(formDataRef.current, dbRecordId);
     }
@@ -213,7 +253,7 @@ const ContactPage = () => {
           body: JSON.stringify({
             id: currentDbRecordId,
             source: 'contact',
-            ...currentFormData
+            ...prepareFormDataForSubmission(currentFormData)
           })
         });
         const data = await response.json();
@@ -229,6 +269,62 @@ const ContactPage = () => {
       }
     }, 1200);
   }, []);
+
+  const renderCheckboxGroup = (fieldName, options, showOtherKey, otherKey, placeholder = 'Please specify...') => {
+    const currentVal = formData[fieldName] || '';
+    const selectedValues = currentVal ? currentVal.split(', ').map(v => v.trim()) : [];
+    const isOtherChecked = !!formData[showOtherKey];
+
+    const toggleOption = (option) => {
+      const next = selectedValues.includes(option)
+        ? selectedValues.filter(v => v !== option)
+        : [...selectedValues, option];
+      setFormData(prev => {
+        const updated = { ...prev, [fieldName]: next.join(', ') };
+        formDataRef.current = updated;
+        if (formStep === 2) triggerAutoSave(updated, dbRecordId);
+        return updated;
+      });
+    };
+
+    const toggleOther = () => {
+      setFormData(prev => {
+        const nextShow = !prev[showOtherKey];
+        const updated = { ...prev, [showOtherKey]: nextShow, [otherKey]: nextShow ? prev[otherKey] : '' };
+        formDataRef.current = updated;
+        if (formStep === 2) triggerAutoSave(updated, dbRecordId);
+        return updated;
+      });
+    };
+
+    return (
+      <div style={{ marginBottom: '4px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px' }}>
+          {options.map(option => {
+            const isSel = selectedValues.includes(option);
+            return (
+              <div key={option} onClick={() => toggleOption(option)} style={{ padding: '12px', borderRadius: '10px', border: `2px solid ${isSel ? 'var(--primary)' : '#eef2f6'}`, background: isSel ? 'rgba(226,88,34,0.05)' : 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s', userSelect: 'none' }}>
+                <div style={{ width: '16px', height: '16px', borderRadius: '4px', border: `2px solid ${isSel ? 'var(--primary)' : '#cbd5e1'}`, background: isSel ? 'var(--primary)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {isSel && <CheckCircle size={10} color="white" />}
+                </div>
+                <span style={{ fontSize: '13px', fontWeight: '600', color: isSel ? 'var(--primary)' : '#475569' }}>{option}</span>
+              </div>
+            );
+          })}
+          <div onClick={toggleOther} style={{ padding: '12px', borderRadius: '10px', border: `2px solid ${isOtherChecked ? 'var(--primary)' : '#eef2f6'}`, background: isOtherChecked ? 'rgba(226,88,34,0.05)' : 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s', userSelect: 'none' }}>
+            <div style={{ width: '16px', height: '16px', borderRadius: '4px', border: `2px solid ${isOtherChecked ? 'var(--primary)' : '#cbd5e1'}`, background: isOtherChecked ? 'var(--primary)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              {isOtherChecked && <CheckCircle size={10} color="white" />}
+            </div>
+            <span style={{ fontSize: '13px', fontWeight: '600', color: isOtherChecked ? 'var(--primary)' : '#475569' }}>Other</span>
+          </div>
+        </div>
+        {isOtherChecked && (
+          <input type="text" name={otherKey} value={formData[otherKey] || ''} onChange={handleChange} placeholder={placeholder}
+            style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid #eef2f6', background: 'white', fontSize: '13px', marginTop: '10px', outline: 'none' }} />
+        )}
+      </div>
+    );
+  };
 
   /* ─── Step 1 submit / autosave ─── */
   const handleInitialSubmit = async (e) => {
@@ -322,7 +418,7 @@ const ContactPage = () => {
         body: JSON.stringify({
           id: dbRecordId,
           source: 'contact',
-          ...formData
+          ...prepareFormDataForSubmission(formData)
         })
       });
 
@@ -481,7 +577,7 @@ const ContactPage = () => {
                         <span style={{ fontWeight: '400', color: '#94a3b8', fontSize: '12px' }}>(Select all that apply)</span>
                       </label>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' }}>
-                        {['CCTV Systems', 'Alarm Systems', 'Other'].map((service) => (
+                        {['CCTV Systems', 'Alarm Systems', 'Smart Door Locks', 'Other'].map((service) => (
                           <div
                             key={service}
                             onClick={() => handleCheckboxChange(service)}
@@ -699,79 +795,78 @@ const ContactPage = () => {
                         <h4 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '20px', color: '#0a2540', display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <Bell size={18} className="text-primary" /> Alarm System Specifications
                         </h4>
+
+                        <div className="form-group" style={{ marginBottom: '20px' }}>
+                          <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', fontSize: '13px' }}>Property Type</label>
+                          {renderCheckboxGroup('alarmPropertyType', ['Residential', 'Commercial', 'Industrial'], 'alarmPropertyTypeShowOther', 'alarmPropertyTypeOther', 'Please specify other property type...')}
+                        </div>
+
+                        <div className="form-group" style={{ marginBottom: '20px' }}>
+                          <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', fontSize: '13px' }}>System preference</label>
+                          {renderCheckboxGroup('alarmSystemType', ['Wireless (Ajax)', 'GSM Burglar Alarm'], 'alarmSystemTypeShowOther', 'alarmSystemTypeOther', 'Please specify other system preference...')}
+                        </div>
+
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px' }}>
                           <div className="form-group" style={{ marginBottom: '0' }}>
-                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Property Type</label>
-                            <select
-                              name="alarmPropertyType"
-                              value={formData.alarmPropertyType}
-                              onChange={handleChange}
-                              style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }}
-                            >
-                              <option value="">Select type</option>
-                              <option value="Residential">Residential</option>
-                              <option value="Commercial">Commercial</option>
-                              <option value="Industrial">Industrial</option>
-                            </select>
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Number of required Sensors</label>
+                            <input type="number" name="numSensors" value={formData.numSensors} onChange={handleChange} placeholder=" " style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }} />
                           </div>
                           <div className="form-group" style={{ marginBottom: '0' }}>
-                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Number of required Sensors</label>
-                            <input
-                              type="number"
-                              name="numSensors"
-                              value={formData.numSensors}
-                              onChange={handleChange}
-                              placeholder=" "
-                              style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }}
-                            />
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Your estimate timeframe</label>
+                            <select name="alarmTimeframe" value={formData.alarmTimeframe} onChange={handleChange} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }}>
+                              <option value="">select</option>
+                              <option value="Urgent">Urgent</option>
+                              <option value="Based on your schedule">Based on your schedule</option>
+                              <option value="With in a Week">With in a Week</option>
+                              <option value="With in a month">With in a Month</option>
+                            </select>
                           </div>
                         </div>
+
                         <div className="form-group" style={{ marginTop: '20px' }}>
-                          <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>System preference</label>
-                          <select
-                            name="alarmSystemType"
-                            value={formData.alarmSystemType}
-                            onChange={handleChange}
-                            style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }}
-                          >
-                            <option value="">Select preference</option>
-                            <option value="Wireless (Ajax)">Wireless (Ajax)</option>
-                            <option value="GSM Burglar Alarm">GSM Burglar Alarm</option>
-                          </select>
+                          <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Previously installed system brand?</label>
+                          <input type="text" name="alarmInstalledSystem" value={formData.alarmInstalledSystem} onChange={handleChange} placeholder="" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }} />
+                        </div>
+                      </div>
+                    )}
 
+                    {/* Smart Door Lock specifics */}
+                    {formData.inquiryType.includes('Smart Door Locks') && (
+                      <div className="animate-slide-down" style={{ background: '#f8fafc', padding: '24px', borderRadius: '20px', border: '1px solid #eef2f6', marginBottom: '24px' }}>
+                        <h4 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '20px', color: '#0a2540', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <KeyRound size={18} className="text-primary" /> Smart Door Lock Specifications
+                        </h4>
 
-                          <div className="row">
-                            <div className="qf-group mb-4">
-                              <label className="mb-2 d-block font-weight-bold">Your estimate timeframe to complete the project?</label>
-                              <select
-                                name="alarmTimeframe"
-                                value={formData.alarmTimeframe}
-                                onChange={handleChange}
-                                style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}
-                              >
-                                <option value="">select</option>
-                                <option value="Urgent">Urgent</option>
-                                <option value="Based on your schedule">Based on your schedule</option>
-                                <option value="With in a Week">With in a Week</option>
-                                <option value="With in a month">With in a Month</option>
-                              </select>
-                            </div>
-                            <div className="qf-group mb-4">
-                              <label className="mb-2 d-block font-weight-bold">If there was previously installed system type the brand here?</label>
-                              <input
-                                type="text"
-                                name="alarmInstalledSystem"
-                                value={formData.alarmInstalledSystem}
-                                onChange={handleChange}
-                                placeholder=""
-                                style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}
-                              />
-                            </div>
+                        <div className="form-group" style={{ marginBottom: '20px' }}>
+                          <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', fontSize: '13px' }}>Lock Type Needed</label>
+                          {renderCheckboxGroup('lockType', ['Ring Video Doorbell', 'Biometric Smart Video Door Lock', 'Smart Glass Door Lock'], 'lockTypeShowOther', 'lockTypeOther', 'Please specify other lock type...')}
+                        </div>
+
+                        <div className="form-group" style={{ marginBottom: '20px' }}>
+                          <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', fontSize: '13px' }}>Property Type</label>
+                          {renderCheckboxGroup('lockPropertyType', ['Residential', 'Commercial', 'Office', 'Industrial'], 'lockPropertyTypeShowOther', 'lockPropertyTypeOther', 'Please specify other property type...')}
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px' }}>
+                          <div className="form-group" style={{ marginBottom: '0' }}>
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Number of Doors to Secure</label>
+                            <input type="number" name="numDoors" value={formData.numDoors} onChange={handleChange} placeholder=" " style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }} />
                           </div>
+                          <div className="form-group" style={{ marginBottom: '0' }}>
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Estimated Timeframe</label>
+                            <select name="lockTimeframe" value={formData.lockTimeframe} onChange={handleChange} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }}>
+                              <option value="">Select timeframe</option>
+                              <option value="Urgent">Urgent</option>
+                              <option value="Based on your schedule">Based on your schedule</option>
+                              <option value="With in a Week">Within a Week</option>
+                              <option value="With in a month">Within a Month</option>
+                            </select>
+                          </div>
+                        </div>
 
-
-
-
+                        <div className="form-group" style={{ marginTop: '20px' }}>
+                          <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Previously installed system? (brand / type)</label>
+                          <input type="text" name="lockInstalledSystem" value={formData.lockInstalledSystem} onChange={handleChange} placeholder="e.g. Yale, Samsung, none" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }} />
                         </div>
                       </div>
                     )}

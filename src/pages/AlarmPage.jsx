@@ -62,7 +62,7 @@ const AlarmPage = ({ onNavigate }) => {
                     <div className="icon-box">{f.icon}</div>
                     <div>
                       <h4>{f.title}</h4>
-                      <p>{f.desc}</p>
+                      <p style={{ fontSize: "13px" }}>{f.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -98,6 +98,33 @@ const AlarmPage = ({ onNavigate }) => {
             <div className="split-image">
               <div className="image-frame">
                 <img src="/assets/service/GSm burglar alarm.webp" alt="Burglar Alarm" className="rounded-2xl shadow-xl" loading="lazy" decoding="async" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Fire Alarm System Section */}
+      <section className="fire-alarm-detail py-24 bg-gray-50">
+        <div className="container">
+          <div className="split-row items-center">
+            <div className="split-text">
+              <span className="pill warning">Life Safety System</span>
+              <h2>Fire Alarm Systems</h2>
+              <p>Our fire alarm solutions protect lives and property with early detection technology. From smoke detectors to full addressable control panels, we design and install systems compliant with Ethiopian fire safety standards.</p>
+
+              <ul className="spec-checklist mt-8">
+                <li><CheckCircle size={18} className="text-orange-500" /> Addressable &amp; conventional control panels</li>
+                <li><CheckCircle size={18} className="text-orange-500" /> Photoelectric smoke detectors for early warning</li>
+                <li><CheckCircle size={18} className="text-orange-500" /> Heat detectors for kitchens and industrial areas</li>
+                <li><CheckCircle size={18} className="text-orange-500" /> Manual break-glass call points at all exits</li>
+                <li><CheckCircle size={18} className="text-orange-500" /> Building-wide sounders and strobe warning lights</li>
+                <li><CheckCircle size={18} className="text-orange-500" /> Full installation with staff emergency procedure training</li>
+              </ul>
+            </div>
+            <div className="split-image">
+              <div className="image-frame warning">
+                <img src="/assets/service/fire_alarm_system.webp" alt="Fire Alarm System" className="rounded-2xl shadow-xl" loading="lazy" decoding="async" />
               </div>
             </div>
           </div>

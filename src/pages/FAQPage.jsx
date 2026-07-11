@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HelpCircle, ChevronDown, ChevronUp, Camera, Bell, Info } from 'lucide-react';
+import { HelpCircle, ChevronDown, ChevronUp, Camera, Bell, Info, KeyRound } from 'lucide-react';
 
 const FAQPage = () => {
   const [activeFilter, setActiveFilter] = useState('All');
@@ -9,7 +9,7 @@ const FAQPage = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  const categories = ['All', 'CCTV Camera', 'Alarm System'];
+  const categories = ['All', 'CCTV Camera', 'Alarm System', 'Smart Door Locks'];
 
   const faqs = [
     {
@@ -79,6 +79,39 @@ const FAQPage = () => {
         }
 
 
+      ]
+    },
+    {
+      category: "Smart Door Locks",
+      questions: [
+        {
+          q: "What types of smart door locks do you install?",
+          a: "We install three main types: Ring Video Doorbells (which add a camera and intercom to your entry), Biometric Smart Video Door Locks (fingerprint + video feed), and Smart Glass Door Locks for frameless glass doors. Each provides keyless, app-controlled access and can be managed remotely from your smartphone."
+        },
+        {
+          q: "Can I still use a physical key with a smart lock?",
+          a: "Yes. All our smart locks come with a traditional key cylinder as a backup. You will never be locked out even if your phone battery dies or the Wi-Fi goes down. Biometric locks also allow PIN code entry as a third backup method."
+        },
+        {
+          q: "How secure are smart locks compared to traditional deadbolts?",
+          a: "Smart locks we install use AES 128-bit or 256-bit encryption — the same standard used in banking. They also include anti-tamper alarms, automatic re-locking, and detailed access logs so you know exactly who entered and when. Physically, the deadbolt mechanisms are as strong or stronger than a standard key lock."
+        },
+        {
+          q: "What happens to my smart lock during a power outage?",
+          a: "Most smart locks are battery-powered (typically AA or lithium batteries) and operate independently of your home's electricity. They will keep working during a power cut. You will receive a low-battery alert through the app well in advance. As a last resort, the physical key cylinder always works."
+        },
+        {
+          q: "Can I grant access to someone without giving them a physical key?",
+          a: "Absolutely. You can create temporary digital access codes or send a virtual 'key' via the lock's app to a family member, housekeeper, or contractor. You can set these to expire after a single use, a specific time window, or revoke them instantly from your phone — no physical key exchange needed."
+        },
+        {
+          q: "Does the Ring Video Doorbell work without a subscription?",
+          a: "Yes. The Ring Doorbell works without a subscription for live view and two-way talk. However, saving video recordings to the cloud requires a Ring Protect Plan. Alternatively, we can configure local video storage via a connected NVR so you retain footage without any monthly fee."
+        },
+        {
+          q: "Is the lock weather-resistant for outdoor installation?",
+          a: "Yes. All the door hardware we supply is rated for outdoor use. The Ring Doorbell is weather-resistant for rain and temperature extremes. The biometric and glass lock components are IP65-rated, protecting against dust and water jets, making them suitable for covered exterior doors and gates."
+        }
       ]
     }
   ];
@@ -159,7 +192,9 @@ const FAQPage = () => {
                   <div className="d-flex align-items-center gap-3" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                     <div className="faq-icon-small">
                       {faq.category === 'Alarm System' ? <Bell size={18} /> :
-                        faq.category === 'CCTV Camera' ? <Camera size={18} /> : <Info size={18} />}
+                        faq.category === 'CCTV Camera' ? <Camera size={18} /> :
+                        faq.category === 'Smart Door Locks' ? <KeyRound size={18} /> :
+                        <Info size={18} />}
                     </div>
                     <h4 className="h5 mb-0 font-weight-bold" style={{ margin: 0 }}>{faq.q}</h4>
                   </div>

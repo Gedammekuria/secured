@@ -58,6 +58,39 @@ const defaultProjects = [
     category: "CCTV Camera",
     image: "/assets/service/maryod_bakery.webp"
   },
+  {
+    id: 6,
+    title: "Jotun Fire Alarm System",
+    clientName: "Jotun Paint Manufacturing",
+    location: "Addis Ababa, Ethiopia",
+    description: "Comprehensive fire alarm system installation across Jotun's paint manufacturing facility to ensure employee safety and protect high-value production equipment.",
+    fullDetail: "Jotun's manufacturing plant required a robust fire detection and alarm solution suitable for a high-risk industrial environment. We installed an addressable fire alarm control panel, heat detectors in the production areas, smoke detectors in office and storage zones, and manual call points at all exits. The system is integrated with the site's emergency evacuation plan, providing immediate zone-based alerts to the safety team and automatic notification to local fire services.",
+    benefit: ["Addressable zone detection", "Industrial-grade heat detectors", "Automatic emergency notification", "Full site evacuation coverage", "24/7 monitoring capability", "Compliance with Ethiopian fire safety standards"],
+    category: "Alarm system",
+    image: "/assets/service/jotun_fire_alarm.webp"
+  },
+  {
+    id: 7,
+    title: "Ethiopian Insurance Corporation Fire Alarm",
+    clientName: "Ethiopian Insurance Corporation",
+    location: "Addis Ababa, Ethiopia",
+    description: "Full-scale fire alarm system installation across the Ethiopian Insurance Corporation's corporate headquarters to protect staff, records, and critical infrastructure.",
+    fullDetail: "Ethiopian Insurance Corporation needed a reliable fire alarm system to safeguard their multi-floor headquarters building. We deployed a conventional fire alarm control panel with smoke detectors in all office floors, server room heat detectors, break-glass manual call points on every floor landing, and ceiling-mounted sounders for building-wide alerts. The installation was completed with full wiring documentation and staff training on emergency procedures.",
+    benefit: ["Multi-floor smoke detection", "Server room heat detection", "Building-wide alarm sounders", "Break-glass manual call points", "Emergency procedure training", "Full wiring documentation"],
+    category: "Alarm system",
+    image: "/assets/service/eic_fire_alarm.webp"
+  },
+  {
+    id: 8,
+    title: "Ethiopian Insurance Corporation Door Lock",
+    clientName: "Ethiopian Insurance Corporation",
+    location: "Addis Ababa, Ethiopia",
+    description: "Installation of Biometric Smart Video Door Locks at the Ethiopian Insurance Corporation to enforce strict access control for sensitive departments and server rooms.",
+    fullDetail: "Following the fire alarm project, Ethiopian Insurance Corporation engaged us to upgrade access control across their headquarters. We installed Biometric Smart Video Door Locks on the executive floor. Each lock supports fingerprint recognition, PIN code, and RFID card access, with a built-in camera capturing every entry attempt. Management receives real-time alerts for unrecognised access attempts and can remotely lock or unlock any door via the mobile app.",
+    benefit: ["Biometric fingerprint access", "Built-in entry camera", "Remote lock/unlock via app", "Real-time intrusion alerts", "RFID and PIN backup access", "Complete access audit trail"],
+    category: "Smart Door Locks",
+    image: "/assets/service/smart doorbell project.jpg"
+  }
 ];
 
 const PortfolioPage = ({ onSelectProject, onNavigate }) => {
@@ -67,17 +100,18 @@ const PortfolioPage = ({ onSelectProject, onNavigate }) => {
   useEffect(() => {
     window.scrollTo(0, 0);
 
+    // Show cached data immediately for fast render, but always re-fetch to get latest
     const cachedProjects = sessionStorage.getItem('safehive_all_projects_cache');
     if (cachedProjects) {
       try {
         const parsed = JSON.parse(cachedProjects);
         setProjectsList(parsed);
-        return;
       } catch (e) {
-        // Fallback to fetch
+        // ignore bad cache
       }
     }
 
+    // Always fetch fresh data from server to pick up any new projects
     fetch('/api/projects')
       .then(res => {
         if (!res.ok) throw new Error('API request failed');
@@ -94,7 +128,7 @@ const PortfolioPage = ({ onSelectProject, onNavigate }) => {
       });
   }, []);
 
-  const categories = ['All', 'CCTV Camera', 'Alarm system'];
+  const categories = ['All', 'CCTV Camera', 'Alarm system', 'Smart Door Locks'];
 
   const filteredProjects = activeFilter === 'All'
     ? projectsList
@@ -226,7 +260,7 @@ const PortfolioPage = ({ onSelectProject, onNavigate }) => {
         <div className="bg-dark rounded-32 p-5 text-white text-center position-relative overflow-hidden" style={{ padding: '80px' }}>
           <div style={{ position: 'relative', zIndex: 2 }}>
             <h2 className="display-4 font-weight-bold mb-4">Ready to start your project?</h2>
-            <p className="lead opacity-70 mx-auto mb-5" style={{ maxWidth: '600px' }}>Join our growing list of satisfied commercial and residential clients across Addis Ababa.</p>
+            <p className="lead opacity-70 mx-auto mb-5" style={{ maxWidth: '600px' }}>Join our growing list of satisfied commercial and residential clients across Ethiopia.</p>
             <button className="btn-primary" style={{ padding: '16px 40px' }} onClick={() => onNavigate('quote')}>Book a Consultation</button>
           </div>
           <div style={{ position: 'absolute', top: '-10%', right: '-10%', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(99, 91, 255, 0.1) 0%, transparent 70%)', filter: 'blur(50px)', zIndex: 1 }}></div>

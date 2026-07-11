@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Camera, Bell, Radio, Home as HomeIcon, Eye, Shield, DoorOpen, AlertTriangle,
   ChevronDown, ChevronUp, ClipboardList, PenTool, Wrench, Users,
-  ArrowRight, Award, CheckCircle, HeartHandshake, ShieldCheck, DollarSign, MapPin
+  ArrowRight, Award, CheckCircle, HeartHandshake, ShieldCheck, DollarSign, MapPin, KeyRound
 } from 'lucide-react';
 
 const iconMap = {
@@ -13,7 +13,9 @@ const iconMap = {
   Home: <HomeIcon size={20} />,
   Eye: <Eye size={20} />,
   DoorOpen: <DoorOpen size={20} />,
-  AlertTriangle: <AlertTriangle size={20} />
+  AlertTriangle: <AlertTriangle size={20} />,
+  KeyRound: <KeyRound size={20} />,
+  Lock: <KeyRound size={20} />
 };
 
 const SERVICES_DATA = [
@@ -55,9 +57,31 @@ const SERVICES_DATA = [
         image: "/assets/service/burglar.webp"
       },
       {
-        title: "Ajax Remote Control",
-        description: "Our systems are easy to access remotely from your smartphone. ",
-        image: "/assets/service/ajax control.webp"
+        title: "Fire alarm detector",
+        description: "Protect your commercial infrastructure with high-precision, addressable smoke detectors designed for early thermal and particle detection. ",
+        image: "/assets/service/fire alarm system.jpg"
+      }
+    ]
+  },
+  {
+    category: "Smart Door Locks",
+    icon: <KeyRound size={20} />,
+    tagline: "Control who enters your property.",
+    cards: [
+      {
+        title: "Ring Video Doorbell",
+        description: "See, hear, and speak to visitors from your phone anywhere in the world. HD video, motion alerts, night vision and two-way talk all in one smart doorbell.",
+        image: "/assets/service/ring doorbell.png"
+      },
+      {
+        title: "Biometric Smart Video Door Lock",
+        description: "Fingerprint, PIN, RFID card and mobile app access with a built-in camera that captures every entry attempt. The ultimate in residential and office access control.",
+        image: "/assets/service/biometric_door_lock.webp"
+      },
+      {
+        title: "Smart Glass Door Lock",
+        description: "Secure frameless glass doors with powerful electromagnetic locks, RFID/PIN access, full audit trail logging and tamper alarms. Ideal for offices and commercial spaces.",
+        image: "/assets/service/smart_glass_door_lock.webp"
       }
     ]
   }
@@ -70,7 +94,7 @@ const Hero = ({ onNavigate, onQuoteOpen, onViewServicesClick }) => {
       <div className="container hero-content animate-fade-up">
         <div className="hero-text">
           <h1>Secure Your Property.</h1>
-          <p>Professional installation of security cameras and alarm systems.</p>
+          <p>Professional installation of security cameras, alarm and Smart Doorlock systems.</p>
           <div className="hero-btns">
             {/*<button onClick={onQuoteOpen} className="btn-primary">Request now <ArrowRight size={16} /></button>*/}
             <a href="#services" className="btn-primary" onClick={(e) => { e.preventDefault(); onViewServicesClick ? onViewServicesClick() : onNavigate('services'); }}>
@@ -110,6 +134,9 @@ const Partners = () => {
   );
 };
 
+// Bump this version any time the service list is updated to bust stale sessionStorage cache
+const CACHE_KEY = 'safehive_services_cache_v2';
+
 const Services = ({ onNavigate, onQuoteOpen }) => {
   const [servicesList, setServicesList] = useState(SERVICES_DATA);
   const [activeTab, setActiveTab] = useState(0);
@@ -122,7 +149,7 @@ const Services = ({ onNavigate, onQuoteOpen }) => {
   }, [activeTab]);
 
   useEffect(() => {
-    const cachedServices = sessionStorage.getItem('safehive_services_cache');
+    const cachedServices = sessionStorage.getItem(CACHE_KEY);
     if (cachedServices) {
       try {
         const parsed = JSON.parse(cachedServices);
@@ -144,7 +171,7 @@ const Services = ({ onNavigate, onQuoteOpen }) => {
       })
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
-          sessionStorage.setItem('safehive_services_cache', JSON.stringify(data));
+          sessionStorage.setItem(CACHE_KEY, JSON.stringify(data));
           const mapped = data.map(s => ({
             ...s,
             icon: iconMap[s.icon] || iconMap['Camera']
@@ -179,7 +206,7 @@ const Services = ({ onNavigate, onQuoteOpen }) => {
   }, []);
 
   const renderCard = (card, i, catName) => {
-    const targetQuote = catName?.includes('CCTV') ? 'cctv-quote' : 'alarm-quote';
+    const targetQuote = catName?.includes('CCTV') ? 'cctv-quote' : catName?.includes('Alarm') ? 'alarm-quote' : 'other-quote';
     return (
       <div key={i} className="gallery-card" style={{ animationDelay: `${i * 0.08}s` }}>
         <div className="gallery-img-wrap">

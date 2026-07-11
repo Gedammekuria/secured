@@ -366,6 +366,37 @@ const AdminPage = ({ onNavigate }) => {
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (selectedRows.size === 0) return;
+    const count = selectedRows.size;
+    if (!window.confirm(`Are you sure you want to permanently delete ${count} selected inquiry/inquiries? This cannot be undone.`)) {
+      return;
+    }
+    const authToken = localStorage.getItem('safehive_admin_token');
+    const ids = Array.from(selectedRows);
+    try {
+      const response = await fetch('/api/admin/inquiries/bulk-delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        },
+        body: JSON.stringify({ ids })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Failed to bulk delete.');
+      // Remove deleted IDs from state
+      setInquiries(prev => prev.filter(item => !ids.includes(String(item.id))));
+      if (selectedInquiry && ids.includes(String(selectedInquiry.id))) {
+        setSelectedInquiry(null);
+      }
+      setSelectedRows(new Set());
+      alert(`✅ ${data.deleted || count} inquiry/inquiries deleted successfully.`);
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  };
+
   // Helper date formatter
   const formatDate = (dateString) => {
     try {
@@ -387,7 +418,9 @@ const AdminPage = ({ onNavigate }) => {
     'Inquiry ID', 'Full Name', 'Company', 'Primary Contact', 'Secondary Contact',
     'Location', 'Budget', 'Source', 'Service Types', 'Custom Inquiry', 'Status',
     'Num Cameras', 'Footage Duration', 'CCTV Timeframe', 'CCTV Previous System', 'CCTV Notes', 'Alarm Property Type',
-    'Num Sensors', 'Alarm System Type', 'Alarm Timeframe', 'Alarm Previous System', 'Message', 'Request Date'
+    'Num Sensors', 'Alarm System Type', 'Alarm Timeframe', 'Alarm Previous System',
+    'Lock Type', 'Lock Property Type', 'Num Doors', 'Lock Timeframe', 'Lock Previous System',
+    'Message', 'Request Date'
   ];
 
   const inquiryToRow = (item) => [
@@ -412,6 +445,11 @@ const AdminPage = ({ onNavigate }) => {
     item.alarm_system_type || '',
     item.alarm_timeframe || '',
     item.alarm_installed_system || '',
+    item.lock_type || '',
+    item.lock_property_type || '',
+    item.num_doors || '',
+    item.lock_timeframe || '',
+    item.lock_installed_system || '',
     item.message || '',
     formatDate(item.created_at),
   ];
@@ -421,8 +459,8 @@ const AdminPage = ({ onNavigate }) => {
     if (!rows || rows.length === 0) { alert('No records to export.'); return; }
     const wsData = [EXPORT_HEADERS, ...rows.map(inquiryToRow)];
     const ws = XLSX.utils.aoa_to_sheet(wsData);
-    // Column widths (23 columns)
-    ws['!cols'] = [10, 18, 18, 22, 22, 16, 12, 10, 20, 20, 12, 12, 16, 18, 20, 20, 20, 12, 20, 16, 20, 30, 20].map(w => ({ wch: w }));
+    // Column widths (28 columns)
+    ws['!cols'] = [10, 18, 18, 22, 22, 16, 12, 10, 20, 20, 12, 12, 16, 18, 20, 20, 20, 12, 20, 16, 20, 20, 20, 12, 16, 20, 30, 20].map(w => ({ wch: w }));
     // Bold header row
     EXPORT_HEADERS.forEach((_, ci) => {
       const cellRef = XLSX.utils.encode_cell({ r: 0, c: ci });
@@ -568,9 +606,10 @@ const AdminPage = ({ onNavigate }) => {
     // ── SERVICE SPECIFICATIONS ──
     const hasCctv = item.num_cameras || item.footage_duration || item.timeframe || item.installedsystem || item.cctv_other;
     const hasAlarm = item.alarm_property_type || item.num_sensors || item.alarm_system_type || item.alarm_timeframe || item.alarm_installed_system;
+    const hasLock = item.lock_type || item.lock_property_type || item.num_doors || item.lock_timeframe || item.lock_installed_system;
     const hasCustom = item.custom_inquiry;
 
-    if (hasCctv || hasAlarm || hasCustom) {
+    if (hasCctv || hasAlarm || hasLock || hasCustom) {
       y = sectionTitle('SERVICE SPECIFICATIONS', y);
 
       const specRows = [];
@@ -589,6 +628,14 @@ const AdminPage = ({ onNavigate }) => {
         if (item.alarm_system_type) specRows.push(['Preferred System Brand/Type', item.alarm_system_type]);
         if (item.alarm_timeframe) specRows.push(['Estimated Timeframe', item.alarm_timeframe]);
         if (item.alarm_installed_system) specRows.push(['Previously Installed System', item.alarm_installed_system]);
+      }
+      if (hasLock) {
+        specRows.push([{ content: 'Smart Door Locks', colSpan: 2, styles: { fontStyle: 'bold', textColor: [29, 78, 216], fillColor: [239, 246, 255], fontSize: 8.5, cellPadding: { top: 4, bottom: 4, left: 6, right: 4 } } }]);
+        if (item.lock_type) specRows.push(['Lock Type', item.lock_type]);
+        if (item.lock_property_type) specRows.push(['Property Profile', item.lock_property_type]);
+        if (item.num_doors) specRows.push(['Number of Doors', item.num_doors]);
+        if (item.lock_timeframe) specRows.push(['Estimated Timeframe', item.lock_timeframe]);
+        if (item.lock_installed_system) specRows.push(['Previously Installed System', item.lock_installed_system]);
       }
       if (hasCustom) {
         specRows.push([{ content: 'Custom Service Request', colSpan: 2, styles: { fontStyle: 'bold', textColor: [15, 118, 110], fillColor: [240, 253, 250], fontSize: 8.5, cellPadding: { top: 4, bottom: 4, left: 6, right: 4 } } }]);
@@ -1289,7 +1336,7 @@ const AdminPage = ({ onNavigate }) => {
 
                     {/* Alarm system specifications */}
                     {(selectedInquiry.alarm_property_type || selectedInquiry.num_sensors || selectedInquiry.alarm_system_type || selectedInquiry.alarm_timeframe || selectedInquiry.alarm_installed_system) ? (
-                      <div>
+                      <div style={{ marginBottom: '15px' }}>
                         <div style={{ fontWeight: '800', fontSize: '13px', color: 'var(--primary)', marginBottom: '8px', marginTop: (selectedInquiry.num_cameras) ? '15px' : '0' }}>🔔 Alarm Intrusion System</div>
                         <div className="modal-spec-row">
                           <span className="modal-spec-label">Property Profile</span>
@@ -1314,16 +1361,43 @@ const AdminPage = ({ onNavigate }) => {
                       </div>
                     ) : null}
 
+                    {/* Smart Door Locks specifications */}
+                    {(selectedInquiry.lock_type || selectedInquiry.lock_property_type || selectedInquiry.num_doors || selectedInquiry.lock_timeframe || selectedInquiry.lock_installed_system) ? (
+                      <div style={{ marginBottom: '15px' }}>
+                        <div style={{ fontWeight: '800', fontSize: '13px', color: 'var(--primary)', marginBottom: '8px', marginTop: (selectedInquiry.num_cameras || selectedInquiry.alarm_property_type) ? '15px' : '0' }}>🔒 Smart Door Locks</div>
+                        <div className="modal-spec-row">
+                          <span className="modal-spec-label">Lock Type Needed</span>
+                          <span className="modal-spec-value">{selectedInquiry.lock_type || 'Not specified'}</span>
+                        </div>
+                        <div className="modal-spec-row">
+                          <span className="modal-spec-label">Property Profile</span>
+                          <span className="modal-spec-value">{selectedInquiry.lock_property_type || 'Not specified'}</span>
+                        </div>
+                        <div className="modal-spec-row">
+                          <span className="modal-spec-label">Number of Doors to Secure</span>
+                          <span className="modal-spec-value">{selectedInquiry.num_doors || 'Not specified'}</span>
+                        </div>
+                        <div className="modal-spec-row">
+                          <span className="modal-spec-label">Estimated Timeframe</span>
+                          <span className="modal-spec-value">{selectedInquiry.lock_timeframe || 'Not specified'}</span>
+                        </div>
+                        <div className="modal-spec-row">
+                          <span className="modal-spec-label">Previously Installed System</span>
+                          <span className="modal-spec-value">{selectedInquiry.lock_installed_system || 'None'}</span>
+                        </div>
+                      </div>
+                    ) : null}
+
                     {/* Custom spec falls back */}
                     {selectedInquiry.custom_inquiry && (
-                      <div className="modal-spec-row">
+                      <div className="modal-spec-row" style={{ marginTop: '10px' }}>
                         <span className="modal-spec-label">Custom Service Requested</span>
                         <span className="modal-spec-value" style={{ color: 'var(--primary)' }}>{selectedInquiry.custom_inquiry}</span>
                       </div>
                     )}
 
                     {/* General consult note */}
-                    {!(selectedInquiry.num_cameras || selectedInquiry.timeframe || selectedInquiry.cctv_other || selectedInquiry.alarm_property_type || selectedInquiry.num_sensors || selectedInquiry.alarm_system_type || selectedInquiry.custom_inquiry) && (
+                    {!(selectedInquiry.num_cameras || selectedInquiry.timeframe || selectedInquiry.cctv_other || selectedInquiry.alarm_property_type || selectedInquiry.num_sensors || selectedInquiry.alarm_system_type || selectedInquiry.custom_inquiry || selectedInquiry.lock_type || selectedInquiry.lock_property_type || selectedInquiry.num_doors || selectedInquiry.lock_timeframe || selectedInquiry.lock_installed_system) && (
                       <div className="text-muted text-center" style={{ fontSize: '13px' }}>
                         No technical specs provided. Client requested a general security consultation.
                       </div>
@@ -1415,6 +1489,7 @@ const AdminPage = ({ onNavigate }) => {
                   className="admin-bell-container"
                   title={`${pendingCount} pending inquiries`}
                   onClick={() => {
+                    setAdminTab('inquiries');
                     setStatusFilter('pending');
                   }}
                 >
@@ -1731,6 +1806,21 @@ const AdminPage = ({ onNavigate }) => {
                               <CheckSquare size={14} />
                               Download Selected ({selectedRows.size})
                             </button>
+
+                            <button
+                              className={`btn-dl ${selectedRows.size === 0 ? 'btn-dl-disabled' : ''}`}
+                              onClick={handleBulkDelete}
+                              disabled={selectedRows.size === 0}
+                              title={selectedRows.size === 0 ? 'Select rows using checkboxes first' : `Delete ${selectedRows.size} selected records permanently`}
+                              style={{
+                                background: selectedRows.size === 0 ? undefined : 'linear-gradient(135deg, #ef4444, #dc2626)',
+                                color: selectedRows.size === 0 ? undefined : 'white',
+                                border: selectedRows.size === 0 ? undefined : '1.5px solid #dc2626'
+                              }}
+                            >
+                              <Trash2 size={14} />
+                              Delete Selected ({selectedRows.size})
+                            </button>
                           </div>
 
                           {/* Row 2 — date range download */}
@@ -1807,17 +1897,16 @@ const AdminPage = ({ onNavigate }) => {
                               <th>Client Name</th>
                               <th>Company</th>
                               <th>Location</th>
-                              <th>Budget</th>
                               <th>Services</th>
                               <th>Request Date</th>
                               <th>Status</th>
-                              <th>Actions</th>
+                              <th style={{ textAlign: 'center' }}>Actions</th>
                             </tr>
                           </thead>
                           <tbody>
                             {currentItems.length === 0 ? (
                               <tr>
-                                <td colSpan="10" className="no-records">
+                                <td colSpan="9" className="no-records">
                                   <Eye size={36} className="opacity-30 mb-2" />
                                   <p>{loading ? 'Loading database items...' : 'No matching inquiries found in the system.'}</p>
                                 </td>
@@ -1847,7 +1936,6 @@ const AdminPage = ({ onNavigate }) => {
                                     <td style={{ fontWeight: '700', color: '#0f172a' }}>{item.full_name}</td>
                                     <td style={{ color: '#64748b', fontSize: '12px' }}>{item.company_name || '—'}</td>
                                     <td style={{ fontWeight: '600' }}>{item.location || 'N/A'}</td>
-                                    <td style={{ color: '#097969', fontWeight: '700' }}>{item.budget || 'N/A'}</td>
                                     <td>
                                       <div className="services-chips">
                                         {item.inquiry_type && item.inquiry_type.map((t, idx) => (
@@ -1874,8 +1962,8 @@ const AdminPage = ({ onNavigate }) => {
                                         {sc.label}
                                       </span>
                                     </td>
-                                    <td>
-                                      <div className="action-btns">
+                                    <td onClick={(e) => e.stopPropagation()}>
+                                      <div className="action-btns" style={{ justifyContent: 'center' }}>
                                         <select
                                           className="actions-status-select"
                                           value={status}
@@ -3039,6 +3127,7 @@ const ProjectForm = ({ project, onSave, onCancel }) => {
             >
               <option value="CCTV Camera">CCTV Camera</option>
               <option value="Alarm system">Alarm system</option>
+              <option value="Smart Door Locks">Smart Door Locks</option>
             </select>
           </div>
         </div>

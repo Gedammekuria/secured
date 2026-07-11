@@ -100,7 +100,40 @@ const defaultProjects = [
     full_detail: "We designed a powerful CCTV system for Maryod Bakery. Key focus areas include the point of sale for transaction security and the production area to monitor quality control. The high-resolution cameras provide clear footage even in low-light conditions during night shifts.",
     benefit: ["24/7 continuous recording", "Elimination of blind spots", "Quality control oversight", "Remote operational checks", "POS transaction monitoring", "Time managment"],
     category: "CCTV Camera",
-    image: "/assets/service/maryod_bakery.jpg",
+    image: "/assets/service/maryod_bakery.webp",
+    show_on_home: false
+  },
+  {
+    title: "Jotun Fire Alarm System",
+    client_name: "Jotun Paint Manufacturing",
+    location: "Addis Ababa, Ethiopia",
+    description: "Comprehensive fire alarm system installation across Jotun's paint manufacturing facility to ensure employee safety and protect high-value production equipment.",
+    full_detail: "Jotun's manufacturing plant required a robust fire detection and alarm solution suitable for a high-risk industrial environment. We installed an addressable fire alarm control panel, heat detectors in the production areas, smoke detectors in office and storage zones, and manual call points at all exits. The system is integrated with the site's emergency evacuation plan, providing immediate zone-based alerts to the safety team and automatic notification to local fire services.",
+    benefit: ["Addressable zone detection", "Industrial-grade heat detectors", "Automatic emergency notification", "Full site evacuation coverage", "24/7 monitoring capability", "Compliance with Ethiopian fire safety standards"],
+    category: "Alarm system",
+    image: "/assets/service/jotun_fire_alarm.webp",
+    show_on_home: true
+  },
+  {
+    title: "Ethiopian Insurance Corporation Fire Alarm",
+    client_name: "Ethiopian Insurance Corporation",
+    location: "Addis Ababa, Ethiopia",
+    description: "Full-scale fire alarm system installation across the Ethiopian Insurance Corporation's corporate headquarters to protect staff, records, and critical infrastructure.",
+    full_detail: "Ethiopian Insurance Corporation needed a reliable fire alarm system to safeguard their multi-floor headquarters building. We deployed a conventional fire alarm control panel with smoke detectors in all office floors, server room heat detectors, break-glass manual call points on every floor landing, and ceiling-mounted sounders for building-wide alerts. The installation was completed with full wiring documentation and staff training on emergency procedures.",
+    benefit: ["Multi-floor smoke detection", "Server room heat detection", "Building-wide alarm sounders", "Break-glass manual call points", "Emergency procedure training", "Full wiring documentation"],
+    category: "Alarm system",
+    image: "/assets/service/eic_fire_alarm.webp",
+    show_on_home: true
+  },
+  {
+    title: "Ethiopian Insurance Corporation Door Lock",
+    client_name: "Ethiopian Insurance Corporation",
+    location: "Addis Ababa, Ethiopia",
+    description: "Installation of Biometric Smart Video Door Locks at the Ethiopian Insurance Corporation to enforce strict access control for sensitive departments and server rooms.",
+    full_detail: "Following the fire alarm project, Ethiopian Insurance Corporation engaged us to upgrade access control across their headquarters. We installed Biometric Smart Video Door Locks on the executive floor, server room, and records vault. Each lock supports fingerprint recognition, PIN code, and RFID card access, with a built-in camera capturing every entry attempt. Management receives real-time alerts for unrecognised access attempts and can remotely lock or unlock any door via the mobile app.",
+    benefit: ["Biometric fingerprint access", "Built-in entry camera", "Remote lock/unlock via app", "Real-time intrusion alerts", "RFID and PIN backup access", "Complete access audit trail"],
+    category: "Smart Door Locks",
+    image: "/assets/service/eic_door_lock.webp",
     show_on_home: false
   }
 ];

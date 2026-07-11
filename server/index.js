@@ -93,6 +93,27 @@ let mockInquiries = [
     status: 'pending',
     notifications: [],
     created_at: new Date(Date.now() - 3600000 * 24).toISOString()
+  },
+  {
+    id: 'mock-3',
+    source: 'quote',
+    full_name: 'Tariku Lemma',
+    initial_contact: 'tariku@example.com',
+    alternative_contact: '+251911998877',
+    company_name: 'Lemma Offices',
+    location: 'Addis Ababa, Bole',
+    budget: '100,001 - 250,000 ETB',
+    inquiry_type: ['Smart Door Locks'],
+    custom_inquiry: null,
+    lock_type: 'Biometric Smart Video Door Lock, Smart Glass Door Lock',
+    lock_property_type: 'Office, Commercial',
+    num_doors: 4,
+    lock_timeframe: 'Within a Week',
+    lock_installed_system: 'None',
+    message: 'Need to secure our new office building doors.',
+    status: 'pending',
+    notifications: [],
+    created_at: new Date(Date.now() - 3600000 * 5).toISOString()
   }
 ];
 
@@ -155,9 +176,37 @@ const defaultServices = [
         image: "/assets/service/burglar.webp"
       },
       {
+        title: "Fire Alarm System",
+        description: "Life-safety fire detection system featuring addressable control panels, photoelectric smoke detectors, heat detectors, manual break-glass call points, and building-wide sounders. Designed to comply with Ethiopian fire safety standards.",
+        image: "/assets/service/fire_alarm_system.webp"
+      },
+      {
         title: "Ajax Remote Control",
         description: "Our systems are simple to access remotely with cellphone ",
         image: "/assets/service/ajax control.webp"
+      }
+    ]
+  },
+  {
+    id: 3,
+    category: "Smart Door Locks",
+    icon: "KeyRound",
+    tagline: "Control who enters your property.",
+    cards: [
+      {
+        title: "Ring Video Doorbell",
+        description: "See, hear, and speak to visitors from your phone anywhere in the world. HD video, motion alerts, night vision and two-way talk — all in one smart doorbell.",
+        image: "/assets/service/ring_doorbell.webp"
+      },
+      {
+        title: "Biometric Smart Video Door Lock",
+        description: "Fingerprint, PIN, RFID card and mobile app access — with a built-in camera that captures every entry attempt. The ultimate in residential and office access control.",
+        image: "/assets/service/biometric_door_lock.webp"
+      },
+      {
+        title: "Smart Glass Door Lock",
+        description: "Secure frameless glass doors with powerful electromagnetic locks, RFID/PIN access, full audit trail logging and tamper alarms. Ideal for offices and commercial spaces.",
+        image: "/assets/service/smart_glass_door_lock.webp"
       }
     ]
   }
@@ -221,7 +270,43 @@ const defaultProjects = [
     full_detail: "We designed a powerful CCTV system for Maryod Bakery. Key focus areas include the point of sale for transaction security and the production area to monitor quality control. The high-resolution cameras provide clear footage even in low-light conditions during night shifts.",
     benefit: ["24/7 continuous recording", "Elimination of blind spots", "Quality control oversight", "Remote operational checks", "POS transaction monitoring", "Time managment"],
     category: "CCTV Camera",
-    image: "/assets/service/maryod_bakery.jpg",
+    image: "/assets/service/maryod_bakery.webp",
+    show_on_home: false
+  },
+  {
+    id: 8,
+    title: "Jotun Fire Alarm System",
+    client_name: "Jotun Paint Manufacturing",
+    location: "Addis Ababa, Ethiopia",
+    description: "Comprehensive fire alarm system installation across Jotun's paint manufacturing facility to ensure employee safety and protect high-value production equipment.",
+    full_detail: "Jotun's manufacturing plant required a robust fire detection and alarm solution suitable for a high-risk industrial environment. We installed an addressable fire alarm control panel, heat detectors in the production areas, smoke detectors in office and storage zones, and manual call points at all exits. The system is integrated with the site's emergency evacuation plan, providing immediate zone-based alerts to the safety team and automatic notification to local fire services.",
+    benefit: ["Addressable zone detection", "Industrial-grade heat detectors", "Automatic emergency notification", "Full site evacuation coverage", "24/7 monitoring capability", "Compliance with Ethiopian fire safety standards"],
+    category: "Alarm system",
+    image: "/assets/service/jotun_fire_alarm.webp",
+    show_on_home: true
+  },
+  {
+    id: 9,
+    title: "Ethiopian Insurance Corporation Fire Alarm",
+    client_name: "Ethiopian Insurance Corporation",
+    location: "Addis Ababa, Ethiopia",
+    description: "Full-scale fire alarm system installation across the Ethiopian Insurance Corporation's corporate headquarters to protect staff, records, and critical infrastructure.",
+    full_detail: "Ethiopian Insurance Corporation needed a reliable fire alarm system to safeguard their multi-floor headquarters building. We deployed a conventional fire alarm control panel with smoke detectors in all office floors, server room heat detectors, break-glass manual call points on every floor landing, and ceiling-mounted sounders for building-wide alerts. The installation was completed with full wiring documentation and staff training on emergency procedures.",
+    benefit: ["Multi-floor smoke detection", "Server room heat detection", "Building-wide alarm sounders", "Break-glass manual call points", "Emergency procedure training", "Full wiring documentation"],
+    category: "Alarm system",
+    image: "/assets/service/eic_fire_alarm.webp",
+    show_on_home: true
+  },
+  {
+    id: 10,
+    title: "Ethiopian Insurance Corporation Door Lock",
+    client_name: "Ethiopian Insurance Corporation",
+    location: "Addis Ababa, Ethiopia",
+    description: "Installation of Biometric Smart Video Door Locks at the Ethiopian Insurance Corporation to enforce strict access control for sensitive departments and server rooms.",
+    full_detail: "Following the fire alarm project, Ethiopian Insurance Corporation engaged us to upgrade access control across their headquarters. We installed Biometric Smart Video Door Locks on the executive floor, server room, and records vault. Each lock supports fingerprint recognition, PIN code, and RFID card access, with a built-in camera capturing every entry attempt. Management receives real-time alerts for unrecognised access attempts and can remotely lock or unlock any door via the mobile app.",
+    benefit: ["Biometric fingerprint access", "Built-in entry camera", "Remote lock/unlock via app", "Real-time intrusion alerts", "RFID and PIN backup access", "Complete access audit trail"],
+    category: "Smart Door Locks",
+    image: "/assets/service/eic_door_lock.webp",
     show_on_home: false
   }
 ];
@@ -250,7 +335,7 @@ async function initDb() {
         alternative_contact VARCHAR(255),
         company_name VARCHAR(255),
         location VARCHAR(255),
-        budget VARCHAR(100),
+        budget VARCHAR(255),
         inquiry_type TEXT[] DEFAULT '{}',
         custom_inquiry TEXT,
         num_cameras INTEGER,
@@ -265,7 +350,12 @@ async function initDb() {
         status VARCHAR(50) DEFAULT 'pending',
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         timeframe VARCHAR(100),
-        installedsystem VARCHAR(255)
+        installedsystem VARCHAR(255),
+        lock_type VARCHAR(255),
+        lock_property_type VARCHAR(100),
+        num_doors INTEGER,
+        lock_timeframe VARCHAR(100),
+        lock_installed_system VARCHAR(255)
       );
     `;
     await pool.query(createTableQuery);
@@ -304,6 +394,9 @@ async function initDb() {
       ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'pending';
     `);
     await pool.query(`
+      ALTER TABLE inquiries ALTER COLUMN budget TYPE VARCHAR(255);
+    `);
+    await pool.query(`
       ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS alarm_timeframe VARCHAR(100);
     `);
     await pool.query(`
@@ -318,6 +411,21 @@ async function initDb() {
     await pool.query(`
       ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS installedsystem VARCHAR(255);
     `);
+    await pool.query(`
+      ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS lock_type VARCHAR(255);
+    `);
+    await pool.query(`
+      ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS lock_property_type VARCHAR(100);
+    `);
+    await pool.query(`
+      ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS num_doors INTEGER;
+    `);
+    await pool.query(`
+      ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS lock_timeframe VARCHAR(100);
+    `);
+    await pool.query(`
+      ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS lock_installed_system VARCHAR(255);
+    `);
 
     // Create database indexes for high performance retrievals
     await pool.query(`
@@ -326,11 +434,11 @@ async function initDb() {
       CREATE INDEX IF NOT EXISTS idx_projects_show_on_home ON projects(show_on_home) WHERE show_on_home = true;
     `);
 
-    // Seed services if table is empty
-    const servicesCount = await pool.query('SELECT COUNT(*) FROM services;');
-    if (parseInt(servicesCount.rows[0].count, 10) === 0) {
-      console.log('🌱 Seeding initial services table...');
-      for (const s of defaultServices) {
+    // Seed services — insert any missing ones (by category name)
+    for (const s of defaultServices) {
+      const existing = await pool.query('SELECT id FROM services WHERE category = $1;', [s.category]);
+      if (existing.rows.length === 0) {
+        console.log(`🌱 Seeding service: ${s.category}`);
         await pool.query(
           'INSERT INTO services (category, icon, tagline, cards) VALUES ($1, $2, $3, $4);',
           [s.category, s.icon, s.tagline, JSON.stringify(s.cards)]
@@ -338,16 +446,20 @@ async function initDb() {
       }
     }
 
-    // Seed projects if table is empty
-    const projectsCount = await pool.query('SELECT COUNT(*) FROM projects;');
-    if (parseInt(projectsCount.rows[0].count, 10) === 0) {
-      console.log('🌱 Seeding initial projects table...');
-      for (const p of defaultProjects) {
-        await pool.query(
-          'INSERT INTO projects (title, client_name, location, description, full_detail, benefit, category, image, show_on_home) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);',
-          [p.title, p.client_name, p.location, p.description, p.full_detail, p.benefit, p.category, p.image, p.show_on_home]
-        );
-      }
+    // Ensure a unique index exists on project title so ON CONFLICT works
+    await pool.query(`
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_projects_title ON projects(title);
+    `);
+
+    // Sync default projects — insert any that don't exist yet (upsert-style)
+    console.log('🌱 Syncing default projects to database...');
+    for (const p of defaultProjects) {
+      await pool.query(
+        `INSERT INTO projects (title, client_name, location, description, full_detail, benefit, category, image, show_on_home)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+         ON CONFLICT (title) DO NOTHING;`,
+        [p.title, p.client_name, p.location, p.description, p.full_detail, p.benefit, p.category, p.image, p.show_on_home]
+      );
     }
 
     // Create site_settings table if it doesn't exist
@@ -423,7 +535,12 @@ app.post('/api/inquiries', async (req, res) => {
     message,
     timeframe,
     installedsystem,
-    previousinstalled
+    previousinstalled,
+    lockType,
+    lockPropertyType,
+    numDoors,
+    lockTimeframe,
+    lockInstalledSystem
   } = req.body;
 
   // Validation
@@ -443,8 +560,12 @@ app.post('/api/inquiries', async (req, res) => {
   const formattedInquiryType = Array.isArray(inquiryType) ? inquiryType : [];
   const parsedNumCameras = numCameras !== undefined ? (numCameras !== null && numCameras !== '' ? parseInt(numCameras, 10) : null) : undefined;
   const parsedNumSensors = numSensors !== undefined ? (numSensors !== null && numSensors !== '' ? parseInt(numSensors, 10) : null) : undefined;
+  const parsedNumDoors = numDoors !== undefined ? (numDoors !== null && numDoors !== '' ? parseInt(numDoors, 10) : null) : undefined;
   const cctvTimeframe = timeframe || null;
   const cctvInstalledSystem = installedsystem || previousinstalled || null;
+  const safeNumCameras = (parsedNumCameras !== null && parsedNumCameras !== undefined && !isNaN(parsedNumCameras)) ? parsedNumCameras : null;
+  const safeNumSensors = (parsedNumSensors !== null && parsedNumSensors !== undefined && !isNaN(parsedNumSensors)) ? parsedNumSensors : null;
+  const safeNumDoors = (parsedNumDoors !== null && parsedNumDoors !== undefined && !isNaN(parsedNumDoors)) ? parsedNumDoors : null;
 
   // Simulation fallback if database is not configured
   if (!process.env.DATABASE_URL) {
@@ -481,7 +602,12 @@ app.post('/api/inquiries', async (req, res) => {
           alarm_installed_system: getValue(alarmInstalledSystem, existingRecord.alarm_installed_system),
           message: getValue(message, existingRecord.message),
           timeframe: getValue(cctvTimeframe, existingRecord.timeframe),
-          installedsystem: getValue(cctvInstalledSystem, existingRecord.installedsystem)
+          installedsystem: getValue(cctvInstalledSystem, existingRecord.installedsystem),
+          lock_type: getValue(lockType, existingRecord.lock_type),
+          lock_property_type: getValue(lockPropertyType, existingRecord.lock_property_type),
+          num_doors: (parsedNumDoors !== undefined && parsedNumDoors !== null) ? parsedNumDoors : existingRecord.num_doors,
+          lock_timeframe: getValue(lockTimeframe, existingRecord.lock_timeframe),
+          lock_installed_system: getValue(lockInstalledSystem, existingRecord.lock_installed_system)
         };
 
         console.log(`📝 [SIMULATED INQUIRY UPDATE] Updated mock inquiry. ID: ${id}`);
@@ -517,7 +643,12 @@ app.post('/api/inquiries', async (req, res) => {
       status: 'pending',
       created_at: new Date().toISOString(),
       timeframe: cctvTimeframe || null,
-      installedsystem: cctvInstalledSystem || null
+      installedsystem: cctvInstalledSystem || null,
+      lock_type: lockType || null,
+      lock_property_type: lockPropertyType || null,
+      num_doors: parsedNumDoors !== undefined && parsedNumDoors !== null && !isNaN(parsedNumDoors) ? parsedNumDoors : null,
+      lock_timeframe: lockTimeframe || null,
+      lock_installed_system: lockInstalledSystem || null
     };
 
     // Add to simulated memory
@@ -565,6 +696,11 @@ app.post('/api/inquiries', async (req, res) => {
         const finalMessage = getValue(message, existingRecord.message);
         const finalCctvTimeframe = getValue(cctvTimeframe, existingRecord.timeframe);
         const finalCctvInstalledSystem = getValue(cctvInstalledSystem, existingRecord.installedsystem);
+        const finalLockType = getValue(lockType, existingRecord.lock_type);
+        const finalLockPropertyType = getValue(lockPropertyType, existingRecord.lock_property_type);
+        const finalNumDoors = (parsedNumDoors !== undefined && parsedNumDoors !== null) ? parsedNumDoors : existingRecord.num_doors;
+        const finalLockTimeframe = getValue(lockTimeframe, existingRecord.lock_timeframe);
+        const finalLockInstalledSystem = getValue(lockInstalledSystem, existingRecord.lock_installed_system);
 
         const updateQuery = `
           UPDATE inquiries SET
@@ -587,8 +723,13 @@ app.post('/api/inquiries', async (req, res) => {
             alarm_installed_system = $17,
             message = $18,
             timeframe = $19,
-            installedsystem = $20
-          WHERE id = $21
+            installedsystem = $20,
+            lock_type = $21,
+            lock_property_type = $22,
+            num_doors = $23,
+            lock_timeframe = $24,
+            lock_installed_system = $25
+          WHERE id = $26
           RETURNING id, created_at;
         `;
 
@@ -602,17 +743,22 @@ app.post('/api/inquiries', async (req, res) => {
           finalBudget || null,
           finalInquiryType,
           finalCustomInquiry || null,
-          finalNumCameras,
+          safeNumCameras !== null ? safeNumCameras : (finalNumCameras ?? null),
           finalFootageDuration || null,
           finalCctvOther || null,
           finalAlarmPropertyType || null,
-          finalNumSensors,
+          safeNumSensors !== null ? safeNumSensors : (finalNumSensors ?? null),
           finalAlarmSystemType || null,
           finalAlarmTimeframe || null,
           finalAlarmInstalledSystem || null,
           finalMessage || null,
           finalCctvTimeframe || null,
           finalCctvInstalledSystem || null,
+          finalLockType || null,
+          finalLockPropertyType || null,
+          safeNumDoors !== null ? safeNumDoors : (finalNumDoors ?? null),
+          finalLockTimeframe || null,
+          finalLockInstalledSystem || null,
           numericId
         ];
 
@@ -661,8 +807,13 @@ app.post('/api/inquiries', async (req, res) => {
         message,
         status,
         timeframe,
-        installedsystem
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
+        installedsystem,
+        lock_type,
+        lock_property_type,
+        num_doors,
+        lock_timeframe,
+        lock_installed_system
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26)
       RETURNING id, created_at;
     `;
 
@@ -676,18 +827,23 @@ app.post('/api/inquiries', async (req, res) => {
       budget || null,
       formattedInquiryType,
       customInquiry || null,
-      parsedNumCameras !== undefined && parsedNumCameras !== null && !isNaN(parsedNumCameras) ? parsedNumCameras : null,
+      parsedNumCameras !== undefined && safeNumCameras !== null && !isNaN(safeNumCameras) ? safeNumCameras : null,
       footageDuration || null,
       cctvOther || null,
       alarmPropertyType || null,
-      parsedNumSensors !== undefined && parsedNumSensors !== null && !isNaN(parsedNumSensors) ? parsedNumSensors : null,
+      parsedNumSensors !== undefined && safeNumSensors !== null && !isNaN(safeNumSensors) ? safeNumSensors : null,
       alarmSystemType || null,
       alarmTimeframe || null,
       alarmInstalledSystem || null,
       message || null,
       'pending',
       cctvTimeframe || null,
-      cctvInstalledSystem || null
+      cctvInstalledSystem || null,
+      lockType || null,
+      lockPropertyType || null,
+      parsedNumDoors !== undefined && safeNumDoors !== null && !isNaN(safeNumDoors) ? safeNumDoors : null,
+      lockTimeframe || null,
+      lockInstalledSystem || null
     ];
 
     const result = await pool.query(insertQuery, values);
@@ -1177,6 +1333,35 @@ app.delete('/api/admin/inquiries/:id', authenticateAdmin, async (req, res) => {
   }
 });
 
+// ── POST /api/admin/inquiries/bulk-delete ─────────────────────────────────────
+app.post('/api/admin/inquiries/bulk-delete', authenticateAdmin, async (req, res) => {
+  const { ids } = req.body;
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ error: 'ids array is required and must not be empty.' });
+  }
+
+  if (!process.env.DATABASE_URL) {
+    const before = mockInquiries.length;
+    mockInquiries = mockInquiries.filter(item => !ids.map(String).includes(String(item.id)));
+    const deleted = before - mockInquiries.length;
+    console.log(`🗑️ [SIMULATED] Bulk deleted ${deleted} inquiries.`);
+    return res.json({ success: true, deleted, message: `${deleted} inquiry/inquiries deleted (Simulated).` });
+  }
+
+  try {
+    const placeholders = ids.map((_, i) => `$${i + 1}`).join(',');
+    const result = await pool.query(
+      `DELETE FROM inquiries WHERE id = ANY(ARRAY[${placeholders}]::integer[]) RETURNING id;`,
+      ids
+    );
+    console.log(`🗑️ Bulk deleted ${result.rowCount} inquiries from database.`);
+    return res.json({ success: true, deleted: result.rowCount, message: `${result.rowCount} inquiry/inquiries deleted.` });
+  } catch (err) {
+    console.error('🔴 Failed to bulk delete inquiries:', err.message);
+    return res.status(500).json({ error: 'Failed to bulk delete inquiries.', details: err.message });
+  }
+});
+
 
 // Helper to send email notification to the client regarding inquiry status change
 async function sendNotificationEmail(inquiry, status) {
@@ -1649,5 +1834,4 @@ app.listen(PORT, async () => {
   await initDb();
 });
 
-// Trigger reload for nodemon clean start 3
-
+// Trigger reload for nodemon clean start 5

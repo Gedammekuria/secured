@@ -6,9 +6,39 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import pg from 'pg';
 import fs from 'fs';
+import path from 'path';
 import { fileURLToPath } from 'url';
+import multer from 'multer';
 
 dotenv.config();
+
+// Resolve __dirname for ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Multer: save uploads to public/assets/service/
+const uploadDir = path.join(__dirname, '..', 'public', 'assets', 'service');
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, uploadDir),
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const base = path.basename(file.originalname, ext)
+      .replace(/[^a-zA-Z0-9._-]/g, '_')
+      .toLowerCase();
+    const unique = `${Date.now()}_${base}${ext}`;
+    cb(null, unique);
+  }
+});
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
+  fileFilter: (_req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) cb(null, true);
+    else cb(new Error('Only image files are allowed'));
+  }
+});
 
 const { Pool } = pg;
 
@@ -73,7 +103,45 @@ let mockInquiries = [
     notifications: [],
     created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
   },
+  {
+    id: 'mock-3',
+    source: 'quote',
+    full_name: 'Tariku Lemma',
+    initial_contact: 'tariku@example.com',
+    alternative_contact: '+251911998877',
+    company_name: 'Lemma Offices',
+    location: 'Addis Ababa, Bole',
+    budget: '100,001 - 250,000 ETB',
+    inquiry_type: ['Smart Door Locks'],
+    custom_inquiry: null,
+    lock_type: 'Biometric Smart Video Door Lock, Smart Glass Door Lock',
+    lock_property_type: 'Office, Commercial',
+    num_doors: 4,
+    lock_timeframe: 'Within a Week',
+    lock_installed_system: 'None',
+    message: 'Need to secure our new office building doors.',
+    status: 'pending',
+    notifications: [],
+    created_at: new Date(Date.now() - 3600000 * 5).toISOString(),
+  },
 ];
+
+// Default Site Settings
+const defaultSiteSettings = {
+  phone: '+251 923 55 55 54',
+  company_email: 'info@safehive.com',
+  location: '22 Mazoriya MAF Building',
+  facebook_url: '',
+  instagram_url: '',
+  tiktok_url: '',
+  linkedin_url: '',
+  youtube_url: '',
+  stat_installations: '100+',
+  stat_years_experience: '17+',
+  stat_client_retention: '99%'
+};
+
+let mockSiteSettings = { ...defaultSiteSettings };
 
 // Default Mock Data for Services and Projects
 const defaultServices = [
@@ -117,9 +185,37 @@ const defaultServices = [
         image: "/assets/service/burglar.webp"
       },
       {
+        title: "Fire Alarm System",
+        description: "Life-safety fire detection system featuring addressable control panels, photoelectric smoke detectors, heat detectors, manual break-glass call points, and building-wide sounders. Designed to comply with Ethiopian fire safety standards.",
+        image: "/assets/service/fire_alarm_system.webp"
+      },
+      {
         title: "Ajax Remote Control",
         description: "Our systems are simple to access remotely with cellphone ",
         image: "/assets/service/ajax control.webp"
+      }
+    ]
+  },
+  {
+    id: 3,
+    category: "Smart Door Locks",
+    icon: "KeyRound",
+    tagline: "Control who enters your property.",
+    cards: [
+      {
+        title: "Ring Video Doorbell",
+        description: "See, hear, and speak to visitors from your phone anywhere in the world. HD video, motion alerts, night vision and two-way talk \u2014 all in one smart doorbell.",
+        image: "/assets/service/ring_doorbell.webp"
+      },
+      {
+        title: "Biometric Smart Video Door Lock",
+        description: "Fingerprint, PIN, RFID card and mobile app access \u2014 with a built-in camera that captures every entry attempt. The ultimate in residential and office access control.",
+        image: "/assets/service/biometric_door_lock.webp"
+      },
+      {
+        title: "Smart Glass Door Lock",
+        description: "Secure frameless glass doors with powerful electromagnetic locks, RFID/PIN access, full audit trail logging and tamper alarms. Ideal for offices and commercial spaces.",
+        image: "/assets/service/smart_glass_door_lock.webp"
       }
     ]
   }
@@ -183,7 +279,43 @@ const defaultProjects = [
     full_detail: "We designed a powerful CCTV system for Maryod Bakery. Key focus areas include the point of sale for transaction security and the production area to monitor quality control. The high-resolution cameras provide clear footage even in low-light conditions during night shifts.",
     benefit: ["24/7 continuous recording", "Elimination of blind spots", "Quality control oversight", "Remote operational checks", "POS transaction monitoring", "Time managment"],
     category: "CCTV Camera",
-    image: "/assets/service/maryod_bakery.jpg",
+    image: "/assets/service/maryod_bakery.webp",
+    show_on_home: false
+  },
+  {
+    id: 8,
+    title: "Jotun Fire Alarm System",
+    client_name: "Jotun Paint Manufacturing",
+    location: "Addis Ababa, Ethiopia",
+    description: "Comprehensive fire alarm system installation across Jotun's paint manufacturing facility to ensure employee safety and protect high-value production equipment.",
+    full_detail: "Jotun's manufacturing plant required a robust fire detection and alarm solution suitable for a high-risk industrial environment. We installed an addressable fire alarm control panel, heat detectors in the production areas, smoke detectors in office and storage zones, and manual call points at all exits. The system is integrated with the site's emergency evacuation plan, providing immediate zone-based alerts to the safety team and automatic notification to local fire services.",
+    benefit: ["Addressable zone detection", "Industrial-grade heat detectors", "Automatic emergency notification", "Full site evacuation coverage", "24/7 monitoring capability", "Compliance with Ethiopian fire safety standards"],
+    category: "Alarm system",
+    image: "/assets/service/jotun_fire_alarm.webp",
+    show_on_home: true
+  },
+  {
+    id: 9,
+    title: "Ethiopian Insurance Corporation Fire Alarm",
+    client_name: "Ethiopian Insurance Corporation",
+    location: "Addis Ababa, Ethiopia",
+    description: "Full-scale fire alarm system installation across the Ethiopian Insurance Corporation's corporate headquarters to protect staff, records, and critical infrastructure.",
+    full_detail: "Ethiopian Insurance Corporation needed a reliable fire alarm system to safeguard their multi-floor headquarters building. We deployed a conventional fire alarm control panel with smoke detectors in all office floors, server room heat detectors, break-glass manual call points on every floor landing, and ceiling-mounted sounders for building-wide alerts. The installation was completed with full wiring documentation and staff training on emergency procedures.",
+    benefit: ["Multi-floor smoke detection", "Server room heat detection", "Building-wide alarm sounders", "Break-glass manual call points", "Emergency procedure training", "Full wiring documentation"],
+    category: "Alarm system",
+    image: "/assets/service/eic_fire_alarm.webp",
+    show_on_home: true
+  },
+  {
+    id: 10,
+    title: "Ethiopian Insurance Corporation Door Lock",
+    client_name: "Ethiopian Insurance Corporation",
+    location: "Addis Ababa, Ethiopia",
+    description: "Installation of Biometric Smart Video Door Locks at the Ethiopian Insurance Corporation to enforce strict access control for sensitive departments and server rooms.",
+    full_detail: "Following the fire alarm project, Ethiopian Insurance Corporation engaged us to upgrade access control across their headquarters. We installed Biometric Smart Video Door Locks on the executive floor, server room, and records vault. Each lock supports fingerprint recognition, PIN code, and RFID card access, with a built-in camera capturing every entry attempt. Management receives real-time alerts for unrecognised access attempts and can remotely lock or unlock any door via the mobile app.",
+    benefit: ["Biometric fingerprint access", "Built-in entry camera", "Remote lock/unlock via app", "Real-time intrusion alerts", "RFID and PIN backup access", "Complete access audit trail"],
+    category: "Smart Door Locks",
+    image: "/assets/service/eic_door_lock.webp",
     show_on_home: false
   }
 ];
@@ -205,7 +337,7 @@ async function ensureDb() {
         alternative_contact VARCHAR(255),
         company_name VARCHAR(255),
         location VARCHAR(255),
-        budget VARCHAR(100),
+        budget VARCHAR(255),
         inquiry_type TEXT[] DEFAULT '{}',
         custom_inquiry TEXT,
         num_cameras INTEGER,
@@ -220,7 +352,12 @@ async function ensureDb() {
         status VARCHAR(50) DEFAULT 'pending',
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         timeframe VARCHAR(100),
-        installedsystem VARCHAR(255)
+        installedsystem VARCHAR(255),
+        lock_type VARCHAR(255),
+        lock_property_type VARCHAR(100),
+        num_doors INTEGER,
+        lock_timeframe VARCHAR(100),
+        lock_installed_system VARCHAR(255)
       );
     `);
 
@@ -271,6 +408,21 @@ async function ensureDb() {
     await pool.query(`
       ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS installedsystem VARCHAR(255);
     `);
+    await pool.query(`
+      ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS lock_type VARCHAR(255);
+    `);
+    await pool.query(`
+      ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS lock_property_type VARCHAR(100);
+    `);
+    await pool.query(`
+      ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS num_doors INTEGER;
+    `);
+    await pool.query(`
+      ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS lock_timeframe VARCHAR(100);
+    `);
+    await pool.query(`
+      ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS lock_installed_system VARCHAR(255);
+    `);
 
     // Create database indexes for high performance retrievals
     await pool.query(`
@@ -279,10 +431,10 @@ async function ensureDb() {
           CREATE INDEX IF NOT EXISTS idx_projects_show_on_home ON projects(show_on_home) WHERE show_on_home = true;
         `);
 
-    // Seed services if table is empty
-    const servicesCount = await pool.query('SELECT COUNT(*) FROM services;');
-    if (parseInt(servicesCount.rows[0].count, 10) === 0) {
-      for (const s of defaultServices) {
+    // Seed services — insert any missing ones (by category name)
+    for (const s of defaultServices) {
+      const existing = await pool.query('SELECT id FROM services WHERE category = $1;', [s.category]);
+      if (existing.rows.length === 0) {
         await pool.query(
           'INSERT INTO services (category, icon, tagline, cards) VALUES ($1, $2, $3, $4);',
           [s.category, s.icon, s.tagline, JSON.stringify(s.cards)]
@@ -299,6 +451,48 @@ async function ensureDb() {
           [p.title, p.client_name, p.location, p.description, p.full_detail, p.benefit, p.category, p.image, p.show_on_home]
         );
       }
+    }
+
+    // Create site_settings table if it doesn't exist
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS site_settings (
+        id INT PRIMARY KEY,
+        phone VARCHAR(100),
+        company_email VARCHAR(255),
+        location VARCHAR(255),
+        facebook_url VARCHAR(255),
+        instagram_url VARCHAR(255),
+        tiktok_url VARCHAR(255),
+        linkedin_url VARCHAR(255),
+        youtube_url VARCHAR(255),
+        stat_installations VARCHAR(100),
+        stat_years_experience VARCHAR(100),
+        stat_client_retention VARCHAR(100)
+      );
+    `);
+
+    // Seed site settings if empty
+    const settingsCount = await pool.query('SELECT COUNT(*) FROM site_settings;');
+    if (parseInt(settingsCount.rows[0].count, 10) === 0) {
+      await pool.query(`
+        INSERT INTO site_settings (
+          id, phone, company_email, location,
+          facebook_url, instagram_url, tiktok_url, linkedin_url, youtube_url,
+          stat_installations, stat_years_experience, stat_client_retention
+        ) VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
+      `, [
+        defaultSiteSettings.phone,
+        defaultSiteSettings.company_email,
+        defaultSiteSettings.location,
+        defaultSiteSettings.facebook_url,
+        defaultSiteSettings.instagram_url,
+        defaultSiteSettings.tiktok_url,
+        defaultSiteSettings.linkedin_url,
+        defaultSiteSettings.youtube_url,
+        defaultSiteSettings.stat_installations,
+        defaultSiteSettings.stat_years_experience,
+        defaultSiteSettings.stat_client_retention
+      ]);
     }
 
     dbInitialised = true;
@@ -590,7 +784,8 @@ app.post('/api/inquiries', async (req, res) => {
     companyName, location, budget, inquiryType, customInquiry,
     numCameras, footageDuration, cctvOther, alarmPropertyType,
     numSensors, alarmSystemType, alarmTimeframe, alarmInstalledSystem, message,
-    timeframe, installedsystem, previousinstalled
+    timeframe, installedsystem, previousinstalled,
+    lockType, lockPropertyType, numDoors, lockTimeframe, lockInstalledSystem
   } = req.body;
 
   if (!source || !fullName || !initialContact) {
@@ -603,6 +798,10 @@ app.post('/api/inquiries', async (req, res) => {
   const formattedInquiryType = Array.isArray(inquiryType) ? inquiryType : [];
   const parsedNumCameras = numCameras != null && numCameras !== '' ? parseInt(numCameras, 10) : null;
   const parsedNumSensors = numSensors != null && numSensors !== '' ? parseInt(numSensors, 10) : null;
+  const parsedNumDoors = numDoors != null && numDoors !== '' ? parseInt(numDoors, 10) : null;
+  const safeNumCameras = (parsedNumCameras !== null && !isNaN(parsedNumCameras)) ? parsedNumCameras : null;
+  const safeNumSensors = (parsedNumSensors !== null && !isNaN(parsedNumSensors)) ? parsedNumSensors : null;
+  const safeNumDoors = (parsedNumDoors !== null && !isNaN(parsedNumDoors)) ? parsedNumDoors : null;
   const cctvTimeframe = timeframe || null;
   const cctvInstalledSystem = installedsystem || previousinstalled || null;
 
@@ -634,7 +833,12 @@ app.post('/api/inquiries', async (req, res) => {
           alarm_installed_system: gv(alarmInstalledSystem, e.alarm_installed_system),
           message: gv(message, e.message),
           timeframe: gv(cctvTimeframe, e.timeframe),
-          installedsystem: gv(cctvInstalledSystem, e.installedsystem)
+          installedsystem: gv(cctvInstalledSystem, e.installedsystem),
+          lock_type: gv(lockType, e.lock_type),
+          lock_property_type: gv(lockPropertyType, e.lock_property_type),
+          num_doors: parsedNumDoors ?? e.num_doors,
+          lock_timeframe: gv(lockTimeframe, e.lock_timeframe),
+          lock_installed_system: gv(lockInstalledSystem, e.lock_installed_system)
         };
         return res.status(200).json({ success: true, id, createdAt: e.created_at });
       }
@@ -649,7 +853,9 @@ app.post('/api/inquiries', async (req, res) => {
       num_sensors: parsedNumSensors, alarm_system_type: alarmSystemType || null,
       alarm_timeframe: alarmTimeframe || null, alarm_installed_system: alarmInstalledSystem || null,
       message: message || null, status: 'pending', created_at: new Date().toISOString(),
-      timeframe: cctvTimeframe || null, installedsystem: cctvInstalledSystem || null
+      timeframe: cctvTimeframe || null, installedsystem: cctvInstalledSystem || null,
+      lock_type: lockType || null, lock_property_type: lockPropertyType || null,
+      num_doors: parsedNumDoors, lock_timeframe: lockTimeframe || null, lock_installed_system: lockInstalledSystem || null
     };
     mockInquiries.unshift(mock);
     return res.status(201).json({ success: true, id: mock.id, createdAt: mock.created_at });
@@ -668,18 +874,23 @@ app.post('/api/inquiries', async (req, res) => {
            company_name=$5,location=$6,budget=$7,inquiry_type=$8,custom_inquiry=$9,
            num_cameras=$10,footage_duration=$11,cctv_other=$12,alarm_property_type=$13,
            num_sensors=$14,alarm_system_type=$15,alarm_timeframe=$16,alarm_installed_system=$17,
-           message=$18,timeframe=$19,installedsystem=$20 WHERE id=$21 RETURNING id,created_at;`,
+           message=$18,timeframe=$19,installedsystem=$20,
+           lock_type=$21,lock_property_type=$22,num_doors=$23,lock_timeframe=$24,lock_installed_system=$25 
+           WHERE id=$26 RETURNING id,created_at;`,
           [
             gv(source, e.source), gv(fullName, e.full_name), gv(initialContact, e.initial_contact),
             gv(alternativeContact, e.alternative_contact), gv(companyName, e.company_name),
             gv(location, e.location), gv(budget, e.budget),
             formattedInquiryType.length ? formattedInquiryType : e.inquiry_type,
-            gv(customInquiry, e.custom_inquiry), parsedNumCameras ?? e.num_cameras,
+            gv(customInquiry, e.custom_inquiry), safeNumCameras ?? e.num_cameras,
             gv(footageDuration, e.footage_duration), gv(cctvOther, e.cctv_other),
-            gv(alarmPropertyType, e.alarm_property_type), parsedNumSensors ?? e.num_sensors,
+            gv(alarmPropertyType, e.alarm_property_type), safeNumSensors ?? e.num_sensors,
             gv(alarmSystemType, e.alarm_system_type), gv(alarmTimeframe, e.alarm_timeframe),
             gv(alarmInstalledSystem, e.alarm_installed_system), gv(message, e.message),
             gv(cctvTimeframe, e.timeframe), gv(cctvInstalledSystem, e.installedsystem),
+            gv(lockType, e.lock_type), gv(lockPropertyType, e.lock_property_type),
+            safeNumDoors ?? e.num_doors, gv(lockTimeframe, e.lock_timeframe),
+            gv(lockInstalledSystem, e.lock_installed_system),
             numericId,
           ]
         );
@@ -695,21 +906,121 @@ app.post('/api/inquiries', async (req, res) => {
     const r = await pool.query(
       `INSERT INTO inquiries (source,full_name,initial_contact,alternative_contact,company_name,
        location,budget,inquiry_type,custom_inquiry,num_cameras,footage_duration,cctv_other,
-       alarm_property_type,num_sensors,alarm_system_type,alarm_timeframe,alarm_installed_system,message,status,timeframe,installedsystem)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21) RETURNING id,created_at;`,
+       alarm_property_type,num_sensors,alarm_system_type,alarm_timeframe,alarm_installed_system,message,status,timeframe,installedsystem,
+       lock_type,lock_property_type,num_doors,lock_timeframe,lock_installed_system)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26) RETURNING id,created_at;`,
       [
         source, fullName, initialContact, alternativeContact || null, companyName || null,
         location || null, budget || null, formattedInquiryType, customInquiry || null,
-        parsedNumCameras, footageDuration || null, cctvOther || null,
-        alarmPropertyType || null, parsedNumSensors, alarmSystemType || null,
+        safeNumCameras, footageDuration || null, cctvOther || null,
+        alarmPropertyType || null, safeNumSensors, alarmSystemType || null,
         alarmTimeframe || null, alarmInstalledSystem || null, message || null, 'pending',
-        cctvTimeframe || null, cctvInstalledSystem || null
+        cctvTimeframe || null, cctvInstalledSystem || null,
+        lockType || null, lockPropertyType || null, safeNumDoors, lockTimeframe || null, lockInstalledSystem || null
       ]
     );
     return res.status(201).json({ success: true, id: r.rows[0].id, createdAt: r.rows[0].created_at });
   } catch (err) {
     return res.status(500).json({ error: 'Failed to save inquiry.', details: err.message });
   }
+});
+
+// ── Public Settings GET Route ───────────────────────────────────────────────
+app.get('/api/settings', async (req, res) => {
+  await ensureDb();
+  if (!pool) {
+    return res.json(mockSiteSettings);
+  }
+  try {
+    const result = await pool.query('SELECT * FROM site_settings WHERE id = 1;');
+    if (result.rows.length > 0) {
+      return res.json(result.rows[0]);
+    }
+    return res.json(defaultSiteSettings);
+  } catch (err) {
+    console.error('🔴 Failed to fetch settings from DB:', err.message);
+    return res.status(500).json({ error: 'Failed to retrieve site settings.' });
+  }
+});
+
+// ── Admin Settings PUT Route ────────────────────────────────────────────────
+app.put('/api/admin/settings', authenticateAdmin, async (req, res) => {
+  await ensureDb();
+  const {
+    phone, company_email, location,
+    facebook_url, instagram_url, tiktok_url, linkedin_url, youtube_url,
+    stat_installations, stat_years_experience, stat_client_retention
+  } = req.body;
+
+  if (!pool) {
+    mockSiteSettings = {
+      phone: phone || '',
+      company_email: company_email || '',
+      location: location || '',
+      facebook_url: facebook_url || '',
+      instagram_url: instagram_url || '',
+      tiktok_url: tiktok_url || '',
+      linkedin_url: linkedin_url || '',
+      youtube_url: youtube_url || '',
+      stat_installations: stat_installations || '',
+      stat_years_experience: stat_years_experience || '',
+      stat_client_retention: stat_client_retention || ''
+    };
+    console.log('📝 [SIMULATED] Site settings updated:', mockSiteSettings);
+    return res.json({ success: true, message: 'Site settings updated successfully (Simulated).', settings: mockSiteSettings });
+  }
+
+  try {
+    const updateQuery = `
+      INSERT INTO site_settings (
+        id, phone, company_email, location,
+        facebook_url, instagram_url, tiktok_url, linkedin_url, youtube_url,
+        stat_installations, stat_years_experience, stat_client_retention
+      ) VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      ON CONFLICT (id) DO UPDATE SET
+        phone = EXCLUDED.phone,
+        company_email = EXCLUDED.company_email,
+        location = EXCLUDED.location,
+        facebook_url = EXCLUDED.facebook_url,
+        instagram_url = EXCLUDED.instagram_url,
+        tiktok_url = EXCLUDED.tiktok_url,
+        linkedin_url = EXCLUDED.linkedin_url,
+        youtube_url = EXCLUDED.youtube_url,
+        stat_installations = EXCLUDED.stat_installations,
+        stat_years_experience = EXCLUDED.stat_years_experience,
+        stat_client_retention = EXCLUDED.stat_client_retention
+      RETURNING *;
+    `;
+    const result = await pool.query(updateQuery, [
+      phone, company_email, location,
+      facebook_url, instagram_url, tiktok_url, linkedin_url, youtube_url,
+      stat_installations, stat_years_experience, stat_client_retention
+    ]);
+    console.log('📥 Updated site settings in database.');
+    return res.json({ success: true, message: 'Site settings updated successfully.', settings: result.rows[0] });
+  } catch (err) {
+    console.error('🔴 Failed to update settings in DB:', err.message);
+    return res.status(500).json({ error: 'Failed to update site settings.' });
+  }
+});
+
+// ── Image Upload Route ────────────────────────────────────────────────────
+// POST /api/admin/upload  — saves image to /public/assets/service/ and
+// returns { url: '/assets/service/filename.ext' }
+app.post('/api/admin/upload', (req, res, next) => {
+  // Check auth header first
+  dotenv.config({ override: true });
+  const authHeader = req.headers.authorization;
+  const expected = process.env.ADMIN_TOKEN || 'safehive_secret_token_2026';
+  if (!authHeader || !authHeader.startsWith('Bearer ') || authHeader.split(' ')[1] !== expected) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  next();
+}, upload.single('image'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No image file provided' });
+  const url = `/assets/service/${req.file.filename}`;
+  console.log(`🖼️  Image uploaded: ${url}`);
+  return res.json({ url });
 });
 
 // ── POST /api/admin/login ──────────────────────────────────────────────────────
@@ -757,6 +1068,29 @@ app.delete('/api/admin/inquiries/:id', authenticateAdmin, async (req, res) => {
     return res.json({ success: true, message: 'Inquiry deleted.' });
   } catch (err) {
     return res.status(500).json({ error: 'Failed to delete inquiry.', details: err.message });
+  }
+});
+
+// ── POST /api/admin/inquiries/bulk-delete ──────────────────────────────────────
+app.post('/api/admin/inquiries/bulk-delete', authenticateAdmin, async (req, res) => {
+  await ensureDb();
+  const { ids } = req.body;
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ error: 'ids array is required and must not be empty.' });
+  }
+  if (!pool) {
+    const before = mockInquiries.length;
+    mockInquiries = mockInquiries.filter(m => !ids.map(String).includes(String(m.id)));
+    const deleted = before - mockInquiries.length;
+    return res.json({ success: true, deleted, message: `${deleted} inquiry/inquiries deleted (Simulated).` });
+  }
+  try {
+    // Build parameterised placeholders $1,$2,...
+    const placeholders = ids.map((_, i) => `$${i + 1}`).join(',');
+    const r = await pool.query(`DELETE FROM inquiries WHERE id = ANY(ARRAY[${placeholders}]::integer[]) RETURNING id;`, ids);
+    return res.json({ success: true, deleted: r.rowCount, message: `${r.rowCount} inquiry/inquiries deleted.` });
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to bulk delete inquiries.', details: err.message });
   }
 });
 

@@ -7,7 +7,7 @@ import {
   ChevronDown, ChevronUp, ClipboardList, PenTool, Wrench, Users,
   Phone, MapPin, Mail, Clock, CheckCircle, Star, Globe,
   Wifi, Lock, Smartphone, Monitor, Menu, X, ArrowRight,
-  Briefcase, HelpCircle, FileText, BookOpen, Send, FileEdit
+  Briefcase, HelpCircle, FileText, BookOpen, Send, FileEdit, KeyRound
 } from 'lucide-react';
 import { useSiteSettings } from './SiteSettingsContext';
 
@@ -51,6 +51,7 @@ import Home from './pages/Home';
 
 const CCTVPage = lazy(() => import('./pages/CCTVPage'));
 const AlarmPage = lazy(() => import('./pages/AlarmPage'));
+const SmartDoorLockPage = lazy(() => import('./pages/SmartDoorLockPage'));
 const FAQPage = lazy(() => import('./pages/FAQPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const BlogPage = lazy(() => import('./pages/BlogPage'));
@@ -89,10 +90,10 @@ const Navbar = ({
   const projectsHideTimer = useRef(null);
 
   // Check if current view is a service-related page
-  const isServicesActive = ['cctv', 'alarm'].includes(currentView);
+  const isServicesActive = ['cctv', 'alarm', 'smartdoorlock'].includes(currentView);
   const isProjectsActive = ['portfolio', 'faq', 'project-detail'].includes(currentView);
   const isHomeActive = ['landing', 'services'].includes(currentView);
-  const isQuoteActive = ['quote', 'cctv-quote', 'alarm-quote', 'other-quote'].includes(currentView);
+  const isQuoteActive = ['quote', 'cctv-quote', 'alarm-quote', 'other-quote', 'smartdoorlock-quote'].includes(currentView);
 
   // Show immediately; cancel any pending hide
   const showMegaMenu = () => {
@@ -257,6 +258,15 @@ const Navbar = ({
                       </div>
                     </div>
                   </a>
+                  <a href="#smartdoorlock" className="mega-header-link" style={{ maxWidth: 'none' }} onClick={(e) => navigateToService(e, 'smartdoorlock')}>
+                    <div className="mega-header" style={{ marginBottom: 0, paddingBottom: 0, borderBottom: 'none' }}>
+                      <span className="mega-icon"><KeyRound size={22} /></span>
+                      <div>
+                        <h4>Smart Door Locks</h4>
+                        <p>Video, biometric & glass locks</p>
+                      </div>
+                    </div>
+                  </a>
 
                 </div>
                 <div className="mega-column mega-featured">
@@ -278,6 +288,9 @@ const Navbar = ({
               </a>
               <a href="#alarm" className={currentView === 'alarm' ? 'active' : ''} onClick={(e) => navigateToService(e, 'alarm')}>
                 <span className="link-icon"><Bell size={14} /></span> Alarm Systems
+              </a>
+              <a href="#smartdoorlock" className={currentView === 'smartdoorlock' ? 'active' : ''} onClick={(e) => navigateToService(e, 'smartdoorlock')}>
+                <span className="link-icon"><KeyRound size={14} /></span> Smart Door Locks
               </a>
             </div>
           </div>
@@ -397,9 +410,9 @@ const Footer = ({ onNavigate }) => {
           <div className="footer-brand">
             <img src="/assets/hexagon-logo.webp" alt="Safehive Logo" className="logo-img" loading="lazy" />
             <p style={{ marginBottom: '16px' }}>
-              Safehive is a sister company of<br />
+              Safehive is a sister company <br />
               <a href="https://www.hexagonview.com" className='hexagon'>
-                hexagon computer systems
+                of hexagon computer systems
               </a><br />
               specialized in security solutions.
             </p>
@@ -440,8 +453,9 @@ const Footer = ({ onNavigate }) => {
           </div>
           <div className="footer-links">
             <h4>Services</h4>
-            <a href="#cctv" onClick={(e) => handleNav(e, 'cctv')} style={{ whiteSpace: 'nowrap' }}><Camera size={18} /> CCTV Installation</a>
+            <a href="#cctv" onClick={(e) => handleNav(e, 'cctv')}><Camera size={18} /> CCTV Installation</a>
             <a href="#alarm" onClick={(e) => handleNav(e, 'alarm')}><Bell size={18} /> Alarm Systems</a>
+            <a href="#smartdoorlock" onClick={(e) => handleNav(e, 'smartdoorlock')}><Lock size={18} /> Smart Door Locks</a>
 
           </div>
           <div className="footer-links">
@@ -555,6 +569,7 @@ function App() {
       case 'services': return <Home onNavigate={setView} onQuoteOpen={(target = 'quote') => setView(target)} onViewServicesClick={handleViewServicesClick} onSelectProject={navigateToProject} />;
       case 'cctv': return <CCTVPage onNavigate={setView} />;
       case 'alarm': return <AlarmPage onNavigate={setView} />;
+      case 'smartdoorlock': return <SmartDoorLockPage onNavigate={setView} />;
       case 'portfolio': return <PortfolioPage onSelectProject={navigateToProject} onNavigate={setView} />;
       case 'faq': return <FAQPage />;
       case 'blog': return <BlogPage />;
@@ -564,6 +579,7 @@ function App() {
       case 'admin': return <AdminPage onNavigate={setView} />;
       case 'cctv-quote': return <QuotePage onNavigate={setView} initialCategory="CCTV Systems" />;
       case 'alarm-quote': return <QuotePage onNavigate={setView} initialCategory="Alarm Systems" />;
+      case 'smartdoorlock-quote': return <QuotePage onNavigate={setView} initialCategory="Smart Door Locks" />;
       case 'other-quote': return <QuotePage onNavigate={setView} initialCategory="Other" />;
       case 'project-detail':
         if (!activeProject) {

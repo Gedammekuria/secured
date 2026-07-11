@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { MapPin, ArrowLeft, Shield, Camera, CheckCircle2, ChevronRight, Users, Briefcase } from 'lucide-react';
+import { MapPin, ArrowLeft, Shield, Camera, CheckCircle2, ChevronRight, Users, Briefcase, Lock, Bell } from 'lucide-react';
 
 const ProjectDetailPage = ({ project, onBack, onNavigate }) => {
   useEffect(() => {
@@ -7,6 +7,26 @@ const ProjectDetailPage = ({ project, onBack, onNavigate }) => {
   }, []);
 
   if (!project) return null;
+
+  const category = (project.category || '').toLowerCase();
+
+  // Determine text and icons based on category
+  let caseStudyTitle = "Professional CCTV System Installation";
+  let projectType = "CCTV Surveillance";
+  let solutionDesc = `The primary objective was to ensure a zero-blind-spot environment while maintaining a clean, professional aesthetic fitting for ${project.title}. Our engineers performed a site survey to calculate optimal camera angles and focal lengths for maximum coverage.`;
+  let benefitIcon = <Camera size={24} color="#635bff" />;
+
+  if (category.includes('alarm')) {
+    caseStudyTitle = "Professional Alarm System Installation";
+    projectType = "Alarm System";
+    solutionDesc = `The primary objective was to ensure comprehensive perimeter security and rapid intrusion detection while maintaining a clean, professional aesthetic fitting for ${project.title}. Our engineers performed a site survey to calculate optimal sensor placement and detector coverage ranges.`;
+    benefitIcon = <Bell size={24} color="#635bff" />;
+  } else if (category.includes('door') || category.includes('lock')) {
+    caseStudyTitle = "Professional Smart doorlock System Installation";
+    projectType = "Smart Door Lock";
+    solutionDesc = `The primary objective was to ensure secure, keyless access control and real-time entry monitoring while maintaining a clean, professional aesthetic fitting for ${project.title}. Our engineers performed a site survey to assess door configurations and select the optimal smart lock systems for secure integration.`;
+    benefitIcon = <Lock size={24} color="#635bff" />;
+  }
 
   return (
     <div className="project-detail-page pb-20">
@@ -57,7 +77,7 @@ const ProjectDetailPage = ({ project, onBack, onNavigate }) => {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid #e2e8f0' }}>
                     <span style={{ color: '#64748b', fontWeight: '600' }}>Project Type</span>
-                    <span style={{ color: '#0a2540', fontWeight: '700' }}>CCTV Surveillance</span>
+                    <span style={{ color: '#0a2540', fontWeight: '700' }}>{projectType}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid #e2e8f0' }}>
                     <span style={{ color: '#64748b', fontWeight: '600' }}>Client Location</span>
@@ -76,7 +96,7 @@ const ProjectDetailPage = ({ project, onBack, onNavigate }) => {
           <div style={{ padding: '60px', borderTop: '1px solid #f1f5f9' }}>
             <div style={{ marginBottom: '40px' }}>
               <div style={{ color: '#635bff', fontWeight: '800', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '16px' }}>Case Study Detail</div>
-              <h2 style={{ fontSize: '36px', fontWeight: '800', color: '#0a2540', marginBottom: '24px', lineHeight: '1.2' }}>Professional CCTV System Installation</h2>
+              <h2 style={{ fontSize: '36px', fontWeight: '800', color: '#0a2540', marginBottom: '24px', lineHeight: '1.2' }}>{caseStudyTitle}</h2>
               <p className="text-muted" style={{ fontSize: '18px', lineHeight: '1.8' }}>
                 {project.fullDetail}
               </p>
@@ -87,13 +107,13 @@ const ProjectDetailPage = ({ project, onBack, onNavigate }) => {
                 <Shield size={24} color="#635bff" /> Solution Architecture
               </h4>
               <p className="text-muted" style={{ lineHeight: '1.7', fontSize: '16px' }}>
-                The primary objective was to ensure a zero-blind-spot environment while maintaining a clean, professional aesthetic fitting for {project.title}. Our engineers performed a site survey to calculate optimal camera angles and focal lengths for maximum coverage.
+                {solutionDesc}
               </p>
             </div>
 
             <div style={{ marginBottom: '48px' }}>
               <h4 style={{ fontSize: '20px', fontWeight: '800', color: '#0a2540', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Camera size={24} color="#635bff" /> Benefits they obtained
+                {benefitIcon} Benefits they obtained
               </h4>
               <div className="modal-benefit-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
                 {project.benefit.map((item, i) => (
@@ -141,14 +161,14 @@ const ProjectDetailPage = ({ project, onBack, onNavigate }) => {
             <div style={{ color: '#635bff', fontWeight: '800', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '16px' }}>The SafeHive Commitment</div>
             <h2 style={{ fontSize: '36px', fontWeight: '800', color: '#0a2540', marginBottom: '20px' }}>Become Our Partner</h2>
             <p className="text-muted mx-auto" style={{ maxWidth: '700px', fontSize: '16px', lineHeight: '1.7' }}>
-              Enhance your service offering by partnering with the specialists at SafeHive. We provide end-to-end CCTV
-              and alarm system installation for residential and commercial clients.            </p>
+              Enhance your service offering by partnering with the specialists at SafeHive. We provide end-to-end CCTV,
+              alarm system and smart doorlock installation for residential and commercial clients.            </p>
           </div>
 
           <div className="project-feature-grid">
             {[
               { title: 'Precision Installation', desc: 'Our technicians ensure optimal device placement and network stability.' },
-              { title: 'Best security Solutions', desc: ' From CCTV camera to wireless alarm systems, we configure every setup.' },
+              { title: 'Best security Solutions', desc: ' From CCTV camera, wireless alarm systems and Smart Doorlock systems we configure every setup.' },
               { title: 'Strict Confidentiality', desc: 'Your security data and privacy are handled with the highest level of encryption.' },
               { title: 'Ongoing Support', desc: 'We don’t just install; we provide the technical support your clients depend on' }
             ].map((feature, i) => (

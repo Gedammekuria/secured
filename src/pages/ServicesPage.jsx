@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Camera, Bell, CheckCircle, Clock, Smartphone, Users, Shield, Zap, Globe, Eye, ArrowRight } from 'lucide-react';
+import { Camera, Bell, CheckCircle, Clock, Smartphone, Users, Shield, Zap, Globe, Eye, ArrowRight, KeyRound, Fingerprint, Video, Lock } from 'lucide-react';
 
 const ServicesPage = ({ onNavigate }) => {
   useEffect(() => {
@@ -109,6 +109,55 @@ const ServicesPage = ({ onNavigate }) => {
               <div className="image-frame">
                 <img src="/assets/service/ajax control.webp" alt="Smart Alarm Systems" loading="lazy" />
                 <div className="image-overlay-accent warning"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+
+      {/* Smart Door Lock Section: Image Left, Text Right */}
+      <section className="service-split cctv-bg" id="smartdoorlock-section" style={{ background: 'linear-gradient(135deg, #e3f2fd 0%, #f8faff 100%)' }}>
+        <div className="container">
+          <div className="split-row">
+            <div className="split-image">
+              <div className="image-frame">
+                <img src="/assets/service/biometric_door_lock.webp" alt="Smart Door Lock Systems" loading="lazy" />
+                <div className="image-overlay-accent"></div>
+              </div>
+            </div>
+            <div className="split-text">
+              <h2>Smart Door Lock Systems</h2>
+              <p>Control who enters your property with our range of intelligent door lock solutions — from Ring Video Doorbells to biometric fingerprint locks and smart glass door security. Every solution is professionally installed for a seamless, reliable experience.</p>
+
+              <ul className="service-features-list">
+                <li>
+                  <div className="feature-icon-sm"><Video size={18} /></div>
+                  <div>
+                    <strong>Ring Video Doorbell</strong>
+                    <span>HD video, motion alerts, night vision and two-way talk. See and speak to visitors from anywhere in the world.</span>
+                  </div>
+                </li>
+                <li>
+                  <div className="feature-icon-sm"><Fingerprint size={18} /></div>
+                  <div>
+                    <strong>Biometric Smart Video Door Lock</strong>
+                    <span>Fingerprint, PIN, RFID and app access with built-in camera capture on every entry attempt.</span>
+                  </div>
+                </li>
+                <li>
+                  <div className="feature-icon-sm"><Lock size={18} /></div>
+                  <div>
+                    <strong>Smart Glass Door Locks</strong>
+                    <span>Electromagnetic locks with RFID/PIN control and audit trail logging for frameless glass doors in offices and commercial spaces.</span>
+                  </div>
+                </li>
+              </ul>
+
+              <div className="service-actions">
+                <button onClick={() => onNavigate('quote')} className="btn-primary">Quote Now</button>
+                <button onClick={() => onNavigate('smartdoorlock')} className="btn-outline">View More <ArrowRight size={16} /></button>
               </div>
             </div>
           </div>
