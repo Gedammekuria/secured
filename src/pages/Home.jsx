@@ -71,7 +71,7 @@ const SERVICES_DATA = [
       {
         title: "Ring Video Doorbell",
         description: "See, hear, and speak to visitors from your phone anywhere in the world. HD video, motion alerts, night vision and two-way talk all in one smart doorbell.",
-        image: "/assets/service/ring doorbell.png"
+        image: "/assets/service/ring doorbell1.jpg"
       },
       {
         title: "Biometric Smart Video Door Lock",
@@ -81,7 +81,7 @@ const SERVICES_DATA = [
       {
         title: "Smart Glass Door Lock",
         description: "Secure frameless glass doors with powerful electromagnetic locks, RFID/PIN access, full audit trail logging and tamper alarms. Ideal for offices and commercial spaces.",
-        image: "/assets/service/smart_glass_door_lock.webp"
+        image: "/assets/service/glass doorlock.jpg"
       }
     ]
   }

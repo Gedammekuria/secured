@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <!-- Home Page -->
+  <url>
+    <loc>https://www.safehive.com.et/</loc>
+    <lastmod>2026-07-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://www.safehive.com.et/hero page.webp</image:loc>
+      <image:title>SafeHive Security Solutions — Addis Ababa</image:title>
+    </image:image>
+  </url>
+
+  <!-- Services Overview -->
+  <url>
+    <loc>https://www.safehive.com.et/#services</loc>
+    <lastmod>2026-07-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- CCTV Page -->
+  <url>
+    <loc>https://www.safehive.com.et/#cctv</loc>
+    <lastmod>2026-07-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://www.safehive.com.et/assets/service/camera install.webp</image:loc>
+      <image:title>CCTV Camera Installation in Addis Ababa</image:title>
+    </image:image>
+  </url>
+
+  <!-- Alarm Systems Page -->
+  <url>
+    <loc>https://www.safehive.com.et/#alarm</loc>
+    <lastmod>2026-07-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://www.safehive.com.et/assets/service/fire alarm system.jpg</image:loc>
+      <image:title>Alarm System Installation Addis Ababa</image:title>
+    </image:image>
+  </url>
+
+  <!-- Smart Door Locks Page -->
+  <url>
+    <loc>https://www.safehive.com.et/#smartdoorlock</loc>
+    <lastmod>2026-07-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Portfolio -->
+  <url>
+    <loc>https://www.safehive.com.et/#portfolio</loc>
+    <lastmod>2026-07-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- About Page -->
+  <url>
+    <loc>https://www.safehive.com.et/#about</loc>
+    <lastmod>2026-07-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- FAQ Page -->
+  <url>
+    <loc>https://www.safehive.com.et/#faq</loc>
+    <lastmod>2026-07-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Blog -->
+  <url>
+    <loc>https://www.safehive.com.et/#blog</loc>
+    <lastmod>2026-07-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Contact Page -->
+  <url>
+    <loc>https://www.safehive.com.et/#contact</loc>
+    <lastmod>2026-07-14</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Quote Page -->
+  <url>
+    <loc>https://www.safehive.com.et/#quote</loc>
+    <lastmod>2026-07-14</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+</urlset>

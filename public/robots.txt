@@ -1,0 +1,13 @@
+# robots.txt for SafeHive (https://www.safehive.com.et)
+# Controls which pages search engine crawlers can index.
+
+User-agent: *
+Allow: /
+
+# Block admin and internal pages from being indexed
+Disallow: /admin
+Disallow: /#admin
+Disallow: /api/
+
+# Sitemap location (tells Google where to find your sitemap)
+Sitemap: https://www.safehive.com.et/sitemap.xml

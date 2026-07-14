@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
+import { useSEO } from './hooks/useSEO';
 import './App.css';
 import './ContentPages.css';
 import PhoneInput from './components/PhoneInput';
@@ -505,6 +506,9 @@ function App() {
     // Simple validation: if hash exists, use it, otherwise landing
     return hash || 'landing';
   });
+
+  // Dynamic SEO: updates <title>, <meta description>, canonical, OG & Twitter tags per page
+  useSEO(view);
 
   const [activeProject, setActiveProject] = useState(null);
 

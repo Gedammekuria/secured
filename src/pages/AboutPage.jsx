@@ -63,56 +63,41 @@ const AboutPage = ({ onNavigate }) => {
       <section className="container section-margin">
         <div className="grid-mobile-1" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '60px', alignItems: 'center' }}>
           <div>
-
             <h2 className="font-weight-bold mb-4" style={{ color: '#0a2540', fontSize: 'clamp(2rem, 4vw, 2.5rem)' }}> Securing Tomorrow, Today.</h2>
-            <p className="text-muted lead mb-5">
-
+            <p className="text-muted lead mb-0">
               Safehive is a trusted leader in intelligent security solutions in ethiopia, specializing in the design, supply, installation,
               and technical support of advanced CCTV Surveillance and Alarm Systems. We believe that true protection goes
               beyond installing cameras and detectors.
             </p>
-
-            <div className="feature-list">
-              <div className="d-flex align-items-center gap-3 mb-4">
-                <div className="rounded-circle bg-primary-light p-2" style={{ backgroundColor: 'rgba(99, 91, 255, 0.1)', color: '#635bff' }}>
-                  <CheckCircle size={18} />
-                </div>
-                <span className="font-weight-bold" style={{ color: '#0a2540' }}>17+ Years of specialized security expertise</span>
-              </div>
-              <div className="d-flex align-items-center gap-3 mb-4">
-                <div className="rounded-circle bg-primary-light p-2" style={{ backgroundColor: 'rgba(99, 91, 255, 0.1)', color: '#635bff' }}>
-                  <CheckCircle size={18} />
-                </div>
-                <span className="font-weight-bold" style={{ color: '#0a2540' }}>Experienced technical engineers</span>
-              </div>
-
-
-              <div className="d-flex align-items-center gap-3 mb-4">
-                <div className="rounded-circle bg-primary-light p-2" style={{ backgroundColor: 'rgba(99, 91, 255, 0.1)', color: '#635bff' }}>
-                  <CheckCircle size={18} />
-                </div>
-                <span className="font-weight-bold" style={{ color: '#0a2540' }}>End-to-end: Design,Installation and Support</span>
-              </div>
-
-
-              <div className="d-flex align-items-center gap-3">
-                <div className="rounded-circle bg-primary-light p-2" style={{ backgroundColor: 'rgba(99, 91, 255, 0.1)', color: '#635bff' }}>
-                  <CheckCircle size={18} />
-                </div>
-                <span className="font-weight-bold" style={{ color: '#0a2540' }}>Competitive pricing with premium quality installation</span>
-              </div>
-            </div>
           </div>
-          <div className="rounded-32 overflow-hidden shadow-lg about-image-container" style={{ height: '450px', position: 'relative' }}>
-            <video
-              src="/assets/service/safehive info.mp4"
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="none"
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
+
+          <div className="feature-list">
+            <div className="d-flex align-items-center gap-3 mb-4">
+              <div className="rounded-circle bg-primary-light p-2" style={{ backgroundColor: 'rgba(99, 91, 255, 0.1)', color: '#635bff' }}>
+                <CheckCircle size={18} />
+              </div>
+              <span className="font-weight-bold" style={{ color: '#0a2540' }}>17+ Years of specialized security expertise</span>
+            </div>
+            <div className="d-flex align-items-center gap-3 mb-4">
+              <div className="rounded-circle bg-primary-light p-2" style={{ backgroundColor: 'rgba(99, 91, 255, 0.1)', color: '#635bff' }}>
+                <CheckCircle size={18} />
+              </div>
+              <span className="font-weight-bold" style={{ color: '#0a2540' }}>Experienced technical engineers</span>
+            </div>
+
+            <div className="d-flex align-items-center gap-3 mb-4">
+              <div className="rounded-circle bg-primary-light p-2" style={{ backgroundColor: 'rgba(99, 91, 255, 0.1)', color: '#635bff' }}>
+                <CheckCircle size={18} />
+              </div>
+              <span className="font-weight-bold" style={{ color: '#0a2540' }}>End-to-end: Design,Installation and Support</span>
+            </div>
+
+            <div className="d-flex align-items-center gap-3">
+              <div className="rounded-circle bg-primary-light p-2" style={{ backgroundColor: 'rgba(99, 91, 255, 0.1)', color: '#635bff' }}>
+                <CheckCircle size={18} />
+              </div>
+              <span className="font-weight-bold" style={{ color: '#0a2540' }}>Competitive pricing with premium quality installation</span>
+            </div>
           </div>
         </div>
       </section>
