@@ -109,22 +109,22 @@ const Hero = ({ onNavigate, onQuoteOpen, onViewServicesClick }) => {
 
 const Partners = () => {
   const logos = [
-    { src: '/assets/partners/Dahua.webp', height: 50 },
-    { src: '/assets/partners/Hikvision.webp', height: 110 },
-    { src: '/assets/partners/WD-Logo-removebg-preview.webp', height: 55 },
-    { src: '/assets/partners/ajax.webp', height: 36 },
-    { src: '/assets/partners/tp-link.webp', height: 50 },
-    { src: '/assets/partners/unifi.webp', height: 36 },
+    { src: '/assets/partners/Dahua.webp', height: 50, alt: 'Dahua Technology — CCTV Partner' },
+    { src: '/assets/partners/Hikvision.webp', height: 110, alt: 'Hikvision — Security Camera Partner' },
+    { src: '/assets/partners/WD-Logo-removebg-preview.webp', height: 55, alt: 'Western Digital — Storage Partner' },
+    { src: '/assets/partners/ajax.webp', height: 36, alt: 'Ajax Systems — Alarm System Partner' },
+    { src: '/assets/partners/tp-link.webp', height: 50, alt: 'TP-Link — Networking Partner' },
+    { src: '/assets/partners/unifi.webp', height: 36, alt: 'Ubiquiti UniFi — Network Partner' },
   ];
 
   return (
-    <div className="partners-section">
+    <div className="partners-section" aria-label="Our trusted security technology partners">
       <div className="container">
         <div className="marquee">
           <div className="marquee-content">
             {[...logos, ...logos].map((logo, index) => (
               <div key={index} className="partner-logo">
-                <img src={logo.src} alt={`Partner ${index}`} style={{ height: `${logo.height}px` }} loading="lazy" decoding="async" />
+                <img src={logo.src} alt={logo.alt} style={{ height: `${logo.height}px` }} loading="lazy" decoding="async" />
               </div>
             ))}
           </div>
@@ -133,6 +133,7 @@ const Partners = () => {
     </div>
   );
 };
+
 
 // Bump this version any time the service list is updated to bust stale sessionStorage cache
 const CACHE_KEY = 'safehive_services_cache_v2';

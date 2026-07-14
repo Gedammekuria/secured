@@ -122,8 +122,27 @@ const FAQPage = () => {
     ? flatFaqs
     : flatFaqs.filter(faq => faq.category === activeFilter);
 
+  // Build FAQ JSON-LD schema for Google rich results
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": flatFaqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.q,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.a
+      }
+    }))
+  };
+
   return (
     <div className="faq-page pb-20">
+      {/* FAQ Structured Data for Google Rich Results */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       {/* Hero Header */}
       <section className="faq-hero text-white text-center  py-24 rounded-32">
         <div className="container">
