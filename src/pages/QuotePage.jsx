@@ -1105,10 +1105,11 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                               </div>
                             </div>
                             <div className=" qf-group mb-4">
-                              <label className="mb-2 d-block font-weight-bold">If there was previously installed system type the brand here?</label>
+                              <label htmlFor="quote-installedsystem" className="mb-2 d-block font-weight-bold">If there was previously installed system type the brand here?</label>
                               <input
                                 type="text"
                                 name="installedsystem"
+                                id="quote-installedsystem"
                                 value={formData.installedsystem}
                                 onChange={handleChange}
                                 placeholder=""
@@ -1132,10 +1133,11 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
 
                             <div className="row">
                               <div className="qf-group mb-4">
-                                <label className="mb-2 d-block font-weight-bold">Number of required Sensors</label>
+                                <label htmlFor="quote-numSensors" className="mb-2 d-block font-weight-bold">Number of required Sensors</label>
                                 <input
                                   type="number"
                                   name="numSensors"
+                                  id="quote-numSensors"
                                   value={formData.numSensors}
                                   onChange={handleChange}
                                   placeholder=" "
@@ -1143,9 +1145,10 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                                 />
                               </div>
                               <div className="qf-group mb-4">
-                                <label className="mb-2 d-block font-weight-bold">Your estimate timeframe to complete the project?</label>
+                                <label htmlFor="quote-alarmTimeframe" className="mb-2 d-block font-weight-bold">Your estimate timeframe to complete the project?</label>
                                 <select
                                   name="alarmTimeframe"
+                                  id="quote-alarmTimeframe"
                                   value={formData.alarmTimeframe}
                                   onChange={handleChange}
                                   style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}
@@ -1159,10 +1162,11 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                               </div>
                             </div>
                             <div className="qf-group mb-4">
-                              <label className="mb-2 d-block font-weight-bold">If there was previously installed system type the brand here?</label>
+                              <label htmlFor="quote-alarmInstalledSystem" className="mb-2 d-block font-weight-bold">If there was previously installed system type the brand here?</label>
                               <input
                                 type="text"
                                 name="alarmInstalledSystem"
+                                id="quote-alarmInstalledSystem"
                                 value={formData.alarmInstalledSystem}
                                 onChange={handleChange}
                                 placeholder=""
@@ -1186,10 +1190,11 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
 
                             <div className="row">
                               <div className="qf-group mb-4">
-                                <label className="mb-2 d-block font-weight-bold">Number of Doors to Secure</label>
+                                <label htmlFor="quote-numDoors" className="mb-2 d-block font-weight-bold">Number of Doors to Secure</label>
                                 <input
                                   type="number"
                                   name="numDoors"
+                                  id="quote-numDoors"
                                   value={formData.numDoors}
                                   onChange={handleChange}
                                   placeholder=" "
@@ -1197,9 +1202,10 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                                 />
                               </div>
                               <div className="qf-group mb-4">
-                                <label className="mb-2 d-block font-weight-bold">Estimated Timeframe</label>
+                                <label htmlFor="quote-lockTimeframe" className="mb-2 d-block font-weight-bold">Estimated Timeframe</label>
                                 <select
                                   name="lockTimeframe"
+                                  id="quote-lockTimeframe"
                                   value={formData.lockTimeframe}
                                   onChange={handleChange}
                                   style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}
@@ -1214,10 +1220,11 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                             </div>
 
                             <div className="qf-group mb-4">
-                              <label className="mb-2 d-block font-weight-bold">Previously installed system? (brand / type)</label>
+                              <label htmlFor="quote-lockInstalledSystem" className="mb-2 d-block font-weight-bold">Previously installed system? (brand / type)</label>
                               <input
                                 type="text"
                                 name="lockInstalledSystem"
+                                id="quote-lockInstalledSystem"
                                 value={formData.lockInstalledSystem}
                                 onChange={handleChange}
                                 placeholder="e.g. Yale, Samsung, none"
@@ -1228,9 +1235,10 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                         )}
 
                         <div className="qf-group mb-4">
-                          <label className="mb-2 d-block font-weight-bold">Estimated Budget<span className="req">*</span></label>
+                          <label htmlFor="quote-budget" className="mb-2 d-block font-weight-bold">Estimated Budget<span className="req">*</span></label>
                           <select
                             name="budget"
+                            id="quote-budget"
                             value={formData.budget}
                             onChange={handleChange}
                             onBlur={handleBlur}
@@ -1274,10 +1282,11 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                         )}
 
                         <div className="qf-group mb-5">
-                          <label className="mb-2 d-block font-weight-bold">Additional Details</label>
+                          <label htmlFor="quote-message" className="mb-2 d-block font-weight-bold">Additional Details</label>
                           <textarea
                             rows="4"
                             name="message"
+                            id="quote-message"
                             value={formData.message}
                             onChange={handleChange}
                             placeholder=" "

@@ -76,7 +76,7 @@ const SERVICES_DATA = [
       {
         title: "Biometric Smart Video Door Lock",
         description: "Fingerprint, PIN, RFID card and mobile app access with a built-in camera that captures every entry attempt. The ultimate in residential and office access control.",
-        image: "/assets/service/biometric_door_lock.webp"
+        image: "/assets/service/smart doorlock.jpg"
       },
       {
         title: "Smart Glass Door Lock",

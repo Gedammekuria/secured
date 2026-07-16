@@ -53,7 +53,6 @@ const BackToTop = () => {
           transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           box-shadow: 0 10px 25px rgba(99, 91, 255, 0.4);
           border: none;
-          outline: none;
         }
 
         .back-to-top.visible {
@@ -66,6 +65,12 @@ const BackToTop = () => {
           background: var(--primary-hover, #7b73ff);
           transform: translateY(-5px);
           box-shadow: 0 15px 30px rgba(99, 91, 255, 0.5);
+        }
+
+        .back-to-top:focus-visible {
+          outline: 3px solid #fff;
+          outline-offset: 2px;
+          box-shadow: 0 0 0 5px rgba(99, 91, 255, 0.6);
         }
 
         @media (max-width: 768px) {
