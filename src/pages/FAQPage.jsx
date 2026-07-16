@@ -94,7 +94,7 @@ const FAQPage = () => {
         },
         {
           q: "How secure are smart locks compared to traditional deadbolts?",
-          a: "Smart locks we install use AES 128-bit or 256-bit encryption — the same standard used in banking. They also include anti-tamper alarms, automatic re-locking, and detailed access logs so you know exactly who entered and when. Physically, the deadbolt mechanisms are as strong or stronger than a standard key lock."
+          a: "Smart locks we install use AES 128-bit or 256-bit encryption the same standard used in banking. They also include anti-tamper alarms, automatic re-locking, and detailed access logs so you know exactly who entered and when. Physically, the deadbolt mechanisms are as strong or stronger than a standard key lock."
         },
         {
           q: "What happens to my smart lock during a power outage?",
@@ -102,7 +102,7 @@ const FAQPage = () => {
         },
         {
           q: "Can I grant access to someone without giving them a physical key?",
-          a: "Absolutely. You can create temporary digital access codes or send a virtual 'key' via the lock's app to a family member, housekeeper, or contractor. You can set these to expire after a single use, a specific time window, or revoke them instantly from your phone — no physical key exchange needed."
+          a: "Absolutely. You can create temporary digital access codes or send a virtual 'key' via the lock's app to a family member, housekeeper, or contractor. You can set these to expire after a single use, a specific time window, or revoke them instantly from your phone no physical key exchange needed."
         },
         {
           q: "Does the Ring Video Doorbell work without a subscription?",
@@ -212,8 +212,8 @@ const FAQPage = () => {
                     <div className="faq-icon-small">
                       {faq.category === 'Alarm System' ? <Bell size={18} /> :
                         faq.category === 'CCTV Camera' ? <Camera size={18} /> :
-                        faq.category === 'Smart Door Locks' ? <KeyRound size={18} /> :
-                        <Info size={18} />}
+                          faq.category === 'Smart Door Locks' ? <KeyRound size={18} /> :
+                            <Info size={18} />}
                     </div>
                     <h4 className="h5 mb-0 font-weight-bold" style={{ margin: 0 }}>{faq.q}</h4>
                   </div>

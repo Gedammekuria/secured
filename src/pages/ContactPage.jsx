@@ -531,7 +531,7 @@ const ContactPage = () => {
 
                 {/* ── STEP 1 ── */}
                 {formStep === 1 ? (
-                  <form onSubmit={handleInitialSubmit} noValidate>
+                  <form onSubmit={handleInitialSubmit} noValidate toolname="contact_request_step1" tooldescription="Submit basic contact information and select required security services">
                     {submitError && <ErrorBanner message={submitError} />}
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '24px' }}>
@@ -547,6 +547,7 @@ const ContactPage = () => {
                           onChange={handleChange}
                           onBlur={handleBlur}
                           placeholder=" "
+                          toolparamdescription="Full name of the contact person"
                           style={{ width: '100%', padding: '16px', borderRadius: '12px', border: fieldBorder('fullName', errors, touched), background: '#f8fafc', outline: 'none', transition: 'border 0.2s' }}
                         />
                         <FieldMsg name="fullName" errors={errors} touched={touched} />
@@ -564,6 +565,7 @@ const ContactPage = () => {
                           onChange={handleChange}
                           onBlur={handleBlur}
                           placeholder=" "
+                          toolparamdescription="Initial contact details, either an email address or phone number"
                           style={{ width: '100%', padding: '16px', borderRadius: '12px', border: fieldBorder('initialContact', errors, touched), background: '#f8fafc', outline: 'none', transition: 'border 0.2s' }}
                         />
                         <FieldMsg name="initialContact" errors={errors} touched={touched} />
@@ -626,6 +628,7 @@ const ContactPage = () => {
                           onChange={handleChange}
                           onBlur={handleBlur}
                           placeholder=" "
+                          toolparamdescription="Detailed description of the custom service requested"
                           style={{ width: '100%', padding: '18px', borderRadius: '12px', border: fieldBorder('customInquiry', errors, touched), background: '#f8fafc', fontSize: '16px', outline: 'none' }}
                         />
                         <FieldMsg name="customInquiry" errors={errors} touched={touched} />
@@ -642,7 +645,7 @@ const ContactPage = () => {
                   </form>
                 ) : (
                   /* ── STEP 2 ── */
-                  <form onSubmit={handleFinalSubmit} noValidate className="animate-fade-in">
+                  <form onSubmit={handleFinalSubmit} noValidate className="animate-fade-in" toolname="contact_request_step2" tooldescription="Provide additional details such as company name, phone/email, location, and message to get a custom security blueprint">
                     {submitError && <ErrorBanner message={submitError} />}
 
                     {/* Company Name (optional) */}
@@ -656,6 +659,7 @@ const ContactPage = () => {
                         value={formData.companyName}
                         onChange={handleChange}
                         placeholder=""
+                        toolparamdescription="Optional name of the company or organization"
                         style={{ width: '100%', padding: '15px', borderRadius: '12px', border: '1.5px solid #eef2f6', background: '#f8fafc' }}
                       />
                     </div>
@@ -684,6 +688,7 @@ const ContactPage = () => {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             placeholder=""
+                            toolparamdescription="Alternative contact method, typically email if phone was provided in step 1, or vice versa"
                             style={{ width: '100%', padding: '15px', borderRadius: '12px', border: fieldBorder('alternativeContact', errors, touched), background: '#f8fafc', outline: 'none' }}
                           />
                         )}
@@ -702,6 +707,7 @@ const ContactPage = () => {
                           onChange={handleChange}
                           onBlur={handleBlur}
                           placeholder=""
+                          toolparamdescription="Physical location of the security installation (e.g. Bole, Addis Ababa)"
                           style={{ width: '100%', padding: '15px', borderRadius: '12px', border: fieldBorder('location', errors, touched), background: '#f8fafc', outline: 'none' }}
                         />
                         <FieldMsg name="location" errors={errors} touched={touched} />
@@ -719,6 +725,7 @@ const ContactPage = () => {
                           value={formData.budget}
                           onChange={handleChange}
                           onBlur={handleBlur}
+                          toolparamdescription="Estimated project budget range in ETB"
                           style={{ width: '100%', padding: '15px', borderRadius: '12px', border: fieldBorder('budget', errors, touched), background: '#f8fafc', outline: 'none' }}
                         >
                           <option value="">Select Budget Range</option>
@@ -883,6 +890,7 @@ const ContactPage = () => {
                         onChange={handleChange}
                         onBlur={handleBlur}
                         placeholder=" "
+                        toolparamdescription="Additional comments, instructions, or specific details about the security request"
                         style={{ width: '100%', padding: '15px', borderRadius: '12px', border: fieldBorder('message', errors, touched), background: '#f8fafc', outline: 'none', resize: 'vertical' }}
                       />
                       <FieldMsg name="message" errors={errors} touched={touched} />

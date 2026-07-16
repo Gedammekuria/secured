@@ -19,7 +19,7 @@ const SEO_MAP = {
     canonical: '/',
   },
   services: {
-    title: 'Security Services | CCTV, Alarms & Smart Locks – SafeHive Ethiopia',
+    title: 'Security Services | CCTV, Alarms & Smart Locks SafeHive Ethiopia',
     description:
       'Explore SafeHive\'s full range of security services: IP & analog CCTV installation, Ajax & GSM alarm systems, and biometric smart door locks in Addis Ababa, Ethiopia.',
     canonical: '/services',
@@ -31,13 +31,13 @@ const SEO_MAP = {
     canonical: '/cctv',
   },
   alarm: {
-    title: 'Alarm System Installation Addis Ababa | Ajax & GSM Alarms – SafeHive',
+    title: 'Alarm System Installation Addis Ababa | Ajax & GSM Alarms SafeHive',
     description:
       'SafeHive installs professional alarm systems in Addis Ababa including Ajax wireless alarms, GSM burglar alarms, and fire detection systems for homes and commercial properties.',
     canonical: '/alarm',
   },
   smartdoorlock: {
-    title: 'Smart Door Lock Installation Addis Ababa | Biometric & Video Locks – SafeHive',
+    title: 'Smart Door Lock Installation Addis Ababa | Biometric & Video Locks SafeHive',
     description:
       'Upgrade your security with biometric smart video door locks and Ring Video Doorbells installed by SafeHive in Addis Ababa. Fingerprint, PIN, RFID & mobile app access.',
     canonical: '/smartdoorlock',
@@ -63,7 +63,7 @@ const SEO_MAP = {
   quote: {
     title: 'Request a Free Security Quote | SafeHive Ethiopia',
     description:
-      'Request a free, no-obligation quote for CCTV, alarm system, or smart door lock installation from SafeHive — Addis Ababa\'s trusted security professionals.',
+      'Request a free, no-obligation quote for CCTV, alarm system, or smart door lock installation from SafeHive Addis Ababa\'s trusted security professionals.',
     canonical: '/quote',
   },
   'cctv-quote': {

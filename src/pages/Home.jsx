@@ -109,12 +109,12 @@ const Hero = ({ onNavigate, onQuoteOpen, onViewServicesClick }) => {
 
 const Partners = () => {
   const logos = [
-    { src: '/assets/partners/Dahua.webp', height: 50, alt: 'Dahua Technology — CCTV Partner' },
-    { src: '/assets/partners/Hikvision.webp', height: 110, alt: 'Hikvision — Security Camera Partner' },
-    { src: '/assets/partners/WD-Logo-removebg-preview.webp', height: 55, alt: 'Western Digital — Storage Partner' },
-    { src: '/assets/partners/ajax.webp', height: 36, alt: 'Ajax Systems — Alarm System Partner' },
-    { src: '/assets/partners/tp-link.webp', height: 50, alt: 'TP-Link — Networking Partner' },
-    { src: '/assets/partners/unifi.webp', height: 36, alt: 'Ubiquiti UniFi — Network Partner' },
+    { src: '/assets/partners/Dahua.webp', height: 50, width: 'auto', alt: 'Dahua Technology — CCTV Partner' },
+    { src: '/assets/partners/Hikvision.webp', height: 110, width: 'auto', alt: 'Hikvision — Security Camera Partner' },
+    { src: '/assets/partners/WD-Logo-removebg-preview.webp', height: 55, width: 'auto', alt: 'Western Digital — Storage Partner' },
+    { src: '/assets/partners/ajax.webp', height: 36, width: 'auto', alt: 'Ajax Systems — Alarm System Partner' },
+    { src: '/assets/partners/tp-link.webp', height: 50, width: 'auto', alt: 'TP-Link — Networking Partner' },
+    { src: '/assets/partners/unifi.webp', height: 36, width: 'auto', alt: 'Ubiquiti UniFi — Network Partner' },
   ];
 
   return (
@@ -123,8 +123,16 @@ const Partners = () => {
         <div className="marquee">
           <div className="marquee-content">
             {[...logos, ...logos].map((logo, index) => (
-              <div key={index} className="partner-logo">
-                <img src={logo.src} alt={logo.alt} style={{ height: `${logo.height}px` }} loading="lazy" decoding="async" />
+              <div key={index} className="partner-logo" style={{ height: '110px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <img
+                  src={logo.src}
+                  alt={logo.alt}
+                  width="auto"
+                  height={logo.height}
+                  style={{ height: `${logo.height}px`, width: 'auto', maxWidth: '160px' }}
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
             ))}
           </div>

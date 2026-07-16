@@ -200,17 +200,24 @@ const Navbar = ({
     }
   }, [mobileMenuOpen]);
   return (
-    <nav className={`navbar ${scrolled ? 'scrolled' : ''} ${mobileMenuOpen ? 'mobile-open' : ''}`}>
-      <div className="nav-overlay" onClick={() => setMobileMenuOpen(false)}></div>
-      <div className="container nav-content">
-        <a href="#" className="logo" onClick={handleLogoClick}>
-          <img src="/assets/safehive.webp" alt="Safehive Logo" className="logo-img" fetchpriority="high" />
-        </a>
-        <button className="mobile-toggle" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-          {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
+    <header>
+      <nav className={`navbar ${scrolled ? 'scrolled' : ''} ${mobileMenuOpen ? 'mobile-open' : ''}`}>
+        <div className="nav-overlay" onClick={() => setMobileMenuOpen(false)}></div>
+        <div className="container nav-content">
+          <a href="#" className="logo" onClick={handleLogoClick}>
+            <img src="/assets/safehive.webp" alt="Safehive Logo" className="logo-img" fetchpriority="high" />
+          </a>
+          <button
+            className="mobile-toggle"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="nav-links-container"
+          >
+            {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
 
-        <div className={`nav-links ${mobileMenuOpen ? 'active' : ''}`}>
+          <div id="nav-links-container" className={`nav-links ${mobileMenuOpen ? 'active' : ''}`}>
           <a
             href="#landing"
             className={isHomeActive ? 'active' : ''}
@@ -392,7 +399,8 @@ const Navbar = ({
         </div>
       </div>
     </nav>
-  );
+  </header>
+);
 };
 
 const Footer = ({ onNavigate }) => {
@@ -426,27 +434,27 @@ const Footer = ({ onNavigate }) => {
             {/* Social media icons */}
             <div className="footer-socials" style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
               {settings.facebook_url && (
-                <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="Facebook" style={{ color: 'rgba(255,255,255,0.6)', transition: 'color 0.2s' }}>
+                <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="Facebook" aria-label="Facebook page" style={{ color: 'rgba(255,255,255,0.6)', transition: 'color 0.2s' }}>
                   <FacebookIcon size={18} />
                 </a>
               )}
               {settings.instagram_url && (
-                <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="Instagram" style={{ color: 'rgba(255,255,255,0.6)', transition: 'color 0.2s' }}>
+                <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="Instagram" aria-label="Instagram profile" style={{ color: 'rgba(255,255,255,0.6)', transition: 'color 0.2s' }}>
                   <InstagramIcon size={18} />
                 </a>
               )}
               {settings.tiktok_url && (
-                <a href={settings.tiktok_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="TikTok" style={{ color: 'rgba(255,255,255,0.6)', transition: 'color 0.2s' }}>
+                <a href={settings.tiktok_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="TikTok" aria-label="TikTok profile" style={{ color: 'rgba(255,255,255,0.6)', transition: 'color 0.2s' }}>
                   <TikTokIcon size={18} />
                 </a>
               )}
               {settings.linkedin_url && (
-                <a href={settings.linkedin_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="LinkedIn" style={{ color: 'rgba(255,255,255,0.6)', transition: 'color 0.2s' }}>
+                <a href={settings.linkedin_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="LinkedIn" aria-label="LinkedIn company page" style={{ color: 'rgba(255,255,255,0.6)', transition: 'color 0.2s' }}>
                   <LinkedInIcon size={18} />
                 </a>
               )}
               {settings.youtube_url && (
-                <a href={settings.youtube_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="YouTube" style={{ color: 'rgba(255,255,255,0.6)', transition: 'color 0.2s' }}>
+                <a href={settings.youtube_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="YouTube" aria-label="YouTube channel" style={{ color: 'rgba(255,255,255,0.6)', transition: 'color 0.2s' }}>
                   <YouTubeIcon size={18} />
                 </a>
               )}
@@ -610,9 +618,11 @@ function App() {
           setMegaMenuVisible={setMegaMenuVisible}
         />
       )}
-      <Suspense fallback={<PageLoader />}>
-        {renderView()}
-      </Suspense>
+      <main id="main-content">
+        <Suspense fallback={<PageLoader />}>
+          {renderView()}
+        </Suspense>
+      </main>
       {view !== 'admin' && <Footer onNavigate={setView} />}
       {view !== 'admin' && <BackToTop />}
       {view !== 'admin' && <ChatWidget />}

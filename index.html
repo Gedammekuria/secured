@@ -69,11 +69,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- =====================================================
-       FONTS: Non-blocking load
+       PERFORMANCE: Preload LCP hero image
+       fetchpriority=high tells the browser to fetch this
+       before other images so LCP fires sooner.
   ====================================================== -->
-  <link rel="preload"
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap"
-    as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="/hero%20page.webp" as="image" fetchpriority="high" type="image/webp">
+
+  <!-- =====================================================
+       FONTS: Non-blocking load via media swap trick
+       Using media="print" onload swap — avoids render-blocking
+       while still loading fonts before user interaction.
+  ====================================================== -->
+  <link rel="stylesheet" media="print" onload="this.media='all'"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap">
   <noscript>
     <link rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap">

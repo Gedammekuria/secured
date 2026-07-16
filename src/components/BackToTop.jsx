@@ -30,7 +30,7 @@ const BackToTop = () => {
   }, []);
 
   return (
-    <div className={`back-to-top ${isVisible ? 'visible' : ''}`} onClick={scrollToTop}>
+    <button className={`back-to-top ${isVisible ? 'visible' : ''}`} onClick={scrollToTop} aria-label="Back to top">
       <ChevronUp size={24} strokeWidth={3} />
       <style dangerouslySetInnerHTML={{ __html: `
         .back-to-top {
@@ -52,6 +52,8 @@ const BackToTop = () => {
           transform: translateY(20px);
           transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           box-shadow: 0 10px 25px rgba(99, 91, 255, 0.4);
+          border: none;
+          outline: none;
         }
 
         .back-to-top.visible {
@@ -75,7 +77,7 @@ const BackToTop = () => {
           }
         }
       `}} />
-    </div>
+    </button>
   );
 };
 

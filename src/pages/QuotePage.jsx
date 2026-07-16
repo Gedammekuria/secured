@@ -764,7 +764,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                   </div>
                 ) : (
                   /* --- FORM VIEW --- */
-                  <form onSubmit={handleFinalSubmit} className="animate-fade-in">
+                  <form onSubmit={handleFinalSubmit} className="animate-fade-in" toolname="quote_request" tooldescription="Submit detailed request for CCTV, Alarm, or Smart Door Lock installation quotes">
                     <div className="d-flex align-items-center justify-content-between flex-wrap gap-4 mb-5 pb-3 border-bottom">
                       <div className="d-flex align-items-center gap-3">
                         <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--primary)', boxShadow: '0 0 10px rgba(226, 88, 34, 0.4)' }}></div>
@@ -807,6 +807,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                               onBlur={handleBlur}
                               placeholder=" "
                               required
+                              toolparamdescription="Full name of the contact person"
                               style={{
                                 border: touched.fullName
                                   ? (errors.fullName ? '2.5px solid #ef4444' : '2.5px solid #22c55e')
@@ -835,6 +836,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                               onBlur={handleBlur}
                               placeholder=" "
                               required
+                              toolparamdescription="Initial contact details, either an email address or phone number"
                               style={{
                                 border: touched.initialContact
                                   ? (errors.initialContact ? '2.5px solid #ef4444' : '2.5px solid #22c55e')
@@ -866,6 +868,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                               onBlur={handleBlur}
                               placeholder=" "
                               required
+                              toolparamdescription="Detailed description of the custom service requested"
                               style={{
                                 border: touched.customInquiry
                                   ? (errors.customInquiry ? '2.5px solid #ef4444' : '2.5px solid #22c55e')

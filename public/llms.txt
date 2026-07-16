@@ -1,0 +1,27 @@
+# SafeHive Security Solutions
+
+> SafeHive is a leading security installation company in Addis Ababa, Ethiopia, specializing in high-definition CCTV camera setup, smart intrusion detection Ajax/GSM alarm systems, and biometric smart door locks.
+
+## Core Navigation & Page Sections
+
+- [Home](https://www.safehive.com.et/#landing) - Introduction to SafeHive security solutions.
+- [Services](https://www.safehive.com.et/#services) - Overview of our custom security packages and technologies.
+- [CCTV Camera Systems](https://www.safehive.com.et/#cctv) - Detailed information on IP cameras, PTZ cameras, outdoor security, and remote monitoring setup.
+- [Alarm Systems](https://www.safehive.com.et/#alarm) - Information on Ajax wireless alarms, GSM burglar alarms, and fire detection systems.
+- [Smart Door Locks](https://www.safehive.com.et/#smartdoorlock) - Biometric video locks, Ring Video Doorbells, and office glass door magnetic lock installations.
+- [Portfolios & Projects](https://www.safehive.com.et/#portfolio) - Review of our completed security projects in Ethiopia.
+- [Frequently Asked Questions (FAQ)](https://www.safehive.com.et/#faq) - Help and common answers about CCTV, alarms, locks, warranty, and pricing.
+- [About Us](https://www.safehive.com.et/#about) - Learn about SafeHive's 17+ years of experience in Ethiopia.
+- [Contact Us](https://www.safehive.com.et/#contact) - Reach out for priority consultation or call/WhatsApp.
+- [Request a Free Quote](https://www.safehive.com.et/#quote) - Free security survey and system design estimate.
+
+## Contact Information
+- **Phone**: +251 911 000 000
+- **Email**: info@safehive.com.et
+- **Office Location**: Addis Ababa, Ethiopia
+- **Hours**: Mon - Fri (7:00 AM - 4:00 PM), Sat (9:00 AM - 2:00 PM)
+
+## Service Detail APIs & Forms
+To request a quote or query pricing programmatic interfaces:
+- **Quote Form**: [Request Quote](https://www.safehive.com.et/#quote) - Supports dynamic selection of services (CCTV, Alarm, Smart Door Locks) and location survey booking.
+- **Contact Form**: [Contact Page](https://www.safehive.com.et/#contact) - For custom inquiries and security engineering blueprints.
