@@ -397,8 +397,7 @@ const Navbar = ({
             Get a Quote
           </a>
         </div>
-      </div>
-    </nav>
+      </nav>
   </header>
 );
 };
