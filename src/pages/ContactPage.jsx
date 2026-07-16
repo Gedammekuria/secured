@@ -537,12 +537,13 @@ const ContactPage = () => {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '24px' }}>
                       {/* Full Name */}
                       <div className="form-group">
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
+                        <label htmlFor="contact-fullName" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
                           Full Name<span className="req">*</span>
                         </label>
                         <input
                           type="text"
                           name="fullName"
+                          id="contact-fullName"
                           value={formData.fullName}
                           onChange={handleChange}
                           onBlur={handleBlur}
@@ -555,12 +556,13 @@ const ContactPage = () => {
 
                       {/* Email / Phone */}
                       <div className="form-group">
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
+                        <label htmlFor="contact-initialContact" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
                           Email or Phone<span className="req">*</span>
                         </label>
                         <input
                           type="text"
                           name="initialContact"
+                          id="contact-initialContact"
                           value={formData.initialContact}
                           onChange={handleChange}
                           onBlur={handleBlur}
@@ -583,6 +585,15 @@ const ContactPage = () => {
                           <div
                             key={service}
                             onClick={() => handleCheckboxChange(service)}
+                            role="checkbox"
+                            aria-checked={formData.inquiryType.includes(service)}
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                              if (e.key === ' ' || e.key === 'Enter') {
+                                e.preventDefault();
+                                handleCheckboxChange(service);
+                              }
+                            }}
                             style={{
                               padding: '14px',
                               borderRadius: '12px',
@@ -650,12 +661,13 @@ const ContactPage = () => {
 
                     {/* Company Name (optional) */}
                     <div className="form-group" style={{ marginBottom: '20px' }}>
-                      <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
+                      <label htmlFor="contact-companyName" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
                         Company Name <span className="opacity-50" style={{ fontWeight: '400' }}>(Optional)</span>
                       </label>
                       <input
                         type="text"
                         name="companyName"
+                        id="contact-companyName"
                         value={formData.companyName}
                         onChange={handleChange}
                         placeholder=""
@@ -667,7 +679,7 @@ const ContactPage = () => {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '20px' }}>
                       {/* Alternative contact */}
                       <div className="form-group">
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
+                        <label htmlFor={isEmailInitial ? "phone-input-alternativeContact" : "contact-alternativeContact"} style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
                           {isEmailInitial ? 'Phone Number' : 'Email Address'}<span className="req">*</span>
                         </label>
                         {isEmailInitial ? (
@@ -684,6 +696,7 @@ const ContactPage = () => {
                           <input
                             type="email"
                             name="alternativeContact"
+                            id="contact-alternativeContact"
                             value={typeof formData.alternativeContact === 'object' ? '' : (formData.alternativeContact || '')}
                             onChange={handleChange}
                             onBlur={handleBlur}
@@ -697,12 +710,13 @@ const ContactPage = () => {
 
                       {/* Location */}
                       <div className="form-group">
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
+                        <label htmlFor="contact-location" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
                           Project Location<span className="req">*</span>
                         </label>
                         <input
                           type="text"
                           name="location"
+                          id="contact-location"
                           value={formData.location}
                           onChange={handleChange}
                           onBlur={handleBlur}
@@ -717,11 +731,12 @@ const ContactPage = () => {
                     {/* Budget */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '24px' }}>
                       <div className="form-group">
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
+                        <label htmlFor="contact-budget" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
                           Estimated Budget<span className="req">*</span>
                         </label>
                         <select
                           name="budget"
+                          id="contact-budget"
                           value={formData.budget}
                           onChange={handleChange}
                           onBlur={handleBlur}
@@ -751,10 +766,11 @@ const ContactPage = () => {
                         </h4>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px' }}>
                           <div className="form-group">
-                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Estimated Number of Cameras needed?</label>
+                            <label htmlFor="contact-numCameras" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Estimated Number of Cameras needed?</label>
                             <input
                               type="number"
                               name="numCameras"
+                              id="contact-numCameras"
                               value={formData.numCameras}
                               onChange={handleChange}
                               placeholder=" "
@@ -762,9 +778,10 @@ const ContactPage = () => {
                             />
                           </div>
                           <div className="form-group">
-                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Your estimate timeframe to complete the project?</label>
+                            <label htmlFor="contact-timeframe" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Your estimate timeframe to complete the project?</label>
                             <select
                               name="timeframe"
+                              id="contact-timeframe"
                               value={formData.timeframe}
                               onChange={handleChange}
                               style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }}
@@ -780,11 +797,12 @@ const ContactPage = () => {
 
 
                           <div className="form-group">
-                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>If there was previously installed system type the brand here?</label>
+                            <label htmlFor="contact-previousinstalled" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>If there was previously installed system type the brand here?</label>
 
                             <input
                               type="text"
                               name="previousinstalled"
+                              id="contact-previousinstalled"
                               value={formData.previousinstalled}
                               onChange={handleChange}
                               placeholder=""
@@ -815,12 +833,12 @@ const ContactPage = () => {
 
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px' }}>
                           <div className="form-group" style={{ marginBottom: '0' }}>
-                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Number of required Sensors</label>
-                            <input type="number" name="numSensors" value={formData.numSensors} onChange={handleChange} placeholder=" " style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }} />
+                            <label htmlFor="contact-numSensors" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Number of required Sensors</label>
+                            <input type="number" name="numSensors" id="contact-numSensors" value={formData.numSensors} onChange={handleChange} placeholder=" " style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }} />
                           </div>
                           <div className="form-group" style={{ marginBottom: '0' }}>
-                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Your estimate timeframe</label>
-                            <select name="alarmTimeframe" value={formData.alarmTimeframe} onChange={handleChange} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }}>
+                            <label htmlFor="contact-alarmTimeframe" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Your estimate timeframe</label>
+                            <select name="alarmTimeframe" id="contact-alarmTimeframe" value={formData.alarmTimeframe} onChange={handleChange} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }}>
                               <option value="">select</option>
                               <option value="Urgent">Urgent</option>
                               <option value="Based on your schedule">Based on your schedule</option>
@@ -831,8 +849,8 @@ const ContactPage = () => {
                         </div>
 
                         <div className="form-group" style={{ marginTop: '20px' }}>
-                          <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Previously installed system brand?</label>
-                          <input type="text" name="alarmInstalledSystem" value={formData.alarmInstalledSystem} onChange={handleChange} placeholder="" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }} />
+                          <label htmlFor="contact-alarmInstalledSystem" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Previously installed system brand?</label>
+                          <input type="text" name="alarmInstalledSystem" id="contact-alarmInstalledSystem" value={formData.alarmInstalledSystem} onChange={handleChange} placeholder="" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }} />
                         </div>
                       </div>
                     )}
@@ -856,12 +874,12 @@ const ContactPage = () => {
 
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px' }}>
                           <div className="form-group" style={{ marginBottom: '0' }}>
-                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Number of Doors to Secure</label>
-                            <input type="number" name="numDoors" value={formData.numDoors} onChange={handleChange} placeholder=" " style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }} />
+                            <label htmlFor="contact-numDoors" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Number of Doors to Secure</label>
+                            <input type="number" name="numDoors" id="contact-numDoors" value={formData.numDoors} onChange={handleChange} placeholder=" " style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }} />
                           </div>
                           <div className="form-group" style={{ marginBottom: '0' }}>
-                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Estimated Timeframe</label>
-                            <select name="lockTimeframe" value={formData.lockTimeframe} onChange={handleChange} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }}>
+                            <label htmlFor="contact-lockTimeframe" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Estimated Timeframe</label>
+                            <select name="lockTimeframe" id="contact-lockTimeframe" value={formData.lockTimeframe} onChange={handleChange} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }}>
                               <option value="">Select timeframe</option>
                               <option value="Urgent">Urgent</option>
                               <option value="Based on your schedule">Based on your schedule</option>
@@ -872,20 +890,21 @@ const ContactPage = () => {
                         </div>
 
                         <div className="form-group" style={{ marginTop: '20px' }}>
-                          <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Previously installed system? (brand / type)</label>
-                          <input type="text" name="lockInstalledSystem" value={formData.lockInstalledSystem} onChange={handleChange} placeholder="e.g. Yale, Samsung, none" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }} />
+                          <label htmlFor="contact-lockInstalledSystem" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px' }}>Previously installed system? (brand / type)</label>
+                          <input type="text" name="lockInstalledSystem" id="contact-lockInstalledSystem" value={formData.lockInstalledSystem} onChange={handleChange} placeholder="e.g. Yale, Samsung, none" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eef2f6', background: 'white' }} />
                         </div>
                       </div>
                     )}
 
                     {/* Message */}
                     <div className="form-group" style={{ marginBottom: '32px' }}>
-                      <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
+                      <label htmlFor="contact-message" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
                         If you have any other information, please type it here <span className="req">*</span>
                       </label>
                       <textarea
                         rows="4"
                         name="message"
+                        id="contact-message"
                         value={formData.message}
                         onChange={handleChange}
                         onBlur={handleBlur}

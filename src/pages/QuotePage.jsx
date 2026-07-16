@@ -819,10 +819,11 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
 
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '24px' }}>
                           <div className="qf-group">
-                            <label className="mb-2 d-block font-weight-bold" style={{ fontSize: '14px' }}>Full Name<span className="req">*</span></label>
+                            <label htmlFor="quote-fullName" className="mb-2 d-block font-weight-bold" style={{ fontSize: '14px' }}>Full Name<span className="req">*</span></label>
                             <input
                               type="text"
                               name="fullName"
+                              id="quote-fullName"
                               value={formData.fullName}
                               onChange={handleChange}
                               onBlur={handleBlur}
@@ -848,10 +849,11 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                             )}
                           </div>
                           <div className="qf-group">
-                            <label className="mb-2 d-block font-weight-bold" style={{ fontSize: '14px' }}>Email or Phone<span className="req">*</span></label>
+                            <label htmlFor="quote-initialContact" className="mb-2 d-block font-weight-bold" style={{ fontSize: '14px' }}>Email or Phone<span className="req">*</span></label>
                             <input
                               type="text"
                               name="initialContact"
+                              id="quote-initialContact"
                               value={formData.initialContact}
                               onChange={handleChange}
                               onBlur={handleBlur}
@@ -880,10 +882,11 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
 
                         {activeCategory === 'Other' && (
                           <div className="qf-group mb-4 animate-slide-down">
-                            <label className="mb-2 d-block font-weight-bold" style={{ fontSize: '14px' }}>What service do you need?<span className="req">*</span></label>
+                            <label htmlFor="quote-customInquiry" className="mb-2 d-block font-weight-bold" style={{ fontSize: '14px' }}>What service do you need?<span className="req">*</span></label>
                             <input
                               type="text"
                               name="customInquiry"
+                              id="quote-customInquiry"
                               value={formData.customInquiry}
                               onChange={handleChange}
                               onBlur={handleBlur}
@@ -963,10 +966,11 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
 
                         <div className="row mb-4">
                           <div className="col-md-6 mb-4 mb-md-0">
-                            <label className="mb-2 d-block font-weight-bold" style={{ fontSize: '14px' }}>Project Location<span className="req">*</span></label>
+                            <label htmlFor="quote-location" className="mb-2 d-block font-weight-bold" style={{ fontSize: '14px' }}>Project Location<span className="req">*</span></label>
                             <input
                               type="text"
                               name="location"
+                              id="quote-location"
                               value={formData.location}
                               onChange={handleChange}
                               onBlur={handleBlur}
@@ -991,10 +995,11 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                             )}
                           </div>
                           <div className="col-md-6">
-                            <label className="mb-2 d-block font-weight-bold" style={{ fontSize: '14px' }}>Company Name <span className="opacity-50" style={{ fontWeight: '400' }}>(Optional)</span></label>
+                            <label htmlFor="quote-companyName" className="mb-2 d-block font-weight-bold" style={{ fontSize: '14px' }}>Company Name <span className="opacity-50" style={{ fontWeight: '400' }}>(Optional)</span></label>
                             <input
                               type="text"
                               name="companyName"
+                              id="quote-companyName"
                               value={formData.companyName}
                               onChange={handleChange}
                               onBlur={handleBlur}
@@ -1015,7 +1020,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                         </div>
 
                         <div className="qf-group mb-5">
-                          <label className="mb-2 d-block font-weight-bold" style={{ fontSize: '14px' }}>
+                          <label htmlFor="quote-alternativeContact" className="mb-2 d-block font-weight-bold" style={{ fontSize: '14px' }}>
                             {isEmailInitial ? 'Contact Phone Number' : 'Email'}
                             <span className="req">*</span>
                           </label>
@@ -1039,6 +1044,7 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                             <input
                               type="email"
                               name="alternativeContact"
+                              id="quote-alternativeContact"
                               value={typeof formData.alternativeContact === 'object' ? '' : (formData.alternativeContact || '')}
                               onChange={handleChange}
                               onBlur={handleBlur}
@@ -1070,10 +1076,11 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
 
                             <div className="row">
                               <div className="qf-group mb-4">
-                                <label className="mb-2 d-block font-weight-bold">Estimated Number of Cameras needed?</label>
+                                <label htmlFor="quote-numCameras" className="mb-2 d-block font-weight-bold">Estimated Number of Cameras needed?</label>
                                 <input
                                   type="number"
                                   name="numCameras"
+                                  id="quote-numCameras"
                                   value={formData.numCameras}
                                   onChange={handleChange}
                                   placeholder=" "
@@ -1081,9 +1088,10 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
                                 />
                               </div>
                               <div className="qf-group mb-4">
-                                <label className="mb-2 d-block font-weight-bold">Your estimate timeframe to complete the project?</label>
+                                <label htmlFor="quote-timeframe" className="mb-2 d-block font-weight-bold">Your estimate timeframe to complete the project?</label>
                                 <select
                                   name="timeframe"
+                                  id="quote-timeframe"
                                   value={formData.timeframe}
                                   onChange={handleChange}
                                   style={{ border: '2.5px solid #f1f5f9', borderRadius: '16px', padding: '15px 20px', width: '100%' }}

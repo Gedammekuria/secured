@@ -140,10 +140,12 @@ const PhoneInput = ({ name, value, onChange, placeholder = 'Your Phone Number', 
         <input
           type="tel"
           name={name}
+          id={name ? `phone-input-${name}` : undefined}
           value={typeof value === 'object' ? '' : (value || '')}
           onChange={handleInputChange}
           placeholder={placeholder}
           required={required}
+          aria-label="Phone number"
           style={{ padding: inputPad }}
         />
       </div>
@@ -173,6 +175,7 @@ const PhoneInput = ({ name, value, onChange, placeholder = 'Your Phone Number', 
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search country..."
+              aria-label="Search countries"
               style={{
                 width: '100%',
                 padding: '8px 12px',
