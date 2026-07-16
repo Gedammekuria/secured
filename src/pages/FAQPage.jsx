@@ -203,10 +203,25 @@ const FAQPage = () => {
                 key={index}
                 className={`faq-item border-bottom py-4 ${openIndex === index ? 'active' : ''}`}
               >
-                <div
+                <button
+                  type="button"
                   className="faq-question d-flex align-items-center justify-content-between cursor-pointer"
                   onClick={() => setOpenIndex(openIndex === index ? -1 : index)}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0' }}
+                  aria-expanded={openIndex === index}
+                  aria-controls={`faq-answer-${index}`}
+                  id={`faq-question-${index}`}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '10px 0',
+                    width: '100%',
+                    background: 'none',
+                    border: 'none',
+                    textAlign: 'left',
+                    color: 'inherit',
+                    fontFamily: 'inherit',
+                  }}
                 >
                   <div className="d-flex align-items-center gap-3" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                     <div className="faq-icon-small">
@@ -220,10 +235,10 @@ const FAQPage = () => {
                   <div className="faq-chevron">
                     {openIndex === index ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                   </div>
-                </div>
+                </button>
 
-                <div className="faq-answer">
-                  <p className="text-muted mb-0 lead" style={{ fontSize: '16px' }}>
+                <div className="faq-answer" id={`faq-answer-${index}`} role="region" aria-labelledby={`faq-question-${index}`} hidden={openIndex !== index}>
+                  <p className="text-muted mb-0 lead" style={{ fontSize: '16px', padding: '10px 0' }}>
                     {faq.a}
                   </p>
                 </div>

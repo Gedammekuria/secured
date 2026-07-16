@@ -67,7 +67,7 @@ const defaultProjects = [
     fullDetail: "Jotun's manufacturing plant required a robust fire detection and alarm solution suitable for a high-risk industrial environment. We installed an addressable fire alarm control panel, heat detectors in the production areas, smoke detectors in office and storage zones, and manual call points at all exits. The system is integrated with the site's emergency evacuation plan, providing immediate zone-based alerts to the safety team and automatic notification to local fire services.",
     benefit: ["Addressable zone detection", "Industrial-grade heat detectors", "Automatic emergency notification", "Full site evacuation coverage", "24/7 monitoring capability", "Compliance with Ethiopian fire safety standards"],
     category: "Alarm system",
-    image: "/assets/service/jotun_fire_alarm.webp"
+    image: "/assets/service/fire alarm control system.jpg"
   },
   {
     id: 7,
@@ -78,7 +78,7 @@ const defaultProjects = [
     fullDetail: "Ethiopian Insurance Corporation needed a reliable fire alarm system to safeguard their multi-floor headquarters building. We deployed a conventional fire alarm control panel with smoke detectors in all office floors, server room heat detectors, break-glass manual call points on every floor landing, and ceiling-mounted sounders for building-wide alerts. The installation was completed with full wiring documentation and staff training on emergency procedures.",
     benefit: ["Multi-floor smoke detection", "Server room heat detection", "Building-wide alarm sounders", "Break-glass manual call points", "Emergency procedure training", "Full wiring documentation"],
     category: "Alarm system",
-    image: "/assets/service/eic_fire_alarm.webp"
+    image: "/assets/service/fire alarm installation.jpg"
   },
   {
     id: 8,
@@ -89,7 +89,7 @@ const defaultProjects = [
     fullDetail: "Following the fire alarm project, Ethiopian Insurance Corporation engaged us to upgrade access control across their headquarters. We installed Biometric Smart Video Door Locks on the executive floor. Each lock supports fingerprint recognition, PIN code, and RFID card access, with a built-in camera capturing every entry attempt. Management receives real-time alerts for unrecognised access attempts and can remotely lock or unlock any door via the mobile app.",
     benefit: ["Biometric fingerprint access", "Built-in entry camera", "Remote lock/unlock via app", "Real-time intrusion alerts", "RFID and PIN backup access", "Complete access audit trail"],
     category: "Smart Door Locks",
-    image: "/assets/service/smart doorbell project.jpg"
+    image: "/assets/service/smart door lock installation.jpg"
   }
 ];
 

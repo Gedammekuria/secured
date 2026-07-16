@@ -259,10 +259,14 @@ const Services = ({ onNavigate, onQuoteOpen }) => {
         {!isMobile && (
           <div className="services-layout-top">
             <div className="services-nav-top">
-              <div className="service-tabs-row">
+              <div className="service-tabs-row" role="tablist" aria-label="Security service categories">
                 {servicesList.map((s, i) => (
                   <button
                     key={i}
+                    role="tab"
+                    aria-selected={activeTab === i}
+                    aria-controls={`service-panel-${i}`}
+                    id={`service-tab-${i}`}
                     className={`service-tab-v ${activeTab === i ? 'active' : ''}`}
                     onClick={() => handleTabChange(i)}
                   >
@@ -286,9 +290,15 @@ const Services = ({ onNavigate, onQuoteOpen }) => {
               </div>
             </div>
 
-            <div className="tab-dots-centered">
-              {servicesList.map((_, i) => (
-                <button key={i} className={`tab-dot ${activeTab === i ? 'active' : ''}`} onClick={() => handleTabChange(i)} />
+            <div className="tab-dots-centered" aria-label="Service category navigation">
+              {servicesList.map((s, i) => (
+                <button
+                  key={i}
+                  aria-label={`Show ${s.category}`}
+                  aria-current={activeTab === i ? 'true' : undefined}
+                  className={`tab-dot ${activeTab === i ? 'active' : ''}`}
+                  onClick={() => handleTabChange(i)}
+                />
               ))}
             </div>
           </div>
@@ -491,9 +501,11 @@ const FeaturedProjects = ({ onNavigate, onSelectProject }) => {
         <div className="content-grid" style={{ marginTop: '40px' }}>
           {featured.map((project) => (
             <div key={project.id} className="portfolio-card bg-white rounded-32 shadow-lg overflow-hidden border-0 d-flex flex-column">
-              <div
+              <button
+                type="button"
                 className="portfolio-image-wrapper"
-                style={{ height: '240px', overflow: 'hidden', position: 'relative', cursor: 'pointer' }}
+                aria-label={`View details for ${project.title}`}
+                style={{ height: '240px', overflow: 'hidden', position: 'relative', cursor: 'pointer', width: '100%', border: 'none', padding: 0, background: 'none', display: 'block' }}
                 onClick={() => onSelectProject && onSelectProject(project)}
               >
                 <img
@@ -505,7 +517,7 @@ const FeaturedProjects = ({ onNavigate, onSelectProject }) => {
                 <div style={{ position: 'absolute', top: '20px', left: '20px' }}>
                   <span className="badge-light" style={{ backgroundColor: 'rgba(10, 37, 64, 0.8)', color: 'white', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.1)' }}>{project.category}</span>
                 </div>
-              </div>
+              </button>
               <div className="portfolio-content p-5 flex-1 d-flex flex-column" style={{ padding: '24px' }}>
                 <div className="d-flex align-items-center gap-2 text-primary mb-2" style={{ fontSize: '13px', fontWeight: '700', color: '#635bff' }}>
                   <MapPin size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} /> {project.location}

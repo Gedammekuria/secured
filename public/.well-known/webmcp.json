@@ -1,0 +1,97 @@
+{
+  "schema_version": "webmcp/0.1",
+  "name": "SafeHive Security Solutions",
+  "description": "SafeHive Security Solutions exposes tools for submitting quote requests and contact inquiries for professional CCTV, alarm, and smart door lock installations.",
+  "tools": [
+    {
+      "name": "contact_request_step1",
+      "description": "Submit basic contact info and select services of interest",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "description": "Full name of the contact person"
+          },
+          "initialContact": {
+            "type": "string",
+            "description": "Primary contact method (email or phone)"
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["CCTV Camera", "Alarm System", "Smart Door Locks", "Other"]
+            },
+            "description": "Selected security services"
+          }
+        },
+        "required": ["fullName", "initialContact", "services"]
+      }
+    },
+    {
+      "name": "contact_request_step2",
+      "description": "Submit company name, phone/email, location, and message details to generate the blueprint",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "companyName": {
+            "type": "string",
+            "description": "Optional company name"
+          },
+          "alternativeContact": {
+            "type": "string",
+            "description": "Alternative email or phone"
+          },
+          "location": {
+            "type": "string",
+            "description": "Specific project location"
+          },
+          "message": {
+            "type": "string",
+            "description": "Additional requirements details"
+          }
+        },
+        "required": ["location", "message"]
+      }
+    },
+    {
+      "name": "quote_request",
+      "description": "Submit dynamic quote details for CCTV, alarm, or smart door locks",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "description": "Full name of the contact person"
+          },
+          "initialContact": {
+            "type": "string",
+            "description": "Primary email or phone"
+          },
+          "location": {
+            "type": "string",
+            "description": "Location of the property to secure"
+          },
+          "companyName": {
+            "type": "string",
+            "description": "Optional company name"
+          },
+          "alternativeContact": {
+            "type": "string",
+            "description": "Alternative email or phone"
+          },
+          "budget": {
+            "type": "string",
+            "description": "Estimated budget bracket"
+          },
+          "message": {
+            "type": "string",
+            "description": "Additional request description"
+          }
+        },
+        "required": ["fullName", "initialContact", "location", "alternativeContact", "budget"]
+      }
+    }
+  ]
+}
