@@ -54,6 +54,7 @@ const pool = connectionString
   : null;
 
 // ── In-memory mock data (used when DATABASE_URL is not set) ────────────────────
+let mockViews = 1248;
 let mockInquiries = [
   {
     id: 'mock-1',
@@ -495,6 +496,19 @@ async function ensureDb() {
       ]);
     }
 
+    // Create site_views table if it doesn't exist
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS site_views (
+        id SERIAL PRIMARY KEY,
+        view_count INTEGER DEFAULT 0,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    // Seed default row if not exists
+    await pool.query(`
+      INSERT INTO site_views (id, view_count) VALUES (1, 0) ON CONFLICT (id) DO NOTHING;
+    `);
+
     dbInitialised = true;
   } catch (err) {
     console.error('DB init error:', err.message);
@@ -773,6 +787,43 @@ app.get('/api/health', async (req, res) => {
     return res.json({ status: 'healthy', database: 'connected' });
   } catch (err) {
     return res.status(500).json({ status: 'unhealthy', error: err.message });
+  }
+});
+
+// Endpoint to track/increment page view
+app.post('/api/views', async (req, res) => {
+  try {
+    if (pool) {
+      const result = await pool.query(`
+        INSERT INTO site_views (id, view_count) VALUES (1, 1)
+        ON CONFLICT (id) DO UPDATE SET view_count = site_views.view_count + 1, updated_at = CURRENT_TIMESTAMP
+        RETURNING view_count;
+      `);
+      const count = result.rows[0]?.view_count || 0;
+      return res.json({ success: true, count });
+    } else {
+      mockViews += 1;
+      return res.json({ success: true, count: mockViews });
+    }
+  } catch (err) {
+    console.error('🔴 Failed to increment view count:', err.message);
+    return res.status(500).json({ error: 'Failed to record page view' });
+  }
+});
+
+// Endpoint to retrieve site views (admin only)
+app.get('/api/admin/views', authenticateAdmin, async (req, res) => {
+  try {
+    if (pool) {
+      const result = await pool.query('SELECT view_count FROM site_views WHERE id = 1;');
+      const count = result.rows[0]?.view_count || 0;
+      return res.json({ count });
+    } else {
+      return res.json({ count: mockViews });
+    }
+  } catch (err) {
+    console.error('🔴 Failed to fetch view count:', err.message);
+    return res.status(500).json({ error: 'Failed to fetch page views' });
   }
 });
 

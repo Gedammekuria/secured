@@ -296,6 +296,16 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
   };
 
   const handleCategorySelect = (category) => {
+    // Update the active category and switch to the form view
+    setActiveCategory(category);
+    setView('form');
+
+    // Reset custom inquiry when switching away from 'Other' service
+    if (category !== 'Other') {
+      setFormData(prev => ({ ...prev, customInquiry: '' }));
+    }
+
+    // Keep the URL in sync with the selected category
     if (category === 'CCTV Systems') {
       onNavigate('cctv-quote');
     } else if (category === 'Alarm Systems') {
@@ -305,6 +315,10 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
     } else {
       onNavigate('other-quote');
     }
+
+    // Ensure the contact step is reset so the custom inquiry field appears
+    setContactSubmitted(false);
+
     window.scrollTo(0, 0);
   };
 
@@ -435,11 +449,18 @@ const QuotePage = ({ onNavigate, initialCategory = null }) => {
 
       setActiveCategory(targetCategory);
       setView('form');
-      setContactSubmitted(true);
+      // For 'Other' service, we need to show the custom inquiry field (step 1), so keep contact step open
+      if (targetCategory === 'Other') {
+        setContactSubmitted(false);
+      } else {
+        setContactSubmitted(true);
+      }
 
       setFormData(prev => ({
         ...prev,
         budget: '',
+        // Reset customInquiry when the new request is for 'Other' service
+        customInquiry: targetCategory === 'Other' ? '' : prev.customInquiry,
         inquiryType: prev.inquiryType.includes(targetCategory) ? prev.inquiryType : [...prev.inquiryType, targetCategory]
       }));
 

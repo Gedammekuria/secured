@@ -396,6 +396,7 @@ const Navbar = ({
           >
             Get a Quote
           </a>
+          </div>
         </div>
       </nav>
   </header>
@@ -513,6 +514,32 @@ function App() {
     // Simple validation: if hash exists, use it, otherwise landing
     return hash || 'landing';
   });
+
+  // Track page visits — once per page load, ignoring reloads/refreshes and admin sessions
+  useEffect(() => {
+    // Detect if this mount is a reload/refresh
+    const isReload =
+      (performance.navigation && performance.navigation.type === 1) ||
+      (performance.getEntriesByType &&
+       performance.getEntriesByType('navigation')[0] &&
+       performance.getEntriesByType('navigation')[0].type === 'reload');
+
+    // Never count visits that start on the admin page
+    const initialHash = window.location.hash.replace('#', '');
+    const isAdminSession = initialHash === 'admin';
+
+    if (!isReload && !isAdminSession) {
+      // Guard against React StrictMode double-invocation in dev
+      if (!window.__safehive_visit_recorded) {
+        window.__safehive_visit_recorded = true;
+        fetch('/api/views', { method: 'POST' })
+          .catch(err => {
+            window.__safehive_visit_recorded = false;
+            console.warn('Failed to track site view:', err);
+          });
+      }
+    }
+  }, []);
 
   // Dynamic SEO: updates <title>, <meta description>, canonical, OG & Twitter tags per page
   useSEO(view);

@@ -35,7 +35,7 @@ const SmartDoorLockPage = ({ onNavigate }) => {
               Control who enters your property from video verification at the door to biometric fingerprint access and smart glass lock management.
             </p>
             <div className="hero-actions justify-center">
-              <button onClick={() => onNavigate('quote')} className="btn-primary">Request a Smart Lock Installation</button>
+              <button onClick={() => onNavigate('smartdoorlock-quote')} className="btn-primary">Request a Smart Lock Installation</button>
             </div>
           </div>
         </div>
@@ -193,7 +193,7 @@ const SmartDoorLockPage = ({ onNavigate }) => {
           <div className="cta-box">
             <h2>Upgrade Your Entry Security Today</h2>
             <p>Our engineers will visit, assess your doors, and recommend the ideal Smart Lock system for your home or business.</p>
-            <button onClick={() => onNavigate('quote')} className="btn-primary">Request Your Free Survey</button>
+            <button onClick={() => onNavigate('smartdoorlock-quote')} className="btn-primary">Request Your Free Survey</button>
           </div>
         </div>
       </section>

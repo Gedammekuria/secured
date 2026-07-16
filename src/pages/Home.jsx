@@ -215,7 +215,14 @@ const Services = ({ onNavigate, onQuoteOpen }) => {
   }, []);
 
   const renderCard = (card, i, catName) => {
-    const targetQuote = catName?.includes('CCTV') ? 'cctv-quote' : catName?.includes('Alarm') ? 'alarm-quote' : 'other-quote';
+    let targetQuote = 'other-quote';
+    if (catName?.includes('CCTV')) {
+      targetQuote = 'cctv-quote';
+    } else if (catName?.includes('Alarm')) {
+      targetQuote = 'alarm-quote';
+    } else if (catName?.toLowerCase().includes('door') || catName?.toLowerCase().includes('lock')) {
+      targetQuote = 'smartdoorlock-quote';
+    }
     return (
       <div key={i} className="gallery-card" style={{ animationDelay: `${i * 0.08}s` }}>
         <div className="gallery-img-wrap">

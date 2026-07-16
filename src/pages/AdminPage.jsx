@@ -81,6 +81,9 @@ const AdminPage = ({ onNavigate }) => {
   const [fetchError, setFetchError] = useState('');
   const [adminTab, setAdminTab] = useState('inquiries');
   const [notificationAlert, setNotificationAlert] = useState(null);
+  const [siteViews, setSiteViews] = useState(null);
+  // Custom delete confirmation modal state
+  const [deleteModal, setDeleteModal] = useState(null); // null | { mode: 'single', id } | { mode: 'bulk', count, ids }
 
   // Filters state
   const [searchQuery, setSearchQuery] = useState('');
@@ -116,7 +119,7 @@ const AdminPage = ({ onNavigate }) => {
     }
   };
 
-  // Check login state on mount
+  // Check login state and set up visibility change tracking
   useEffect(() => {
     const token = localStorage.getItem('safehive_admin_token');
     const storedEmail = localStorage.getItem('safehive_admin_email');
@@ -127,7 +130,22 @@ const AdminPage = ({ onNavigate }) => {
       }
       fetchAdminProfile(token);
       fetchInquiries(token);
+      fetchSiteViews(token);
     }
+
+    // Auto-update stats/inquiries when admin tab is focused/visible again
+    const handleVisibilityChange = () => {
+      const activeToken = localStorage.getItem('safehive_admin_token');
+      if (document.visibilityState === 'visible' && activeToken) {
+        fetchInquiries(activeToken);
+        fetchSiteViews(activeToken);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   const handleLogin = async (e) => {
@@ -154,6 +172,7 @@ const AdminPage = ({ onNavigate }) => {
       setAdminEmail(dynamicEmail);
       setLoggedIn(true);
       fetchInquiries(data.token);
+      fetchSiteViews(data.token);
     } catch (err) {
       setLoginError(err.message);
     } finally {
@@ -272,6 +291,22 @@ const AdminPage = ({ onNavigate }) => {
     }
   };
 
+  const fetchSiteViews = async (token) => {
+    const authToken = token || localStorage.getItem('safehive_admin_token');
+    if (!authToken) return;
+    try {
+      const response = await fetch('/api/admin/views', {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSiteViews(data.count ?? 0);
+      }
+    } catch (err) {
+      console.warn('Could not fetch site views:', err.message);
+    }
+  };
+
   const handleStatusChange = async (id, newStatus) => {
     const authToken = localStorage.getItem('safehive_admin_token');
     // Optimistic update
@@ -336,64 +371,52 @@ const AdminPage = ({ onNavigate }) => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this inquiry permanently?')) {
-      return;
-    }
-
-    const authToken = localStorage.getItem('safehive_admin_token');
-    try {
-      const response = await fetch(`/api/admin/inquiries/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${authToken}`
-        }
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to delete inquiry.');
-      }
-
-      // Update state directly or refetch
-      setInquiries(prev => prev.filter(item => item.id !== id));
-      if (selectedInquiry && selectedInquiry.id === id) {
-        setSelectedInquiry(null);
-      }
-    } catch (err) {
-      alert('Error: ' + err.message);
-    }
+  const handleDelete = (id) => {
+    setDeleteModal({ mode: 'single', id });
   };
 
-  const handleBulkDelete = async () => {
+  const handleBulkDelete = () => {
     if (selectedRows.size === 0) return;
-    const count = selectedRows.size;
-    if (!window.confirm(`Are you sure you want to permanently delete ${count} selected inquiry/inquiries? This cannot be undone.`)) {
-      return;
-    }
-    const authToken = localStorage.getItem('safehive_admin_token');
     const ids = Array.from(selectedRows);
+    setDeleteModal({ mode: 'bulk', count: ids.length, ids });
+  };
+
+  const confirmDeleteAction = async () => {
+    if (!deleteModal) return;
+    const authToken = localStorage.getItem('safehive_admin_token');
     try {
-      const response = await fetch('/api/admin/inquiries/bulk-delete', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`
-        },
-        body: JSON.stringify({ ids })
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Failed to bulk delete.');
-      // Remove deleted IDs from state
-      setInquiries(prev => prev.filter(item => !ids.includes(String(item.id))));
-      if (selectedInquiry && ids.includes(String(selectedInquiry.id))) {
-        setSelectedInquiry(null);
+      if (deleteModal.mode === 'single') {
+        const { id } = deleteModal;
+        const response = await fetch(`/api/admin/inquiries/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Failed to delete inquiry.');
+        setInquiries(prev => prev.filter(item => item.id !== id));
+        if (selectedInquiry && selectedInquiry.id === id) setSelectedInquiry(null);
+        setNotificationAlert({ type: 'success', message: 'Inquiry deleted successfully.' });
+        setTimeout(() => setNotificationAlert(null), 3500);
+      } else {
+        const { ids, count } = deleteModal;
+        const response = await fetch('/api/admin/inquiries/bulk-delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+          body: JSON.stringify({ ids })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Failed to bulk delete.');
+        setInquiries(prev => prev.filter(item => !ids.includes(String(item.id))));
+        if (selectedInquiry && ids.includes(String(selectedInquiry.id))) setSelectedInquiry(null);
+        setSelectedRows(new Set());
+        setNotificationAlert({ type: 'success', message: `${data.deleted || count} inquiry/inquiries deleted successfully.` });
+        setTimeout(() => setNotificationAlert(null), 3500);
       }
-      setSelectedRows(new Set());
-      alert(`✅ ${data.deleted || count} inquiry/inquiries deleted successfully.`);
     } catch (err) {
-      alert('Error: ' + err.message);
+      setNotificationAlert({ type: 'error', message: 'Error: ' + err.message });
+      setTimeout(() => setNotificationAlert(null), 4000);
+    } finally {
+      setDeleteModal(null);
     }
   };
 
@@ -1681,6 +1704,23 @@ const AdminPage = ({ onNavigate }) => {
                           <Users size={16} />
                         </div>
                       </div>
+
+                      {/* Site Views card — inside the grid, next to Finished */}
+                      <div className="metric-card" style={{ background: 'linear-gradient(135deg, rgba(226,88,34,0.05) 0%, rgba(255,117,0,0.05) 100%)', border: '1.5px solid rgba(226,88,34,0.15)' }}>
+                        <div className="metric-card-info">
+                          <h3 style={{ color: '#e25822' }}>Site Visits</h3>
+                          <p style={{ color: '#e25822' }}>
+                            {siteViews === null ? (
+                              <span style={{ fontSize: '14px', opacity: 0.5 }}>...</span>
+                            ) : (
+                              siteViews.toLocaleString()
+                            )}
+                          </p>
+                        </div>
+                        <div className="metric-card-icon" style={{ background: 'rgba(226,88,34,0.1)', color: '#e25822' }}>
+                          <Eye size={16} />
+                        </div>
+                      </div>
                     </div>
 
                     {/* Filters panel */}
@@ -1874,6 +1914,96 @@ const AdminPage = ({ onNavigate }) => {
                     {fetchError && (
                       <div className="login-error-alert mb-4">
                         Failed to load database entries: {fetchError}
+                      </div>
+                    )}
+
+                    {/* Bulk actions banner */}
+                    {selectedRows.size > 0 && (
+                      <div 
+                        className="bulk-actions-banner animate-fade-in"
+                        style={{
+                          background: 'linear-gradient(135deg, #fef2f2 0%, #fff1f2 100%)',
+                          border: '1px solid #fee2e2',
+                          borderRadius: '16px',
+                          padding: '16px 24px',
+                          marginBottom: '20px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          boxShadow: '0 4px 12px rgba(239, 68, 68, 0.05)',
+                          flexWrap: 'wrap',
+                          gap: '16px'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div 
+                            style={{
+                              width: '36px',
+                              height: '36px',
+                              borderRadius: '50%',
+                              background: 'rgba(239, 68, 68, 0.1)',
+                              color: '#ef4444',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            <Trash2 size={18} />
+                          </div>
+                          <div style={{ textAlign: 'left' }}>
+                            <span style={{ fontWeight: '800', color: '#991b1b', fontSize: '15px' }}>
+                              Bulk Actions Active
+                            </span>
+                            <p style={{ margin: 0, fontSize: '13px', color: '#b91c1c', fontWeight: '500' }}>
+                              You have selected <strong>{selectedRows.size}</strong> {selectedRows.size === 1 ? 'inquiry' : 'inquiries'}.
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedRows(new Set())}
+                            className="btn-logout"
+                            style={{
+                              padding: '8px 16px',
+                              background: 'white',
+                              borderColor: '#fca5a5',
+                              color: '#b91c1c',
+                              fontWeight: '700',
+                              fontSize: '13px',
+                              height: '40px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              borderRadius: '12px'
+                            }}
+                          >
+                            Deselect All
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleBulkDelete}
+                            style={{
+                              padding: '10px 20px',
+                              background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                              border: 'none',
+                              color: 'white',
+                              borderRadius: '12px',
+                              fontWeight: '800',
+                              fontSize: '13px',
+                              boxShadow: '0 4px 12px rgba(239, 68, 68, 0.2)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              cursor: 'pointer',
+                              height: '40px'
+                            }}
+                          >
+                            <Trash2 size={14} />
+                            Delete Selected ({selectedRows.size})
+                          </button>
+                        </div>
                       </div>
                     )}
 
@@ -2160,6 +2290,55 @@ const AdminPage = ({ onNavigate }) => {
         )}
 
       </div>
+
+      {/* ── CUSTOM DELETE CONFIRMATION MODAL ── */}
+      {deleteModal && (
+        <div className="delete-modal-overlay" onClick={() => setDeleteModal(null)}>
+          <div className="delete-modal-card" onClick={e => e.stopPropagation()}>
+            {/* Animated danger icon */}
+            <div className="delete-modal-icon-wrap">
+              <div className="delete-modal-icon-ring" />
+              <div className="delete-modal-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                  <path d="M10 11v6M14 11v6" />
+                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                </svg>
+              </div>
+            </div>
+
+            <h2 className="delete-modal-title">
+              {deleteModal.mode === 'bulk' ? 'Delete Multiple Inquiries' : 'Delete Inquiry'}
+            </h2>
+
+            <p className="delete-modal-message">
+              {deleteModal.mode === 'bulk'
+                ? <>You are about to permanently delete <strong>{deleteModal.count}</strong> selected {deleteModal.count === 1 ? 'inquiry' : 'inquiries'}.</>
+                : <>You are about to permanently delete inquiry <strong>#{String(deleteModal.id).slice(-5).toUpperCase()}</strong>.</>
+              }
+            </p>
+            <p className="delete-modal-warning">
+              ⚠ This action <strong>cannot be undone</strong>. All associated data will be lost forever.
+            </p>
+
+            <div className="delete-modal-actions">
+              <button className="delete-modal-cancel" onClick={() => setDeleteModal(null)}>
+                Cancel
+              </button>
+              <button className="delete-modal-confirm" onClick={confirmDeleteAction}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                  <path d="M10 11v6M14 11v6" />
+                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                </svg>
+                Yes, Delete{deleteModal.mode === 'bulk' ? ` ${deleteModal.count}` : ''}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div >
 

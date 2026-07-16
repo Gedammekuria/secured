@@ -3,11 +3,16 @@
 
 User-agent: *
 Allow: /
+Allow: /assets/
+Allow: /sitemap.xml
 
-# Block admin and internal pages from being indexed
+# Block admin and internal API from being indexed
 Disallow: /admin
 Disallow: /#admin
 Disallow: /api/
 
-# Sitemap location (tells Google where to find your sitemap)
+# Crawl delay to be polite to hosting (optional, helps with shared servers)
+Crawl-delay: 5
+
+# Sitemap location (tells Google, Bing, and others where to find your sitemap)
 Sitemap: https://www.safehive.com.et/sitemap.xml
