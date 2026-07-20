@@ -476,7 +476,7 @@ const ContactPage = () => {
 
           {/* Left: Expert Consultation */}
           <div className="d-flex flex-column gap-4">
-            <div className="bg-dark rounded-32 p-5 text-white h-100" style={{ padding: '60px 40px', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div className="bg-dark rounded-32 p-5 text-white" style={{ padding: '60px 40px', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               <div style={{ position: 'relative', zIndex: 2 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px' }}>
                   <div className="rounded-circle bg-primary d-flex align-items-center justify-content-center" style={{ width: '60px', height: '60px', background: 'rgba(99, 91, 255, 0.2)' }}>

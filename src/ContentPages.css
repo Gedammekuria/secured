@@ -289,7 +289,7 @@
   display: grid;
   grid-template-columns: 1fr 1.6fr;
   gap: 32px;
-  align-items: stretch;
+  align-items: start;
 }
 
 @media (max-width: 1024px) {
