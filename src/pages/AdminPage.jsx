@@ -509,38 +509,34 @@ const AdminPage = ({ onNavigate }) => {
     // ── Brand header bar ──
     // Bottom orange accent line
     doc.setFillColor(226, 88, 34);
-    doc.rect(0, 21.2, PW, 0.8, 'F');
+    doc.rect(0, 17.4, PW, 0.8, 'F');
 
     // Header Background: clean white
     doc.setFillColor(255, 255, 255);
-    doc.rect(0, 0, PW, 21.2, 'F');
+    doc.rect(0, 0, PW, 17.4, 'F');
 
     // Logo (if logoDataUrl is available)
     if (logoDataUrl) {
-      doc.addImage(logoDataUrl, 'PNG', ML, 3.1, 40, 15);
+      doc.addImage(logoDataUrl, 'PNG', ML, 2.2, 34.6, 13);
     } else {
       // Fallback text if logo is not loaded
       doc.setTextColor(226, 88, 34);
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(16);
-      doc.text('SAFEHIVE', ML, 12);
-      doc.setFontSize(9);
+      doc.setFontSize(14);
+      doc.text('SAFEHIVE', ML, 10);
+      doc.setFontSize(8.5);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(100, 116, 139);
-      doc.text('SafeHive Security Systems', ML, 18);
+      doc.text('SafeHive Security Systems', ML, 15);
     }
 
     // Right elements (Dark text now since background is white)
     doc.setTextColor(10, 37, 64);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
-    doc.text('INQUIRY RECORD', PW - MR - 38, 12);
-    doc.setFontSize(8.5);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(100, 116, 139);
-    doc.text(`ID: ${formatInqId(item.id)}`, PW - MR - 38, 18);
+    doc.text(`INQUIRY RECORD - ID: ${formatInqId(item.id)}`, PW - MR, 10.3, { align: 'right' });
 
-    let y = 30;
+    let y = 25;
 
     // ── Inquiry meta strip ──
     doc.setFillColor(248, 250, 252);
