@@ -11,7 +11,7 @@ const defaultProjects = [
     fullDetail: "A massive security deployment for a large commercial properties group. We engineered a high resolution IP cameras. The system features advanced motion analytics to monitor high-traffic areas and thermal detection for sensitive zones.",
     benefit: ["24/7 continuous recording", "Elimination of blind spots", "Remote global access", "Motion detection", "Minimized risks of employee's and property loses", "Take immediate action for the problem"],
     category: "CCTV Camera",
-    image: "/assets/service/amibara project.webp",
+    image: "/assets/service/amibara project.jpg",
   },
   {
     id: 2,
@@ -45,7 +45,7 @@ const defaultProjects = [
     fullDetail: "Sunrise Real Estate required a CCTV security solution for their residential complex. We installed the Cameras with out blined spot.",
     benefit: ["24/7 continuous recording", "Elimination of blind spots", " ", "Remote global access", "Motion-triggered alerts", "Night vision excellence"],
     category: "CCTV Camera",
-    image: "/assets/service/sunrise.webp"
+    image: "/assets/service/Sunrise project.jpg"
   },
   {
     id: 5,

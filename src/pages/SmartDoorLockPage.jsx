@@ -148,7 +148,7 @@ const SmartDoorLockPage = ({ onNavigate }) => {
             <div className="split-image">
               <div className="image-frame">
                 <img
-                  src="/assets/service/smart_glass_door_lock.webp"
+                  src="/assets/service/smart glass doorlock.jpg"
                   alt="Smart Glass Door Lock"
                   className="rounded-2xl shadow-2xl"
                   loading="lazy"

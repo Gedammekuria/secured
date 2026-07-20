@@ -216,7 +216,7 @@ async function migrate() {
     const prj = await pool.query('SELECT COUNT(*) FROM projects');
     console.log(`\n📊 Final counts: services=${svc.rows[0].count}, projects=${prj.rows[0].count}`);
     console.log('🎉 Migration complete!');
-  } catch(e) {
+  } catch (e) {
     console.error('❌ Migration error:', e.message);
     console.error(e);
   }

@@ -9,26 +9,16 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import multer from 'multer';
+import { put } from '@vercel/blob';
 
 // Resolve __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Multer: save uploads to public/assets/service/
+// Multer: save uploads using memoryStorage for serverless blob upload
 const uploadDir = path.join(__dirname, '..', 'public', 'assets', 'service');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, uploadDir),
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const base = path.basename(file.originalname, ext)
-      .replace(/[^a-zA-Z0-9._-]/g, '_')
-      .toLowerCase();
-    const unique = `${Date.now()}_${base}${ext}`;
-    cb(null, unique);
-  }
-});
+const storage = multer.memoryStorage();
 const upload = multer({
   storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
@@ -954,11 +944,42 @@ app.post('/api/admin/upload', (req, res, next) => {
     return res.status(401).json({ error: 'Unauthorized' });
   }
   next();
-}, upload.single('image'), (req, res) => {
+}, upload.single('image'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No image file provided' });
-  const url = `/assets/service/${req.file.filename}`;
-  console.log(`🖼️  Image uploaded: ${url}`);
-  return res.json({ url });
+  
+  const ext = path.extname(req.file.originalname);
+  const base = path.basename(req.file.originalname, ext)
+    .replace(/[^a-zA-Z0-9._-]/g, '_')
+    .toLowerCase();
+  const filename = `${Date.now()}_${base}${ext}`;
+
+  // If Vercel Blob token is configured, use Vercel Blob
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    try {
+      const blob = await put(filename, req.file.buffer, {
+        access: 'public',
+        token: process.env.BLOB_READ_WRITE_TOKEN
+      });
+      console.log(`🖼️ Image uploaded to Vercel Blob: ${blob.url}`);
+      return res.json({ url: blob.url });
+    } catch (err) {
+      console.error('🔴 Failed to upload image to Vercel Blob:', err.message);
+      return res.status(500).json({ error: 'Failed to upload image to Vercel Blob: ' + err.message });
+    }
+  } else {
+    // Local fallback for local development
+    try {
+      if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+      const filePath = path.join(uploadDir, filename);
+      fs.writeFileSync(filePath, req.file.buffer);
+      const url = `/assets/service/${filename}`;
+      console.log(`🖼️ Image uploaded locally (fallback): ${url}`);
+      return res.json({ url });
+    } catch (err) {
+      console.error('🔴 Failed to save image locally:', err.message);
+      return res.status(500).json({ error: 'Failed to save image locally: ' + err.message });
+    }
+  }
 });
 
 // Admin Authentication Middleware
