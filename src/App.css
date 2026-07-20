@@ -1012,12 +1012,12 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  will-change: backdrop-filter;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   /* Mask: fully opaque (blur active) on left, fades to transparent (no blur) on the right */
   -webkit-mask-image: linear-gradient(to right, black 0%, black 30%, transparent 75%, transparent 100%);
   mask-image: linear-gradient(to right, black 0%, black 5%, black 10%, transparent 50%, transparent 60%, transparent 70%, transparent 100%);
-  pointer-events: none;
   pointer-events: none;
 }
 

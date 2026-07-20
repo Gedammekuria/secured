@@ -84,6 +84,8 @@ const SmartDoorLockPage = ({ onNavigate }) => {
                 <img
                   src="/assets/service/ring doorbell.png"
                   alt="Ring Video Doorbell"
+                  width={600}
+                  height={450}
                   className="rounded-2xl shadow-2xl"
                   loading="lazy"
                   decoding="async"
@@ -118,6 +120,8 @@ const SmartDoorLockPage = ({ onNavigate }) => {
                 <img
                   src="/assets/service/smart doorlock.jpg"
                   alt="Biometric Smart Video Door Lock"
+                  width={600}
+                  height={450}
                   className="rounded-2xl shadow-xl"
                   loading="lazy"
                   decoding="async"
@@ -150,6 +154,8 @@ const SmartDoorLockPage = ({ onNavigate }) => {
                 <img
                   src="/assets/service/smart glass doorlock.jpg"
                   alt="Smart Glass Door Lock"
+                  width={600}
+                  height={450}
                   className="rounded-2xl shadow-2xl"
                   loading="lazy"
                   decoding="async"

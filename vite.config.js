@@ -32,6 +32,7 @@ export default defineConfig({
     ],
   },
   build: {
+    cssCodeSplit: true,
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -41,9 +42,14 @@ export default defineConfig({
           if (id.includes('node_modules/lucide-react')) {
             return 'icons';
           }
+          // Split heavy pages into their own chunks
+          if (id.includes('/pages/ContactPage')) return 'page-contact';
+          if (id.includes('/pages/QuotePage')) return 'page-quote';
+          if (id.includes('/pages/AdminPage')) return 'page-admin';
         },
       },
     },
     chunkSizeWarningLimit: 600,
   },
 })
+

@@ -127,11 +127,12 @@ const Partners = () => {
                 <img
                   src={logo.src}
                   alt={logo.alt}
-                  width="auto"
+                  width={160}
                   height={logo.height}
                   style={{ height: `${logo.height}px`, width: 'auto', maxWidth: '160px' }}
-                  loading="lazy"
+                  loading={index < 6 ? 'eager' : 'lazy'}
                   decoding="async"
+                  fetchPriority={index < 6 ? 'high' : 'auto'}
                 />
               </div>
             ))}
@@ -226,7 +227,7 @@ const Services = ({ onNavigate, onQuoteOpen }) => {
     return (
       <div key={i} className="gallery-card" style={{ animationDelay: `${i * 0.08}s` }}>
         <div className="gallery-img-wrap">
-          <img src={card.image} alt={card.title} className="gallery-img" loading="lazy" decoding="async" />
+          <img src={card.image} alt={card.title} className="gallery-img" width={400} height={300} loading="lazy" decoding="async" />
           <div className="gallery-label">{card.title}</div>
         </div>
         <div className="gallery-desc">
@@ -364,7 +365,7 @@ const Process = () => {
             <div key={i} className="process-step">
               <div className="process-card">
                 <div className="process-img-wrap">
-                  <img src={step.image} alt={step.title} loading="lazy" decoding="async" />
+                  <img src={step.image} alt={step.title} width={400} height={300} loading="lazy" decoding="async" />
                   <div className="process-label">{step.title}</div>
                   <div className="step-number">{i + 1}</div>
                 </div>

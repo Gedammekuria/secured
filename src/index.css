@@ -200,3 +200,26 @@ a:focus-visible {
   content-visibility: auto;
   contain-intrinsic-size: 0 400px;
 }
+
+/* Disable expensive mesh animation on mobile to save GPU/battery */
+@media (max-width: 768px) {
+  .stripe-mesh::before,
+  .stripe-mesh::after {
+    animation: none;
+    filter: blur(40px);
+  }
+}
+
+/* Respect user preference for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .stripe-mesh::before,
+  .stripe-mesh::after {
+    animation: none;
+  }
+  .animate-fade-up,
+  .animate-fade-in {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
