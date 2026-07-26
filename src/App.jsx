@@ -432,29 +432,29 @@ const Footer = ({ onNavigate }) => {
 
 
             {/* Social media icons */}
-            <div className="footer-socials" style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+            <div className="footer-socials">
               {settings.facebook_url && (
-                <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="Facebook" aria-label="Facebook page" style={{ color: 'var(--text-main)', transition: 'color 0.2s' }}>
+                <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="Facebook" aria-label="Facebook page">
                   <FacebookIcon size={18} />
                 </a>
               )}
               {settings.instagram_url && (
-                <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="Instagram" aria-label="Instagram profile" style={{ color: 'var(--text-main)', transition: 'color 0.2s' }}>
+                <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="Instagram" aria-label="Instagram profile">
                   <InstagramIcon size={18} />
                 </a>
               )}
               {settings.tiktok_url && (
-                <a href={settings.tiktok_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="TikTok" aria-label="TikTok profile" style={{ color: 'var(--text-main)', transition: 'color 0.2s' }}>
+                <a href={settings.tiktok_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="TikTok" aria-label="TikTok profile">
                   <TikTokIcon size={18} />
                 </a>
               )}
               {settings.linkedin_url && (
-                <a href={settings.linkedin_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="LinkedIn" aria-label="LinkedIn company page" style={{ color: 'var(--text-main)', transition: 'color 0.2s' }}>
+                <a href={settings.linkedin_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="LinkedIn" aria-label="LinkedIn company page">
                   <LinkedInIcon size={18} />
                 </a>
               )}
               {settings.youtube_url && (
-                <a href={settings.youtube_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="YouTube" aria-label="YouTube channel" style={{ color: 'var(--text-main)', transition: 'color 0.2s' }}>
+                <a href={settings.youtube_url} target="_blank" rel="noopener noreferrer" className="social-icon" title="YouTube" aria-label="YouTube channel">
                   <YouTubeIcon size={18} />
                 </a>
               )}
@@ -483,17 +483,17 @@ const Footer = ({ onNavigate }) => {
           </div>
           <div className="footer-links">
             <h4>Contact Info</h4>
-            <a href={`tel:${settings.phone}`} className="footer-contact-item" style={{ color: 'var(--text-main)' }}>
+            <a href={`tel:${settings.phone}`} className="footer-contact-item" style={{ color: '#fff' }}>
               <Phone size={14} className="text-primary" /> {settings.phone}
             </a>
-            <a href={`mailto:${settings.company_email}`} className="footer-contact-item" style={{ color: 'var(--text-main)' }}>
+            <a href={`mailto:${settings.company_email}`} className="footer-contact-item" style={{ color: '#fff' }}>
               <Mail size={14} className="text-primary" /> {settings.company_email}
             </a>
 
-            <div className="footer-contact-item" style={{ color: 'var(--text-main)', fontSize: '15px', display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <div className="footer-contact-item" style={{ color: '#fff', fontSize: '15px', display: 'flex', gap: '10px', alignItems: 'center' }}>
               <MapPin size={14} className="text-primary" />{settings.location}
             </div>
-            <div className="footer-contact-item" style={{ color: 'var(--text-main)', fontSize: '15px', display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <div className="footer-contact-item" style={{ color: '#fff', fontSize: '15px', display: 'flex', gap: '10px', alignItems: 'center' }}>
               <Clock size={14} className="text-primary" /> Mon - Fri: 7:00 AM - 4:00 PM
             </div>
           </div>
