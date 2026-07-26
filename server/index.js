@@ -253,14 +253,14 @@ const defaultProjects = [
   },
   {
     id: 5,
-    title: "Maryod Bakery CCTV Installation ",
-    client_name: "Maryod Bakery",
+    title: "Amstel Frozen Foods CCTV Installation ",
+    client_name: "Amstel Frozen Foods",
     location: "Addis Ababa, Ethiopia",
     description: "Professional CCTV camera installation designed to provide continuous, high quality monitoring.",
-    full_detail: "We designed a powerful CCTV system for Maryod Bakery. Key focus areas include the point of sale for transaction security and the production area to monitor quality control. The high-resolution cameras provide clear footage even in low-light conditions during night shifts.",
+    full_detail: "We designed a powerful CCTV system for Amstel Frozen Foods. Key focus areas include the point of sale for transaction security and the production area to monitor quality control. The high-resolution cameras provide clear footage even in low-light conditions during night shifts.",
     benefit: ["24/7 continuous recording", "Elimination of blind spots", "Quality control oversight", "Remote operational checks", "POS transaction monitoring", "Time managment"],
     category: "CCTV Camera",
-    image: "/assets/service/maryod_bakery.webp",
+    image: "/assets/service/amstel_frozen_foods.webp",
     show_on_home: false
   },
   {

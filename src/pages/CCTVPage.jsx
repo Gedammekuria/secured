@@ -17,13 +17,13 @@ const CCTVPage = ({ onNavigate }) => {
       title: "High Resolution Quality",
       desc: "Crystal clear resolution that captures every detail with precision, day or night.",
       icon: <Eye className="text-blue-500" />,
-      image: "/assets/service/high resolution.webp"
+      image: "/assets/service/high-resolution.webp"
     },
     {
       title: "Night Vision Pro",
       desc: "Advanced infrared and night-color technology for total visibility in complete darkness.",
       icon: <Camera className="text-blue-500" />,
-      image: "/assets/service/night vision.webp"
+      image: "/assets/service/night-vision.webp"
     },
     {
       title: "Motion Detection",
@@ -41,7 +41,7 @@ const CCTVPage = ({ onNavigate }) => {
       title: "Remote Access",
       desc: "Access your live feed and recordings from anywhere in the world via your smartphone.",
       icon: <PhoneIcon className="text-blue-500" />,
-      image: "/assets/service/Remote access.webp"
+      image: "/assets/service/Remote-access.webp"
     },
     {
       title: "Local NVR recording",
@@ -179,7 +179,7 @@ const CCTVPage = ({ onNavigate }) => {
 
           <div className="why-cctv-spotlight">
             <div className="spotlight-image">
-              <img src="/assets/service/live view.webp" alt="Live View Surveillance" loading="lazy" decoding="async" />
+              <img src="/assets/service/live-view.webp" alt="Live View Surveillance" loading="lazy" decoding="async" />
               <div className="live-tag">
                 <span className="live-dot"></span>
                 LIVE VIEW

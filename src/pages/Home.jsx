@@ -27,17 +27,17 @@ const SERVICES_DATA = [
       {
         title: "Outdoor Cameras",
         description: "Weatherproof Outdoor cameras with night vision and motion detection. Covers driveways, gardens, and perimeters 24/7.",
-        image: "/assets/service/outdoor camera 1.webp"
+        image: "/assets/service/outdoor-camera-1.webp"
       },
       {
         title: "Indoor Cameras",
         description: "A wide-angle lenses and two-way audio. Monitor your home's interior from your smartphone.",
-        image: "/assets/service/indoor camera 1.webp"
+        image: "/assets/service/indoor-camera-1.webp"
       },
       {
         title: "Remote Access",
         description: "You can monitor any incident on your property remotely from your smartphone anywhere in the world",
-        image: "/assets/service/mobile view.webp"
+        image: "/assets/service/mobile-view.webp"
       },
     ]
   },
@@ -49,7 +49,7 @@ const SERVICES_DATA = [
       {
         title: "Ajax Alarm System",
         description: "It is a wireless security technology that protects against intrusion, fire, and flooding. It's the most awarded and reliable smart home/commercial security solutions.",
-        image: "/assets/service/ajax detector.webp"
+        image: "/assets/service/ajax-detector.webp"
       },
       {
         title: "GSM Burglare alarm System",
@@ -59,7 +59,7 @@ const SERVICES_DATA = [
       {
         title: "Fire alarm detector",
         description: "Protect your commercial infrastructure with high-precision, addressable smoke detectors designed for early thermal and particle detection. ",
-        image: "/assets/service/fire alarm system.jpg"
+        image: "/assets/service/fire-alarm-system.jpg"
       }
     ]
   },
@@ -71,17 +71,17 @@ const SERVICES_DATA = [
       {
         title: "Ring Video Doorbell",
         description: "See, hear, and speak to visitors from your phone anywhere in the world. HD video, motion alerts, night vision and two-way talk all in one smart doorbell.",
-        image: "/assets/service/ring doorbell1.jpg"
+        image: "/assets/service/ring-doorbell1.jpg"
       },
       {
         title: "Biometric Smart Video Door Lock",
         description: "Fingerprint, PIN, RFID card and mobile app access with a built-in camera that captures every entry attempt. The ultimate in residential and office access control.",
-        image: "/assets/service/smart doorlock.jpg"
+        image: "/assets/service/smart-doorlock.jpg"
       },
       {
         title: "Smart Glass Door Lock",
         description: "Secure frameless glass doors with powerful electromagnetic locks, RFID/PIN access, full audit trail logging and tamper alarms. Ideal for offices and commercial spaces.",
-        image: "/assets/service/glass doorlock.jpg"
+        image: "/assets/service/glass-doorlock.jpg"
       }
     ]
   }
@@ -342,7 +342,7 @@ const Process = () => {
     {
       title: "Installation and Configuration",
       description: "Experienced technicians handle the setup with precision, ensuring clean wiring and optimal device placement.",
-      image: "/assets/service/proper NVR placement.webp",
+      image: "/assets/service/proper-NVR-placement.webp",
       icon: <Wrench size={22} />
     },
     {
