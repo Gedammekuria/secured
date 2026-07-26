@@ -252,8 +252,6 @@ const PortfolioPage = ({ onSelectProject, onNavigate }) => {
                         fontWeight: '700',
                         padding: '12px 14px',
                         borderRadius: '12px',
-                        backgroundColor: '#635bff',
-                        color: '#ffffff',
                         border: 'none',
                         fontSize: '14px'
                       }}

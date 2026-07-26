@@ -554,7 +554,7 @@ const FeaturedProjects = ({ onNavigate, onSelectProject }) => {
                         }
                       }}
                       className="btn-primary"
-                      style={{ flex: 1, justifyContent: 'center', fontWeight: '700', padding: '12px 10px', borderRadius: '12px', backgroundColor: '#635bff', color: '#ffffff', border: 'none', fontSize: '13px' }}
+                      style={{ flex: 1, justifyContent: 'center', fontWeight: '700', padding: '12px 10px', borderRadius: '12px', border: 'none', fontSize: '13px' }}
                     >
                       Request Now
                     </button>
