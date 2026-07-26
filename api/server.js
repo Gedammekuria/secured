@@ -178,7 +178,7 @@ const defaultServices = [
       {
         title: "Fire Alarm System",
         description: "Life-safety fire detection system featuring addressable control panels, photoelectric smoke detectors, heat detectors, manual break-glass call points, and building-wide sounders. Designed to comply with Ethiopian fire safety standards.",
-        image: "/assets/service/fire-alarm-system.jpg"
+        image: "/assets/service/fire-alarm-system.webp"
       },
       {
         title: "Ajax Remote Control",
@@ -196,17 +196,17 @@ const defaultServices = [
       {
         title: "Ring Video Doorbell",
         description: "See, hear, and speak to visitors from your phone anywhere in the world. HD video, motion alerts, night vision and two-way talk \u2014 all in one smart doorbell.",
-        image: "/assets/service/ring-doorbell1.jpg"
+        image: "/assets/service/ring-doorbell1.webp"
       },
       {
         title: "Biometric Smart Video Door Lock",
         description: "Fingerprint, PIN, RFID card and mobile app access \u2014 with a built-in camera that captures every entry attempt. The ultimate in residential and office access control.",
-        image: "/assets/service/smart-doorlock.jpg"
+        image: "/assets/service/smart-doorlock.webp"
       },
       {
         title: "Smart Glass Door Lock",
         description: "Secure frameless glass doors with powerful electromagnetic locks, RFID/PIN access, full audit trail logging and tamper alarms. Ideal for offices and commercial spaces.",
-        image: "/assets/service/glass-doorlock.jpg"
+        image: "/assets/service/glass-doorlock.webp"
       }
     ]
   }
@@ -222,7 +222,7 @@ const defaultProjects = [
     full_detail: "A massive security deployment for a large commercial properties group. We engineered a high resolution IP camera network designed for 360-degree blind-spot coverage. The system features advanced motion analytics to monitor high-traffic areas and thermal detection for sensitive zones.",
     benefit: ["24/7 continuous recording", "Elimination of blind spots", "Remote global access", "Motion detection", "Minimized risks of employee's and property loses", "Take immediate action for the problem"],
     category: "CCTV Camera",
-    image: "/assets/service/amibara-project.jpg",
+    image: "/assets/service/amibara-project.webp",
     show_on_home: true
   },
   {
@@ -258,7 +258,7 @@ const defaultProjects = [
     full_detail: "Sunrise Real Estate required a CCTV security solution for their residential complex. We installed the Cameras with out blined spot.",
     benefit: ["24/7 continuous recording", "Elimination of blind spots", "Remote global access", "Motion-triggered alerts", "Night vision excellence"],
     category: "CCTV Camera",
-    image: "/assets/service/Sunrise-project.jpg",
+    image: "/assets/service/Sunrise-project.webp",
     show_on_home: false
   },
   {
@@ -282,7 +282,7 @@ const defaultProjects = [
     full_detail: "Jotun's manufacturing plant required a robust fire detection and alarm solution suitable for a high-risk industrial environment. We installed an addressable fire alarm control panel, heat detectors in the production areas, smoke detectors in office and storage zones, and manual call points at all exits. The system is integrated with the site's emergency evacuation plan, providing immediate zone-based alerts to the safety team and automatic notification to local fire services.",
     benefit: ["Addressable zone detection", "Industrial-grade heat detectors", "Automatic emergency notification", "Full site evacuation coverage", "24/7 monitoring capability", "Compliance with Ethiopian fire safety standards"],
     category: "Alarm system",
-    image: "/assets/service/fire-alarm-control-system.jpg",
+    image: "/assets/service/fire-alarm-control-system.webp",
     show_on_home: true
   },
   {
@@ -294,7 +294,7 @@ const defaultProjects = [
     full_detail: "Ethiopian Insurance Corporation needed a reliable fire alarm system to safeguard their multi-floor headquarters building. We deployed a conventional fire alarm control panel with smoke detectors in all office floors, server room heat detectors, break-glass manual call points on every floor landing, and ceiling-mounted sounders for building-wide alerts. The installation was completed with full wiring documentation and staff training on emergency procedures.",
     benefit: ["Multi-floor smoke detection", "Server room heat detection", "Building-wide alarm sounders", "Break-glass manual call points", "Emergency procedure training", "Full wiring documentation"],
     category: "Alarm system",
-    image: "/assets/service/fire-alarm-installation.jpg",
+    image: "/assets/service/fire-alarm-installation.webp",
     show_on_home: true
   },
   {
@@ -306,7 +306,7 @@ const defaultProjects = [
     full_detail: "Following the fire alarm project, Ethiopian Insurance Corporation engaged us to upgrade access control across their headquarters. We installed Biometric Smart Video Door Locks on the executive floor, server room, and records vault. Each lock supports fingerprint recognition, PIN code, and RFID card access, with a built-in camera capturing every entry attempt. Management receives real-time alerts for unrecognised access attempts and can remotely lock or unlock any door via the mobile app.",
     benefit: ["Biometric fingerprint access", "Built-in entry camera", "Remote lock/unlock via app", "Real-time intrusion alerts", "RFID and PIN backup access", "Complete access audit trail"],
     category: "Smart Door Locks",
-    image: "/assets/service/smart-door-lock-installation.jpg",
+    image: "/assets/service/smart-door-lock-installation.webp",
     show_on_home: false
   }
 ];
