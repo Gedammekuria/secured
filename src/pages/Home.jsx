@@ -526,19 +526,39 @@ const FeaturedProjects = ({ onNavigate, onSelectProject }) => {
                 <h3 className="font-weight-bold mb-3" style={{ fontSize: '18px', color: '#0a2540', lineHeight: '1.4', margin: '8px 0' }}>{project.title}</h3>
                 <p className="text-muted mb-4" style={{ lineHeight: '1.6', fontSize: '14px', flexGrow: 1 }}>{project.description}</p>
                 <div className="mt-auto pt-4" style={{ borderTop: '1px solid #f1f5f9' }}>
-                  <button
-                    onClick={() => {
-                      if (onSelectProject) {
-                        onSelectProject(project);
-                      } else {
-                        onNavigate('portfolio');
-                      }
-                    }}
-                    className="btn-primary w-100"
-                    style={{ justifyContent: 'center', fontWeight: '700', padding: '12px', borderRadius: '12px' }}
-                  >
-                    View Details
-                  </button>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button
+                      onClick={() => {
+                        if (onSelectProject) {
+                          onSelectProject(project);
+                        } else {
+                          onNavigate('portfolio');
+                        }
+                      }}
+                      className="btn-primary"
+                      style={{ flex: 1, justifyContent: 'center', fontWeight: '700', padding: '12px 10px', borderRadius: '12px', backgroundColor: '#f1f5f9', color: '#0a2540', border: '1px solid #e2e8f0', fontSize: '13px' }}
+                    >
+                      View Details
+                    </button>
+                    <button
+                      onClick={() => {
+                        const catLower = (project.category || '').toLowerCase();
+                        if (catLower.includes('cctv') || catLower.includes('camera')) {
+                          onNavigate('cctv-quote');
+                        } else if (catLower.includes('alarm')) {
+                          onNavigate('alarm-quote');
+                        } else if (catLower.includes('door') || catLower.includes('lock')) {
+                          onNavigate('smartdoorlock-quote');
+                        } else {
+                          onNavigate('quote');
+                        }
+                      }}
+                      className="btn-primary"
+                      style={{ flex: 1, justifyContent: 'center', fontWeight: '700', padding: '12px 10px', borderRadius: '12px', backgroundColor: '#635bff', color: '#ffffff', border: 'none', fontSize: '13px' }}
+                    >
+                      Request Now
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

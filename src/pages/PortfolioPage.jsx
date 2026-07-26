@@ -134,6 +134,19 @@ const PortfolioPage = ({ onSelectProject, onNavigate }) => {
     ? projectsList
     : projectsList.filter(p => p.category === activeFilter);
 
+  const handleRequestNow = (category) => {
+    const catLower = (category || '').toLowerCase();
+    if (catLower.includes('cctv') || catLower.includes('camera')) {
+      onNavigate('cctv-quote');
+    } else if (catLower.includes('alarm')) {
+      onNavigate('alarm-quote');
+    } else if (catLower.includes('door') || catLower.includes('lock')) {
+      onNavigate('smartdoorlock-quote');
+    } else {
+      onNavigate('quote');
+    }
+  };
+
   return (
     <div className="portfolio-page pb-20">
       {/* Hero Header */}
@@ -212,13 +225,42 @@ const PortfolioPage = ({ onSelectProject, onNavigate }) => {
                 <h3 className="font-weight-bold mb-3" style={{ fontSize: '22px', color: '#0a2540', lineHeight: '1.4' }}>{project.title}</h3>
                 <p className="text-muted mb-4" style={{ lineHeight: '1.6', fontSize: '15px' }}>{project.description}</p>
                 <div className="mt-auto pt-4" style={{ borderTop: '1px solid #f1f5f9' }}>
-                  <button
-                    onClick={() => onSelectProject(project)}
-                    className="btn-primary w-100"
-                    style={{ justifyContent: 'center', fontWeight: '700', padding: '14px', borderRadius: '12px' }}
-                  >
-                    View More
-                  </button>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button
+                      onClick={() => onSelectProject(project)}
+                      className="btn-primary"
+                      style={{
+                        flex: '1',
+                        justifyContent: 'center',
+                        fontWeight: '700',
+                        padding: '12px 14px',
+                        borderRadius: '12px',
+                        backgroundColor: '#f1f5f9',
+                        color: '#0a2540',
+                        border: '1px solid #e2e8f0',
+                        fontSize: '14px'
+                      }}
+                    >
+                      View More
+                    </button>
+                    <button
+                      onClick={() => handleRequestNow(project.category)}
+                      className="btn-primary"
+                      style={{
+                        flex: '1',
+                        justifyContent: 'center',
+                        fontWeight: '700',
+                        padding: '12px 14px',
+                        borderRadius: '12px',
+                        backgroundColor: '#635bff',
+                        color: '#ffffff',
+                        border: 'none',
+                        fontSize: '14px'
+                      }}
+                    >
+                      Request Now
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
