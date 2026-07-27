@@ -22,3 +22,23 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment variables — NEVER commit these
+.env
+.env.*
+!.env.example
+
+# Database/migration scripts (contain sensitive logic)
+full_migrate.js
+check_new_db.js
+check_db_images.js
+fix_db_images.js
+fix_timestamp_images.js
+delete_maryod.js
+migrate-db.js
+test-db.js
+insert-projects.js
+script.js
+
+# Notification logs
+notifications_log.txt
