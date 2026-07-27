@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Eye, EyeOff, Trash2, LogOut, Search, ShieldAlert, Filter, Calendar, Users, FileText, Database, Lock, X, ChevronDown, Bell, Download, CheckSquare, Square, ArrowLeft, Sheet, Plus, Edit, Camera, Shield, Radio, Home as HomeIcon, DoorOpen, AlertTriangle, Mail, ChevronLeft, ChevronRight, LayoutDashboard, Settings, FolderKanban, Globe, CheckCircle, Circle } from 'lucide-react';
+import { Eye, EyeOff, Trash2, LogOut, Search, ShieldAlert, Filter, Calendar, Users, FileText, Database, Lock, X, ChevronDown, Bell, Download, CheckSquare, Square, ArrowLeft, Sheet, Plus, Edit, Camera, Shield, Radio, Home as HomeIcon, DoorOpen, AlertTriangle, Mail, ChevronLeft, ChevronRight, LayoutDashboard, Settings, FolderKanban, Globe, CheckCircle, Circle, Activity } from 'lucide-react';
 import { useSiteSettings } from '../SiteSettingsContext';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
@@ -1599,6 +1599,15 @@ const AdminPage = ({ onNavigate }) => {
                     <span className="sidebar-nav-icon"><ShieldAlert size={18} /></span>
                     {sidebarOpen && <span className="sidebar-nav-label">Security</span>}
                   </button>
+
+                  <button
+                    className={`sidebar-nav-item ${adminTab === 'logs' ? 'sidebar-nav-active' : ''}`}
+                    onClick={() => setAdminTab('logs')}
+                    title="Audit Logs"
+                  >
+                    <span className="sidebar-nav-icon"><Activity size={18} /></span>
+                    {sidebarOpen && <span className="sidebar-nav-label">Audit Logs</span>}
+                  </button>
                 </nav>
 
                 {/* Sidebar footer */}
@@ -1654,6 +1663,13 @@ const AdminPage = ({ onNavigate }) => {
                 >
                   <Lock size={20} />
                   Security
+                </button>
+                <button
+                  className={`mobile-tab-btn ${adminTab === 'logs' ? 'active' : ''}`}
+                  onClick={() => setAdminTab('logs')}
+                >
+                  <Activity size={20} />
+                  Logs
                 </button>
               </nav>
 
@@ -1915,7 +1931,7 @@ const AdminPage = ({ onNavigate }) => {
 
                     {/* Bulk actions banner */}
                     {selectedRows.size > 0 && (
-                      <div 
+                      <div
                         className="bulk-actions-banner animate-fade-in"
                         style={{
                           background: 'linear-gradient(135deg, #fef2f2 0%, #fff1f2 100%)',
@@ -1932,7 +1948,7 @@ const AdminPage = ({ onNavigate }) => {
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <div 
+                          <div
                             style={{
                               width: '36px',
                               height: '36px',
@@ -1955,7 +1971,7 @@ const AdminPage = ({ onNavigate }) => {
                             </p>
                           </div>
                         </div>
-                        
+
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                           <button
                             type="button"
@@ -2207,6 +2223,10 @@ const AdminPage = ({ onNavigate }) => {
 
                 {adminTab === 'security' && (
                   <SecurityTab adminEmail={adminEmail} />
+                )}
+
+                {adminTab === 'logs' && (
+                  <LogsTab />
                 )}
 
               </div> {/* end admin-main-content */}
@@ -3997,6 +4017,320 @@ const SettingsTab = () => {
           </button>
         </div>
       </form>
+    </div>
+  );
+};
+
+/* ── LOGS & AUDIT TAB COMPONENT ── */
+const LogsTab = () => {
+  const [logs, setLogs] = useState([]);
+  const [stats, setStats] = useState({ totalLogs: 0, emailCount: 0, resetCount: 0, statusCount: 0 });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [expandedLogId, setExpandedLogId] = useState(null);
+  const [actionSuccess, setActionSuccess] = useState('');
+
+  const token = localStorage.getItem('safehive_admin_token');
+
+  const fetchLogs = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/admin/logs', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Failed to fetch system logs');
+      const data = await res.json();
+      setLogs(data.logs || []);
+      setStats(data.stats || { totalLogs: 0, emailCount: 0, resetCount: 0, statusCount: 0 });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLogs();
+  }, []);
+
+  const handleClearLogs = async () => {
+    if (!window.confirm('Are you sure you want to clear the notification & audit log history? This action cannot be undone.')) return;
+    try {
+      const res = await fetch('/api/admin/logs', {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Failed to clear logs');
+      setActionSuccess('Log history cleared successfully.');
+      setTimeout(() => setActionSuccess(''), 4000);
+      fetchLogs();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleDownloadLogsTxt = () => {
+    if (logs.length === 0) return;
+    const fullText = logs.map(l => l.raw).join('\n\n========================================\n\n');
+    const blob = new Blob([fullText], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `safehive_audit_logs_${new Date().toISOString().slice(0, 10)}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const filteredLogs = logs.filter(log => {
+    const matchesType = typeFilter === 'all' || log.type === typeFilter;
+    const q = searchQuery.toLowerCase();
+    const matchesSearch = !q ||
+      (log.recipient && log.recipient.toLowerCase().includes(q)) ||
+      (log.subject && log.subject.toLowerCase().includes(q)) ||
+      (log.body && log.body.toLowerCase().includes(q)) ||
+      (log.timestamp && log.timestamp.toLowerCase().includes(q));
+    return matchesType && matchesSearch;
+  });
+
+  const formatLogDate = (isoStr) => {
+    if (!isoStr) return 'N/A';
+    try {
+      const d = new Date(isoStr);
+      if (isNaN(d.getTime())) return isoStr;
+      return d.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+    } catch {
+      return isoStr;
+    }
+  };
+
+  return (
+    <div className="admin-services-tab animate-fade-in">
+      <div className="tab-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+        <div>
+          <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Activity size={24} style={{ color: '#635bff' }} />
+            System Audit & Notification Logs
+          </h2>
+          <p style={{ color: '#64748b', fontSize: '14px', margin: '4px 0 0 0' }}>
+            Track email dispatches, status update notifications, and admin security events.
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <button onClick={fetchLogs} className="btn-logout" style={{ padding: '9px 16px', fontSize: '13px' }}>
+            Refresh Logs
+          </button>
+          <button onClick={handleDownloadLogsTxt} disabled={logs.length === 0} className="btn-download-toggle" style={{ padding: '9px 16px', fontSize: '13px' }}>
+            <Download size={15} /> Export Logs (.txt)
+          </button>
+          <button onClick={handleClearLogs} disabled={logs.length === 0} className="btn-logout" style={{ padding: '9px 16px', fontSize: '13px', borderColor: '#fca5a5', color: '#dc2626' }}>
+            <Trash2 size={15} /> Clear Logs
+          </button>
+        </div>
+      </div>
+
+      {/* Metrics Row */}
+      <div className="metrics-grid" style={{ marginBottom: '24px' }}>
+        <div className="metric-card">
+          <div className="metric-card-info">
+            <h3>Total Log Events</h3>
+            <p style={{ color: '#635bff' }}>{stats.totalLogs}</p>
+          </div>
+          <div className="metric-card-icon" style={{ background: '#eef2ff', color: '#635bff' }}>
+            <FileText size={18} />
+          </div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-card-info">
+            <h3>Status Emails Sent</h3>
+            <p style={{ color: '#16a34a' }}>{stats.statusCount}</p>
+          </div>
+          <div className="metric-card-icon" style={{ background: '#f0fdf4', color: '#16a34a' }}>
+            <Mail size={18} />
+          </div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-card-info">
+            <h3>Password & Security</h3>
+            <p style={{ color: '#ea580c' }}>{stats.resetCount}</p>
+          </div>
+          <div className="metric-card-icon" style={{ background: '#fff7ed', color: '#ea580c' }}>
+            <Lock size={18} />
+          </div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-card-info">
+            <h3>Total Notifications</h3>
+            <p style={{ color: '#0284c7' }}>{stats.emailCount}</p>
+          </div>
+          <div className="metric-card-icon" style={{ background: '#f0f9ff', color: '#0284c7' }}>
+            <Bell size={18} />
+          </div>
+        </div>
+      </div>
+
+      {actionSuccess && (
+        <div className="login-error-alert" style={{ background: '#f0fdf4', borderColor: '#bbf7d0', color: '#15803d', marginBottom: '20px' }}>
+          <CheckCircle size={16} /> {actionSuccess}
+        </div>
+      )}
+
+      {error && (
+        <div className="login-error-alert mb-4">
+          Failed: {error}
+        </div>
+      )}
+
+      {/* Filters Bar */}
+      <div className="filters-panel" style={{ marginBottom: '20px' }}>
+        <div className="filters-row">
+          <div className="search-box-wrapper" style={{ flex: '1', minWidth: '240px' }}>
+            <Search size={16} className="search-icon" />
+            <input
+              type="text"
+              placeholder="Search by recipient, subject, text, or date..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          <select
+            className="filter-select"
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            style={{ width: '220px' }}
+          >
+            <option value="all">All Log Event Types</option>
+            <option value="Client Status Update">Client Status Update</option>
+            <option value="Notification Email">Notification Email</option>
+            <option value="Password Reset Request">Password Reset Request</option>
+            <option value="Password Reset Success">Password Reset Success</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Logs Table / List */}
+      <div className="service-table-card" style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+        {loading ? (
+          <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
+            Loading system audit logs...
+          </div>
+        ) : filteredLogs.length === 0 ? (
+          <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
+            No log events match your search/filter criteria.
+          </div>
+        ) : (
+          <div className="table-responsive">
+            <table className="inquiries-table">
+              <thead>
+                <tr>
+                  <th style={{ width: '60px' }}>#</th>
+                  <th style={{ width: '180px' }}>Timestamp</th>
+                  <th style={{ width: '160px' }}>Event Type</th>
+                  <th>Recipient / Target</th>
+                  <th>Subject Line</th>
+                  <th style={{ width: '100px', textAlign: 'center' }}>Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredLogs.map((log) => {
+                  const isExpanded = expandedLogId === log.id;
+                  const isReset = log.type.includes('Password Reset');
+                  const isStatus = log.type.includes('Status Update');
+
+                  return (
+                    <React.Fragment key={log.id}>
+                      <tr
+                        onClick={() => setExpandedLogId(isExpanded ? null : log.id)}
+                        style={{ cursor: 'pointer', background: isExpanded ? '#f8fafc' : undefined }}
+                      >
+                        <td style={{ fontWeight: '700', color: '#64748b', fontSize: '13px' }}>#{log.id}</td>
+                        <td style={{ fontSize: '12px', color: '#475569', whiteSpace: 'nowrap' }}>
+                          {formatLogDate(log.timestamp)}
+                        </td>
+                        <td>
+                          <span
+                            className="status-badge"
+                            style={{
+                              background: isReset ? '#fff7ed' : isStatus ? '#f0fdf4' : '#eff6ff',
+                              color: isReset ? '#c2410c' : isStatus ? '#15803d' : '#1d4ed8',
+                              border: `1px solid ${isReset ? '#ffedd5' : isStatus ? '#dcfce7' : '#dbeafe'}`,
+                              fontSize: '11px'
+                            }}
+                          >
+                            {log.type}
+                          </span>
+                        </td>
+                        <td style={{ fontSize: '13px', fontWeight: '600', color: '#0f172a' }}>
+                          {log.recipient}
+                        </td>
+                        <td style={{ fontSize: '13px', color: '#334155' }}>
+                          {log.subject}
+                        </td>
+                        <td style={{ textAlign: 'center' }}>
+                          <button
+                            type="button"
+                            className="btn-logout"
+                            style={{ padding: '4px 10px', fontSize: '12px', borderColor: '#cbd5e1' }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExpandedLogId(isExpanded ? null : log.id);
+                            }}
+                          >
+                            {isExpanded ? 'Hide' : 'View'}
+                          </button>
+                        </td>
+                      </tr>
+
+                      {isExpanded && (
+                        <tr>
+                          <td colSpan={6} style={{ background: '#f8fafc', padding: '16px 24px', borderBottom: '1.5px solid #e2e8f0' }}>
+                            <div style={{ background: 'white', border: '1px solid #cbd5e1', borderRadius: '12px', padding: '16px' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                                <span style={{ fontSize: '12px', fontWeight: '800', color: '#635bff', textTransform: 'uppercase' }}>
+                                  Full Audit Log Output
+                                </span>
+                                <span style={{ fontSize: '11px', color: '#64748b' }}>
+                                  ID: #{log.id} • {log.timestamp}
+                                </span>
+                              </div>
+                              <pre style={{
+                                whiteSpace: 'pre-wrap',
+                                fontFamily: 'monospace',
+                                fontSize: '12px',
+                                background: '#0f172a',
+                                color: '#f8fafc',
+                                padding: '16px',
+                                borderRadius: '8px',
+                                margin: 0,
+                                lineHeight: '1.5',
+                                overflowX: 'auto'
+                              }}>{log.raw}</pre>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

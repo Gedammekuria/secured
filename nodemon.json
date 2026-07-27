@@ -1,9 +1,15 @@
 {
+    "watch": [
+        "server"
+    ],
     "ignore": [
         ".env",
         "notifications_log.txt",
         "node_modules",
         "dist",
-        "public"
-    ]
+        "public",
+        "*.js",
+        "src"
+    ],
+    "ext": "js,json"
 }

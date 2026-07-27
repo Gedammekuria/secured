@@ -59,7 +59,7 @@ const SERVICES_DATA = [
       {
         title: "Fire alarm detector",
         description: "Protect your commercial infrastructure with high-precision, addressable smoke detectors designed for early thermal and particle detection. ",
-        image: "/assets/service/fire-alarm-system.jpg"
+        image: "/assets/service/fire_alarm_system.webp"
       }
     ]
   },
@@ -71,17 +71,17 @@ const SERVICES_DATA = [
       {
         title: "Ring Video Doorbell",
         description: "See, hear, and speak to visitors from your phone anywhere in the world. HD video, motion alerts, night vision and two-way talk all in one smart doorbell.",
-        image: "/assets/service/ring-doorbell1.jpg"
+        image: "/assets/service/ring-doorbell1.webp"
       },
       {
         title: "Biometric Smart Video Door Lock",
         description: "Fingerprint, PIN, RFID card and mobile app access with a built-in camera that captures every entry attempt. The ultimate in residential and office access control.",
-        image: "/assets/service/smart-doorlock.jpg"
+        image: "/assets/service/smart-doorlock.webp"
       },
       {
         title: "Smart Glass Door Lock",
         description: "Secure frameless glass doors with powerful electromagnetic locks, RFID/PIN access, full audit trail logging and tamper alarms. Ideal for offices and commercial spaces.",
-        image: "/assets/service/glass-doorlock.jpg"
+        image: "/assets/service/glass-doorlock.webp"
       }
     ]
   }

@@ -946,7 +946,7 @@ app.post('/api/admin/upload', (req, res, next) => {
   next();
 }, upload.single('image'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No image file provided' });
-  
+
   const ext = path.extname(req.file.originalname);
   const base = path.basename(req.file.originalname, ext)
     .replace(/[^a-zA-Z0-9._-]/g, '_')
@@ -1358,6 +1358,105 @@ app.put('/api/admin/settings', authenticateAdmin, async (req, res) => {
   } catch (err) {
     console.error('🔴 Failed to update site settings in DB:', err.message);
     return res.status(500).json({ error: 'Failed to update site settings.' });
+  }
+});
+
+// ── GET /api/admin/logs — Fetch system and notification audit logs ─────────────
+app.get('/api/admin/logs', authenticateAdmin, async (req, res) => {
+  try {
+    const logFilePath = 'notifications_log.txt';
+    if (!fs.existsSync(logFilePath)) {
+      return res.json({
+        logs: [],
+        stats: { totalLogs: 0, emailCount: 0, resetCount: 0, statusCount: 0 }
+      });
+    }
+
+    const fileContent = fs.readFileSync(logFilePath, 'utf8');
+    const rawBlocks = fileContent.split('========================================').filter(b => b.trim().length > 0);
+
+    let emailCount = 0;
+    let resetCount = 0;
+    let statusCount = 0;
+
+    const parsedLogs = rawBlocks.map((block, idx) => {
+      const lines = block.trim().split('\n');
+      let timestamp = '';
+      let recipient = '';
+      let subject = '';
+      let bodyLines = [];
+      let isBody = false;
+
+      lines.forEach(line => {
+        if (line.startsWith('Timestamp:')) {
+          timestamp = line.replace('Timestamp:', '').trim();
+        } else if (line.startsWith('Recipient:')) {
+          recipient = line.replace('Recipient:', '').trim();
+        } else if (line.startsWith('Subject:')) {
+          subject = line.replace('Subject:', '').trim();
+        } else if (line.startsWith('Body:')) {
+          isBody = true;
+        } else if (isBody) {
+          bodyLines.push(line);
+        }
+      });
+
+      let type = 'System Event';
+      const subjLower = subject.toLowerCase();
+      if (subjLower.includes('password reset code') || subjLower.includes('reset code')) {
+        type = 'Password Reset Request';
+        resetCount++;
+      } else if (subjLower.includes('reset successful') || subjLower.includes('password reset')) {
+        type = 'Password Reset Success';
+        resetCount++;
+      } else if (subjLower.includes('request accepted') || subjLower.includes('in progress') || subjLower.includes('project completed')) {
+        type = 'Client Status Update';
+        statusCount++;
+        emailCount++;
+      } else if (subjLower.includes('inquiry update') || subjLower.includes('safehive')) {
+        type = 'Notification Email';
+        emailCount++;
+      } else {
+        emailCount++;
+      }
+
+      return {
+        id: rawBlocks.length - idx,
+        timestamp: timestamp || new Date().toISOString(),
+        recipient: recipient || 'N/A',
+        subject: subject || 'System Event',
+        type: type,
+        body: bodyLines.join('\n').trim(),
+        raw: block.trim()
+      };
+    }).reverse(); // Most recent first
+
+    return res.json({
+      logs: parsedLogs,
+      stats: {
+        totalLogs: parsedLogs.length,
+        emailCount,
+        resetCount,
+        statusCount
+      }
+    });
+  } catch (err) {
+    console.error('🔴 Failed to fetch admin logs:', err.message);
+    return res.status(500).json({ error: 'Failed to read audit logs.' });
+  }
+});
+
+// ── DELETE /api/admin/logs — Clear audit logs ──────────────────────────────────
+app.delete('/api/admin/logs', authenticateAdmin, async (req, res) => {
+  try {
+    const logFilePath = 'notifications_log.txt';
+    const clearHeader = `========================================\n[LOG FILE CLEARED BY ADMIN]\nTimestamp: ${new Date().toISOString()}\n========================================\n`;
+    fs.writeFileSync(logFilePath, clearHeader, 'utf8');
+    console.log('🗑️ Admin logs file was cleared.');
+    return res.json({ success: true, message: 'Log history cleared successfully.' });
+  } catch (err) {
+    console.error('🔴 Failed to clear admin logs:', err.message);
+    return res.status(500).json({ error: 'Failed to clear log file.' });
   }
 });
 

@@ -82,7 +82,7 @@ const SmartDoorLockPage = ({ onNavigate }) => {
             <div className="split-image">
               <div className="image-frame">
                 <img
-                  src="/assets/service/ring-doorbell.png"
+                  src="/assets/service/ring-doorbell.webp"
                   alt="Ring Video Doorbell"
                   width={600}
                   height={450}
@@ -118,7 +118,7 @@ const SmartDoorLockPage = ({ onNavigate }) => {
             <div className="split-image">
               <div className="image-frame">
                 <img
-                  src="/assets/service/smart-doorlock.jpg"
+                  src="/assets/service/smart-doorlock.webp"
                   alt="Biometric Smart Video Door Lock"
                   width={600}
                   height={450}
@@ -152,7 +152,7 @@ const SmartDoorLockPage = ({ onNavigate }) => {
             <div className="split-image">
               <div className="image-frame">
                 <img
-                  src="/assets/service/smart-glass-doorlock.jpg"
+                  src="/assets/service/smart-glass-doorlock.webp"
                   alt="Smart Glass Door Lock"
                   width={600}
                   height={450}
