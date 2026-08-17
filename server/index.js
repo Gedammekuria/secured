@@ -169,11 +169,6 @@ const defaultServices = [
         title: "Fire Alarm System",
         description: "Life-safety fire detection system featuring addressable control panels, photoelectric smoke detectors, heat detectors, manual break-glass call points, and building-wide sounders. Designed to comply with Ethiopian fire safety standards.",
         image: "/assets/service/fire_alarm_system.webp"
-      },
-      {
-        title: "Ajax Remote Control",
-        description: "Our systems are simple to access remotely with cellphone ",
-        image: "/assets/service/ajax control.webp"
       }
     ]
   },

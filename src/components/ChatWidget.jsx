@@ -17,7 +17,7 @@ export default function ChatWidget() {
 
       const script = document.createElement('script');
       script.async = true;
-      script.src = 'https://embed.tawk.to/6a382feba653051d4007ff13/1jrlnmh0g';
+      script.src = 'https://embed.tawk.to/6a829cd5883a1a1d4bc9ba70/default';
       script.charset = 'UTF-8';
       script.setAttribute('crossorigin', '*');
       document.head.appendChild(script);

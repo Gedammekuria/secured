@@ -20,7 +20,7 @@ const ServicesPage = ({ onNavigate }) => {
           <div className="split-row">
             <div className="split-image">
               <div className="image-frame">
-                <img src="/assets/service/indoor-camera-1.webp" alt="Professional CCTV Systems" loading="lazy" />
+                <img src="/assets/service/outdoor-camera-1.webp" alt="Professional CCTV Systems" loading="lazy" />
                 <div className="image-overlay-accent"></div>
               </div>
             </div>
@@ -123,7 +123,7 @@ const ServicesPage = ({ onNavigate }) => {
           <div className="split-row">
             <div className="split-image">
               <div className="image-frame">
-                <img src="/assets/service/smart-doorlock.webp" alt="Smart Door Lock Systems" loading="lazy" />
+                <img src="/assets/service/Smart_Door_lock.jpg" alt="Smart Door Lock Systems" loading="lazy" />
                 <div className="image-overlay-accent"></div>
               </div>
             </div>

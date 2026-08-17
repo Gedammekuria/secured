@@ -179,11 +179,6 @@ const defaultServices = [
         title: "Fire Alarm System",
         description: "Life-safety fire detection system featuring addressable control panels, photoelectric smoke detectors, heat detectors, manual break-glass call points, and building-wide sounders. Designed to comply with Ethiopian fire safety standards.",
         image: "/assets/service/fire-alarm-system.webp"
-      },
-      {
-        title: "Ajax Remote Control",
-        description: "Our systems are simple to access remotely with cellphone ",
-        image: "/assets/service/ajax-control.webp"
       }
     ]
   },
@@ -1059,7 +1054,7 @@ app.post('/api/admin/upload', (req, res, next) => {
   next();
 }, upload.single('image'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No image file provided' });
-  
+
   const ext = path.extname(req.file.originalname);
   const base = path.basename(req.file.originalname, ext)
     .replace(/[^a-zA-Z0-9._-]/g, '_')

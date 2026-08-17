@@ -50,7 +50,7 @@ const AlarmPage = ({ onNavigate }) => {
       {/* Ajax Section */}
       <section id="ajax" className="ajax-detail py-20">
         <div className="container">
-          <div className="split-row items-center reverted">
+          <div className="split-row items-center">
             <div className="split-text">
               <span className="pill warning">Best Wireless Security</span>
               <h2>Ajax Alarm Security System</h2>
@@ -80,7 +80,7 @@ const AlarmPage = ({ onNavigate }) => {
       {/* GSM System Section */}
       <section className="gsm-detail py-24 bg-gray-50">
         <div className="container">
-          <div className="split-row items-center reverse">
+          <div className="split-row items-center reverted">
             <div className="split-text">
               <span className="pill warning">Reliable & Affordable</span>
               <h2>GSM Burglar Alarm Systems</h2>
@@ -124,7 +124,7 @@ const AlarmPage = ({ onNavigate }) => {
             </div>
             <div className="split-image">
               <div className="image-frame warning">
-                <img src="/assets/service/fire_alarm_system.webp" alt="Fire Alarm System" className="rounded-2xl shadow-xl" loading="lazy" decoding="async" />
+                <img src="/assets/service/fire-alarm-system1.webp" alt="Fire Alarm System" className="rounded-2xl shadow-xl" loading="lazy" decoding="async" />
               </div>
             </div>
           </div>
