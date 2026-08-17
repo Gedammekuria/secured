@@ -41,7 +41,7 @@ const CCTVPage = ({ onNavigate }) => {
       title: "Remote Access",
       desc: "Access your live feed and recordings from anywhere in the world via your smartphone.",
       icon: <PhoneIcon className="text-blue-500" />,
-      image: "/assets/service/Remote-access.webp"
+      image: "/assets/service/Camera-remote-view-home.webp"
     },
     {
       title: "Local NVR recording",

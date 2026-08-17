@@ -135,12 +135,12 @@ const defaultServices = [
       {
         title: "Outdoor Cameras",
         description: "Weatherproof Outdoor cameras with night vision and motion detection. Covers driveways, gardens, and perimeters 24/7.",
-        image: "/assets/service/outdoor camera 1.webp"
+        image: "/assets/service/outdoor-camera-1.webp"
       },
       {
         title: "Indoor Cameras",
         description: "A wide-angle lenses and two-way audio. Monitor your home's interior from your smartphone.",
-        image: "/assets/service/indoor camera 1.webp"
+        image: "/assets/service/indoor-camera-1.webp"
       },
       {
         title: "Remote Access",
@@ -158,7 +158,7 @@ const defaultServices = [
       {
         title: "Ajax Alarm System",
         description: "It is a wireless security technology that protects against intrusion, fire, and flooding. It's the most awarded and reliable smart home/commercial security solutions.",
-        image: "/assets/service/ajax detector.webp"
+        image: "/assets/service/ajax-detector.webp"
       },
       {
         title: "GSM Burglare alarm System",
@@ -181,7 +181,7 @@ const defaultServices = [
       {
         title: "Ring Video Doorbell",
         description: "See, hear, and speak to visitors from your phone anywhere in the world. HD video, motion alerts, night vision and two-way talk — all in one smart doorbell.",
-        image: "/assets/service/ring_doorbell.webp"
+        image: "/assets/service/ring-doorbell1.webp"
       },
       {
         title: "Biometric Smart Video Door Lock",
@@ -191,7 +191,7 @@ const defaultServices = [
       {
         title: "Smart Glass Door Lock",
         description: "Secure frameless glass doors with powerful electromagnetic locks, RFID/PIN access, full audit trail logging and tamper alarms. Ideal for offices and commercial spaces.",
-        image: "/assets/service/smart_glass_door_lock.webp"
+        image: "/assets/service/smart-glass-doorlock.webp"
       }
     ]
   }
@@ -433,7 +433,7 @@ async function initDb() {
       CREATE INDEX IF NOT EXISTS idx_projects_show_on_home ON projects(show_on_home) WHERE show_on_home = true;
     `);
 
-    // Seed services — insert any missing ones (by category name)
+    // Seed/sync services — insert any missing, and always update cards to latest defaults
     for (const s of defaultServices) {
       const existing = await pool.query('SELECT id FROM services WHERE category = $1;', [s.category]);
       if (existing.rows.length === 0) {
@@ -441,6 +441,12 @@ async function initDb() {
         await pool.query(
           'INSERT INTO services (category, icon, tagline, cards) VALUES ($1, $2, $3, $4);',
           [s.category, s.icon, s.tagline, JSON.stringify(s.cards)]
+        );
+      } else {
+        // Always sync cards and tagline to match current defaultServices (keeps image paths up to date)
+        await pool.query(
+          'UPDATE services SET cards = $1, tagline = $2 WHERE category = $3;',
+          [JSON.stringify(s.cards), s.tagline, s.category]
         );
       }
     }

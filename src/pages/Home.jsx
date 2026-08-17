@@ -81,7 +81,7 @@ const SERVICES_DATA = [
       {
         title: "Smart Glass Door Lock",
         description: "Secure frameless glass doors with powerful electromagnetic locks, RFID/PIN access, full audit trail logging and tamper alarms. Ideal for offices and commercial spaces.",
-        image: "/assets/service/glass-doorlock.webp"
+        image: "/assets/service/smart-glass-doorlock.webp"
       }
     ]
   }
@@ -145,7 +145,7 @@ const Partners = () => {
 
 
 // Bump this version any time the service list is updated to bust stale sessionStorage cache
-const CACHE_KEY = 'safehive_services_cache_v5';
+const CACHE_KEY = 'safehive_services_cache_v8';
 
 const Services = ({ onNavigate, onQuoteOpen }) => {
   const [servicesList, setServicesList] = useState(SERVICES_DATA);

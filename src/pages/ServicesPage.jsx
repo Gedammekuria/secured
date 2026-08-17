@@ -107,7 +107,7 @@ const ServicesPage = ({ onNavigate }) => {
             </div>
             <div className="split-image">
               <div className="image-frame">
-                <img src="/assets/service/ajax-control.webp" alt="Smart Alarm Systems" loading="lazy" />
+                <img src="/assets/service/ajax-detector.webp" alt="Smart Alarm Systems" loading="lazy" />
                 <div className="image-overlay-accent warning"></div>
               </div>
             </div>
@@ -123,7 +123,7 @@ const ServicesPage = ({ onNavigate }) => {
           <div className="split-row">
             <div className="split-image">
               <div className="image-frame">
-                <img src="/assets/service/Smart_Door_lock.jpg" alt="Smart Door Lock Systems" loading="lazy" />
+                <img src="/assets/service/smart-doorlock-services.webp" alt="Smart Door Lock Systems" loading="lazy" />
                 <div className="image-overlay-accent"></div>
               </div>
             </div>

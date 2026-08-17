@@ -56,20 +56,41 @@ async function fixImages() {
             const cards = Array.isArray(svc.cards) ? svc.cards : JSON.parse(svc.cards);
             let changed = false;
             const fixedCards = cards.map(card => {
-                let newImg = serviceCardImageFixes[card.image];
+                let newImg = card.image;
                 let updatedTitle = card.title;
-                if (card.title === 'Remote Access') {
+
+                // Step 1: Apply map-based image path fixes (handles spaces/underscores)
+                if (serviceCardImageFixes[card.image]) {
+                    newImg = serviceCardImageFixes[card.image];
+                }
+
+                // Step 2: Apply title-based overrides (always enforce correct image per card type)
+                if (card.title === 'Remote Access' || card.title === 'Outdoor Cameras' && false) {
+                    // Remote Access always gets the correct camera remote view image
                     newImg = '/assets/service/Camera-remote-view-home.webp';
                 } else if (card.title === 'Biometric Smart Video Door Lock') {
                     newImg = '/assets/service/Smart-doorlock-home.webp';
                 } else if (card.title.toLowerCase().includes('fire alarm')) {
                     newImg = '/assets/service/fire-alarm-system1.webp';
                     updatedTitle = 'Fire alarm System';
+                } else if (card.title === 'Outdoor Cameras') {
+                    newImg = '/assets/service/outdoor-camera-1.webp';
+                } else if (card.title === 'Indoor Cameras') {
+                    newImg = '/assets/service/indoor-camera-1.webp';
+                } else if (card.title === 'Ajax Alarm System') {
+                    newImg = '/assets/service/ajax-detector.webp';
+                } else if (card.title === 'Ring Video Doorbell') {
+                    newImg = '/assets/service/ring-doorbell1.webp';
+                } else if (card.title === 'Smart Glass Door Lock') {
+                    newImg = '/assets/service/smart-glass-doorlock.webp';
+                } else if (card.title === 'GSM Burglare alarm System') {
+                    newImg = '/assets/service/burglar.webp';
                 }
-                if ((newImg && newImg !== card.image) || updatedTitle !== card.title) {
-                    console.log(`  ✅ ${svc.category} / "${card.title}": ${card.image} → ${newImg || card.image} (${updatedTitle})`);
+
+                if (newImg !== card.image || updatedTitle !== card.title) {
+                    console.log(`  ✅ ${svc.category} / "${card.title}": ${card.image} → ${newImg}`);
                     changed = true;
-                    return { ...card, title: updatedTitle, image: newImg || card.image };
+                    return { ...card, title: updatedTitle, image: newImg };
                 }
                 return card;
             });
