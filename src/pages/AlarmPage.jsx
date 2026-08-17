@@ -124,7 +124,7 @@ const AlarmPage = ({ onNavigate }) => {
             </div>
             <div className="split-image">
               <div className="image-frame warning">
-                <img src="/assets/service/Fire-alarm-system.webp" alt="Fire Alarm System" className="rounded-2xl shadow-xl" loading="lazy" decoding="async" />
+                <img src="/assets/service/Fire-alarm-system-service.webp" alt="Fire Alarm System" className="rounded-2xl shadow-xl" loading="lazy" decoding="async" />
               </div>
             </div>
           </div>
