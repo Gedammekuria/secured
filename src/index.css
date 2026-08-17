@@ -1,15 +1,15 @@
 :root {
-  --primary: #e25822;
-  --primary-hover: #ff7500;
+  --primary: #d84c17;
+  --primary-hover: #be3e0c;
   --secondary: #0a2540;
   --accent: #00d4ff;
-  --text-main: #425466;
-  --text-dark: #0a2540;
-  --bg-light: #f6f9fc;
+  --text-main: #334155;
+  --text-dark: #0f172a;
+  --bg-light: #f8fafc;
   --white: #ffffff;
 
-  --font-sans: 'Inter', 'Segoe UI', Roboto, sans-serif;
-  --font-display: Arial, sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-display: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);

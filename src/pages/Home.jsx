@@ -89,36 +89,43 @@ const SERVICES_DATA = [
 const Hero = ({ onNavigate, onQuoteOpen, onViewServicesClick }) => {
   return (
     <section className="hero">
-      <div className="hero-bg-image"></div>
+      <img
+        src="/hero page.webp"
+        alt="SafeHive Security Solutions Hero Banner"
+        className="hero-bg-img"
+        fetchPriority="high"
+        decoding="async"
+        width={1920}
+        height={1080}
+      />
       <div className="hero-overlay"></div>
       <div className="container hero-content animate-fade-up">
         <div className="hero-text">
           <h1>Secure Your Property.</h1>
           <p>Professional installation of security cameras, alarm and Smart Doorlock systems.</p>
           <div className="hero-btns">
-            {/*<button onClick={onQuoteOpen} className="btn-primary">Request now <ArrowRight size={16} /></button>*/}
             <a href="#services" className="btn-primary" onClick={(e) => { e.preventDefault(); onViewServicesClick ? onViewServicesClick() : onNavigate('services'); }}>
               View Our Services <ArrowRight size={16} />
             </a>
           </div>
         </div>
       </div>
-    </section >
+    </section>
   );
 };
 
 const Partners = () => {
   const logos = [
-    { src: '/assets/partners/Dahua.webp', height: 50, width: 'auto', alt: 'Dahua Technology — CCTV Partner' },
-    { src: '/assets/partners/Hikvision.webp', height: 110, width: 'auto', alt: 'Hikvision — Security Camera Partner' },
-    { src: '/assets/partners/WD-Logo-removebg-preview.webp', height: 55, width: 'auto', alt: 'Western Digital — Storage Partner' },
-    { src: '/assets/partners/ajax.webp', height: 36, width: 'auto', alt: 'Ajax Systems — Alarm System Partner' },
-    { src: '/assets/partners/tp-link.webp', height: 50, width: 'auto', alt: 'TP-Link — Networking Partner' },
-    { src: '/assets/partners/unifi.webp', height: 36, width: 'auto', alt: 'Ubiquiti UniFi — Network Partner' },
+    { src: '/assets/partners/Dahua.webp', height: 50, width: 160, alt: 'Dahua Technology — CCTV Partner' },
+    { src: '/assets/partners/Hikvision.webp', height: 110, width: 160, alt: 'Hikvision — Security Camera Partner' },
+    { src: '/assets/partners/WD-Logo-removebg-preview.webp', height: 55, width: 160, alt: 'Western Digital — Storage Partner' },
+    { src: '/assets/partners/ajax.webp', height: 36, width: 160, alt: 'Ajax Systems — Alarm System Partner' },
+    { src: '/assets/partners/tp-link.webp', height: 50, width: 160, alt: 'TP-Link — Networking Partner' },
+    { src: '/assets/partners/unifi.webp', height: 36, width: 160, alt: 'Ubiquiti UniFi — Network Partner' },
   ];
 
   return (
-    <div className="partners-section" aria-label="Our trusted security technology partners">
+    <section className="partners-section" aria-label="Our trusted security technology partners">
       <div className="container">
         <div className="marquee">
           <div className="marquee-content">
@@ -130,16 +137,15 @@ const Partners = () => {
                   width={160}
                   height={logo.height}
                   style={{ height: `${logo.height}px`, width: 'auto', maxWidth: '160px' }}
-                  loading={index < 6 ? 'eager' : 'lazy'}
+                  loading="lazy"
                   decoding="async"
-                  fetchPriority={index < 6 ? 'high' : 'auto'}
                 />
               </div>
             ))}
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
@@ -494,7 +500,7 @@ const FeaturedProjects = ({ onNavigate, onSelectProject }) => {
     <section className="featured-projects-home why-choose-us" style={{ background: '#f8fafc', paddingTop: '80px', paddingBottom: '80px', borderTop: '1px solid #e2e8f0' }}>
       <div className="container animate-fade-up">
         <div className="section-header">
-          <span className="pill" style={{ backgroundColor: '#eef2ff', color: '#635bff' }}>Projects</span>
+          <span className="pill" style={{ backgroundColor: '#eef2ff', color: '#4f46e5' }}>Projects</span>
           <h2>Featured Completed Projects</h2>
           <p>Explore some of our premium security setups deployed successfully.</p>
         </div>
@@ -520,7 +526,7 @@ const FeaturedProjects = ({ onNavigate, onSelectProject }) => {
                 </div>
               </button>
               <div className="portfolio-content p-5 flex-1 d-flex flex-column" style={{ padding: '24px' }}>
-                <div className="d-flex align-items-center gap-2 text-primary mb-2" style={{ fontSize: '13px', fontWeight: '700', color: '#635bff' }}>
+                <div className="d-flex align-items-center gap-2 text-primary mb-2" style={{ fontSize: '13px', fontWeight: '700', color: '#4f46e5' }}>
                   <MapPin size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} /> {project.location}
                 </div>
                 <h3 className="font-weight-bold mb-3" style={{ fontSize: '18px', color: '#0a2540', lineHeight: '1.4', margin: '8px 0' }}>{project.title}</h3>

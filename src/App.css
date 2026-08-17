@@ -1006,11 +1006,27 @@
   display: flex;
   align-items: center;
   margin-top: var(--nav-height);
-  /* Offset for the fixed navbar */
   overflow: hidden;
-  background: linear-gradient(rgba(24, 24, 24, 0.5), rgba(139, 218, 224, 0.2)), url('/hero page.webp');
-  background-size: cover;
-  background-position: right center;
+  background-color: #0f172a;
+}
+
+.hero-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: right center;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.4) 60%, rgba(15, 23, 42, 0.2) 100%);
+  z-index: 1;
+  pointer-events: none;
 }
 
 /* Gradient blur: strong blur on the left fading to zero on the right */
@@ -4482,5 +4498,19 @@
 
 .hexagon:hover {
   color: var(--primary);
+}
 
+/* Mobile Hardware Acceleration & Rendering Optimization */
+@media (max-width: 768px) {
+  .hero-bg-img,
+  .marquee-content,
+  .hero-content {
+    will-change: transform;
+    transform: translateZ(0);
+  }
+
+  .hero::before {
+    backdrop-filter: blur(2px) !important;
+    -webkit-backdrop-filter: blur(2px) !important;
+  }
 }
