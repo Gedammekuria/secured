@@ -125,6 +125,14 @@ const Navbar = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Auto-expand Services and Projects sub-menus when mobile menu opens
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      setMobileServicesOpen(true);
+      setMobileProjectsOpen(true);
+    }
+  }, [mobileMenuOpen, setMobileServicesOpen]);
+
   useEffect(() => {
     if (!megaMenuVisible) return;
 
