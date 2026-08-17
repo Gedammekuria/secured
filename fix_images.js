@@ -9,7 +9,7 @@ const projectImageFixes = [
     { id_title: 'Amstel Frozen Foods CCTV Installation ', newImage: '/assets/service/amstel_frozen_foods.webp' },
     { id_title: 'Jotun Fire Alarm System', newImage: '/assets/service/fire-alarm-control-system.webp' },
     { id_title: 'Ethiopian Insurance Corporation Fire Alarm', newImage: '/assets/service/fire-alarm-installation.webp' },
-    { id_title: 'Ethiopian Insurance Corporation Door Lock', newImage: '/assets/service/smart-doorlock.webp' },
+    { id_title: 'Ethiopian Insurance Corporation Door Lock', newImage: '/assets/service/smart-door-lock-installation.webp' },
 ];
 
 // Maps old service card image paths → correct actual file paths
@@ -56,11 +56,20 @@ async function fixImages() {
             const cards = Array.isArray(svc.cards) ? svc.cards : JSON.parse(svc.cards);
             let changed = false;
             const fixedCards = cards.map(card => {
-                const newImg = serviceCardImageFixes[card.image];
-                if (newImg && newImg !== card.image) {
-                    console.log(`  ✅ ${svc.category} / "${card.title}": ${card.image} → ${newImg}`);
+                let newImg = serviceCardImageFixes[card.image];
+                let updatedTitle = card.title;
+                if (card.title === 'Remote Access') {
+                    newImg = '/assets/service/Camera-remote-view-home.webp';
+                } else if (card.title === 'Biometric Smart Video Door Lock') {
+                    newImg = '/assets/service/Smart-doorlock-home.webp';
+                } else if (card.title.toLowerCase().includes('fire alarm')) {
+                    newImg = '/assets/service/fire-alarm-system1.webp';
+                    updatedTitle = 'Fire alarm System';
+                }
+                if ((newImg && newImg !== card.image) || updatedTitle !== card.title) {
+                    console.log(`  ✅ ${svc.category} / "${card.title}": ${card.image} → ${newImg || card.image} (${updatedTitle})`);
                     changed = true;
-                    return { ...card, image: newImg };
+                    return { ...card, title: updatedTitle, image: newImg || card.image };
                 }
                 return card;
             });

@@ -37,7 +37,7 @@ const SERVICES_DATA = [
       {
         title: "Remote Access",
         description: "You can monitor any incident on your property remotely from your smartphone anywhere in the world",
-        image: "/assets/service/mobile-view.webp"
+        image: "/assets/service/Camera-remote-view-home.webp"
       },
     ]
   },
@@ -57,9 +57,9 @@ const SERVICES_DATA = [
         image: "/assets/service/burglar.webp"
       },
       {
-        title: "Fire alarm detector",
+        title: "Fire alarm System",
         description: "Protect your commercial infrastructure with high-precision, addressable smoke detectors designed for early thermal and particle detection. ",
-        image: "/assets/service/fire_alarm_system.webp"
+        image: "/assets/service/fire-alarm-system1.webp"
       }
     ]
   },
@@ -76,7 +76,7 @@ const SERVICES_DATA = [
       {
         title: "Biometric Smart Video Door Lock",
         description: "Fingerprint, PIN, RFID card and mobile app access with a built-in camera that captures every entry attempt. The ultimate in residential and office access control.",
-        image: "/assets/service/smart-doorlock.webp"
+        image: "/assets/service/Smart-doorlock-home.webp"
       },
       {
         title: "Smart Glass Door Lock",
@@ -145,7 +145,7 @@ const Partners = () => {
 
 
 // Bump this version any time the service list is updated to bust stale sessionStorage cache
-const CACHE_KEY = 'safehive_services_cache_v2';
+const CACHE_KEY = 'safehive_services_cache_v5';
 
 const Services = ({ onNavigate, onQuoteOpen }) => {
   const [servicesList, setServicesList] = useState(SERVICES_DATA);

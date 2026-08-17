@@ -155,7 +155,7 @@ const defaultServices = [
       {
         title: "Remote Access",
         description: "You can view any incidence from your property by using  smartphone everywhere remotely.",
-        image: "/assets/service/mobile-view.webp"
+        image: "/assets/service/Camera-remote-view-home.webp"
       }
     ]
   },
@@ -178,7 +178,7 @@ const defaultServices = [
       {
         title: "Fire Alarm System",
         description: "Life-safety fire detection system featuring addressable control panels, photoelectric smoke detectors, heat detectors, manual break-glass call points, and building-wide sounders. Designed to comply with Ethiopian fire safety standards.",
-        image: "/assets/service/fire-alarm-system.webp"
+        image: "/assets/service/fire-alarm-system1.webp"
       }
     ]
   },
@@ -196,7 +196,7 @@ const defaultServices = [
       {
         title: "Biometric Smart Video Door Lock",
         description: "Fingerprint, PIN, RFID card and mobile app access \u2014 with a built-in camera that captures every entry attempt. The ultimate in residential and office access control.",
-        image: "/assets/service/smart-doorlock.webp"
+        image: "/assets/service/Smart-doorlock-home.webp"
       },
       {
         title: "Smart Glass Door Lock",

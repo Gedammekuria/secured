@@ -101,7 +101,7 @@ const PortfolioPage = ({ onSelectProject, onNavigate }) => {
     window.scrollTo(0, 0);
 
     // Show cached data immediately for fast render, but always re-fetch to get latest
-    const cachedProjects = sessionStorage.getItem('safehive_all_projects_cache');
+    const cachedProjects = sessionStorage.getItem('safehive_all_projects_cache_v3');
     if (cachedProjects) {
       try {
         const parsed = JSON.parse(cachedProjects);
@@ -119,7 +119,7 @@ const PortfolioPage = ({ onSelectProject, onNavigate }) => {
       })
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
-          sessionStorage.setItem('safehive_all_projects_cache', JSON.stringify(data));
+          sessionStorage.setItem('safehive_all_projects_cache_v3', JSON.stringify(data));
           setProjectsList(data);
         }
       })

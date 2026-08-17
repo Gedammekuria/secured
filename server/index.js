@@ -145,7 +145,7 @@ const defaultServices = [
       {
         title: "Remote Access",
         description: "You can view any incidence from your property by using  smartphone everywhere remotely.",
-        image: "/assets/service/mobile view.webp"
+        image: "/assets/service/Camera-remote-view-home.webp"
       }
     ]
   },
@@ -168,7 +168,7 @@ const defaultServices = [
       {
         title: "Fire Alarm System",
         description: "Life-safety fire detection system featuring addressable control panels, photoelectric smoke detectors, heat detectors, manual break-glass call points, and building-wide sounders. Designed to comply with Ethiopian fire safety standards.",
-        image: "/assets/service/fire_alarm_system.webp"
+        image: "/assets/service/fire-alarm-system1.webp"
       }
     ]
   },
@@ -186,7 +186,7 @@ const defaultServices = [
       {
         title: "Biometric Smart Video Door Lock",
         description: "Fingerprint, PIN, RFID card and mobile app access — with a built-in camera that captures every entry attempt. The ultimate in residential and office access control.",
-        image: "/assets/service/biometric_door_lock.webp"
+        image: "/assets/service/Smart-doorlock-home.webp"
       },
       {
         title: "Smart Glass Door Lock",
@@ -291,7 +291,7 @@ const defaultProjects = [
     full_detail: "Following the fire alarm project, Ethiopian Insurance Corporation engaged us to upgrade access control across their headquarters. We installed Biometric Smart Video Door Locks on the executive floor, server room, and records vault. Each lock supports fingerprint recognition, PIN code, and RFID card access, with a built-in camera capturing every entry attempt. Management receives real-time alerts for unrecognised access attempts and can remotely lock or unlock any door via the mobile app.",
     benefit: ["Biometric fingerprint access", "Built-in entry camera", "Remote lock/unlock via app", "Real-time intrusion alerts", "RFID and PIN backup access", "Complete access audit trail"],
     category: "Smart Door Locks",
-    image: "/assets/service/eic_door_lock.webp",
+    image: "/assets/service/smart-door-lock-installation.webp",
     show_on_home: false
   }
 ];
