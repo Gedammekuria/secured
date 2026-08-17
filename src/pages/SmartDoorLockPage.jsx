@@ -118,7 +118,7 @@ const SmartDoorLockPage = ({ onNavigate }) => {
             <div className="split-image">
               <div className="image-frame">
                 <img
-                  src="/assets/service/smart-doorlock.webp"
+                  src="/assets/service/smart-doorlock-services.webp"
                   alt="Biometric Smart Video Door Lock"
                   width={600}
                   height={450}
