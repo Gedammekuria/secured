@@ -2131,7 +2131,7 @@
   .service-mobile-gallery {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: 20px;
     animation: fadeIn 0.6s ease-out;
   }
 
@@ -2142,6 +2142,42 @@
 
     .gallery-card {
       height: 300px;
+    }
+  }
+
+  /* Specific Tablet Enhancements (641px - 1024px) */
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .services-gallery {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 24px !important;
+    }
+
+    .service-mobile-gallery {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 24px !important;
+    }
+
+    .gallery-card {
+      height: 300px !important;
+    }
+
+    .gallery-card:hover .gallery-desc,
+    .gallery-card:active .gallery-desc,
+    .gallery-card:focus-within .gallery-desc {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+      pointer-events: all !important;
+    }
+
+    .gallery-desc p {
+      font-size: 13.5px !important;
+      line-height: 1.5 !important;
+      margin-bottom: 14px !important;
+    }
+
+    .process-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 24px !important;
     }
   }
 

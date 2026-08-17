@@ -46,6 +46,13 @@ export default defineConfig({
           if (id.includes('/pages/ContactPage')) return 'page-contact';
           if (id.includes('/pages/QuotePage')) return 'page-quote';
           if (id.includes('/pages/AdminPage')) return 'page-admin';
+          if (id.includes('/pages/CCTVPage')) return 'page-cctv';
+          if (id.includes('/pages/AlarmPage')) return 'page-alarm';
+          if (id.includes('/pages/SmartDoorLockPage')) return 'page-doorlock';
+          if (id.includes('/pages/PortfolioPage')) return 'page-portfolio';
+          if (id.includes('/pages/FAQPage')) return 'page-faq';
+          if (id.includes('/pages/BlogPage')) return 'page-blog';
+          if (id.includes('/pages/AboutPage')) return 'page-about';
         },
       },
     },

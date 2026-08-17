@@ -432,6 +432,37 @@
   gap: 32px;
 }
 
+@media (min-width: 641px) and (max-width: 1024px) {
+  .content-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 24px !important;
+  }
+
+  .portfolio-card .portfolio-content {
+    padding: 24px !important;
+  }
+
+  .portfolio-card .portfolio-image-wrapper {
+    height: 220px !important;
+  }
+
+  .portfolio-card h3 {
+    font-size: 20px !important;
+    line-height: 1.35 !important;
+  }
+
+  .portfolio-card p {
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    margin-bottom: 16px !important;
+  }
+
+  .portfolio-card .mt-auto button {
+    padding: 10px 10px !important;
+    font-size: 13px !important;
+  }
+}
+
 @media (max-width: 768px) {
   .display-4 {
     font-size: 2.2rem !important;
